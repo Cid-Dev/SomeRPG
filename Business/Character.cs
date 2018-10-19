@@ -12,7 +12,7 @@ namespace Business
         private int _baseHP;
         private int _baseCooldown;
         private int _level = 1;
-        private int _currentExp = 0;
+        protected int _currentExp = 0;
         private int _baseExp = 16;
         private int _givenExp = 4;
         private float expMultiplier = 1.5F;
@@ -21,6 +21,8 @@ namespace Business
         private float maxAttackMultiplier = 1.1F;
 
         public string Name { get; set; }
+        public int Level{ get => _level; set => _level = value; }
+        public int GivenExp { get => _givenExp; set => _givenExp = value; }
         public int CurrentHP { get; set; }
         public int BaseHP
         {
@@ -130,9 +132,9 @@ namespace Business
             return (report);
         }
 
-        public string Stats()
+        public virtual string Stats()
         {
-            string result = "=== Name : " + Name + " === HP : " + CurrentHP + "/" + BaseHP + " === Damages : " + CurrentMinAttack + " - " + CurrentMaxAttack + " === Level : " + _level + " === Exp : " + _currentExp + "/" + getRequiredExp + " ===\n";
+            string result = "=== Name : " + Name + " === HP : " + BaseHP + " === Damages : " + CurrentMinAttack + " - " + CurrentMaxAttack + " === Level : " + _level + " ===\n";
 
             return (result);
         }
