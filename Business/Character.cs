@@ -8,9 +8,9 @@ namespace Business
 {
     public class Character
     {
-        private Random seed = new Random();
+        protected Random seed = new Random();
         private int _baseHP;
-        private int _baseCooldown;
+        protected int _baseCooldown;
         private int _level = 1;
         protected int _currentExp = 0;
         private int _baseExp = 16;
@@ -86,7 +86,7 @@ namespace Business
             }
         }
 
-        private string setExp(int exp)
+        protected string setExp(int exp)
         {
             string result = "";
 
@@ -108,6 +108,11 @@ namespace Business
             return (result);
         }
 
+        public void Heal(int amount)
+        {
+            CurrentHP = ((CurrentHP + amount > BaseHP) ? (BaseHP) : (CurrentHP + amount));
+        }
+
         public int Defend(int damage)
         {
             CurrentHP -= damage;
@@ -116,7 +121,7 @@ namespace Business
             return (CurrentHP);
         }
 
-        public string Attack()
+        public virtual string Attack()
         {
             string report;
             CurrentCooldown = _baseCooldown;
@@ -125,10 +130,7 @@ namespace Business
             report = Name + " attacked " + Target.Name + " and dealt " + damage + " damage.\n";
             report += Target.Name + " has " + TargetHP + " HP remaining.\n";
             if (TargetHP <= 0)
-            {
-                report += "You killed " + Target.Name + " and have earned " + Target.getGivenExp + " exp\n";
-                report += setExp(Target.getGivenExp);
-            }
+                report += Name + " killed " + Target.Name;
             return (report);
         }
 

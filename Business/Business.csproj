@@ -41,6 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Character.cs" />
+    <Compile Include="HPPotion.cs" />
+    <Compile Include="IStackable.cs" />
+    <Compile Include="Item.cs" />
+    <Compile Include="IUsable.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

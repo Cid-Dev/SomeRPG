@@ -2,31 +2,158 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using Business;
 
 namespace SomeRPG
 {
     class Program
     {
-        static Character player;
+        static Player player;
 
-        static void Fight(Character monster)
+        static void DisplayFightInfos(Character monster)
         {
             Console.Clear();
             Console.WriteLine(player.Stats());
             Console.WriteLine("You are fighting a monster !");
             Console.WriteLine(monster.Stats());
+            string action = "=== " + player.Name + " : " + player.CurrentCooldown + " === " + monster.Name + " : " + monster.CurrentCooldown + " ===";
+        }
+
+        static void OpenInventory(Character monster)
+        {
+            bool back = false;
+            
+            while (!back)
+            {
+                string input = "";
+                int i = 1;
+                string options = "Inventory :\n";
+                List<IUsable> usables = null;
+                usables = new List<IUsable>();
+                do
+                {
+                    foreach (Item item in player.Inventory)
+                    {
+                        if (item is IUsable)
+                        {
+                            string stack = "";
+                            if (item is IStackable)
+                            {
+                                var stackable = item as IStackable;
+                                stack = "(" + stackable.Quantity + "/" + stackable.MaxAmount + ") ";
+                            }
+                            options += "[" + i++ + "] " + item.Name + " " + stack + ": " + item.Description + "\n";
+                            usables.Add(item as IUsable);
+                        }
+                    }
+
+                    DisplayFightInfos(monster);
+                    if (usables.Count > 0)
+                    {
+                        Console.WriteLine(options);
+                        Console.WriteLine("Please select a number or go [[B]ack]");
+                    }
+                    else
+                        Console.WriteLine("No usables items in inventory. Please go [[B]ack]");
+                    input = Console.ReadLine();
+                } while (!Regex.IsMatch(input, "^([0-9]+)|(b(ack)?)$", RegexOptions.IgnoreCase));
+
+
+                if (int.TryParse(input, out int result))
+                {
+                    if (result > 0 && result <= usables.Count)
+                    {
+                        --result;
+                        ConsoleKeyInfo menu;
+                        do
+                        {
+                            DisplayFightInfos(monster);
+                            Console.WriteLine("Please select a target for " + (usables[result] as Item).Name);
+                            Console.WriteLine("[Y]ourself. [M]onster. [B]ack");
+                            menu = Console.ReadKey();
+                        } while (menu.Key != ConsoleKey.Y
+                                 && menu.Key != ConsoleKey.M
+                                 && menu.Key != ConsoleKey.B);
+
+                        Character target = null;
+
+                        switch (menu.Key)
+                        {
+                            case (ConsoleKey.Y):
+                                target = player;
+                                break;
+
+                            case (ConsoleKey.M):
+                                target = monster;
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                        if (target != null)
+                        {
+                            usables[result].Use(target);
+                            if (usables[result] is IStackable)
+                            {
+                                var stackable = usables[result] as IStackable;
+                                if (stackable.Quantity <= 0)
+                                    player.Inventory.Remove(stackable as Item);
+                            }
+                            else
+                                player.Inventory.Remove(usables[result] as Item);
+                        }
+                    }
+                }
+                else
+                    back = true;
+            }
+        }
+
+        static bool selectAction(Character monster)
+        {
+            ConsoleKeyInfo menu;
+            do
+            {
+                DisplayFightInfos(monster);
+                Console.WriteLine("Select your action");
+                Console.WriteLine("[A]ttack. [I]nventory. [F]lee like a coward");
+                menu = Console.ReadKey();
+            } while (menu.Key != ConsoleKey.A
+                     && menu.Key != ConsoleKey.I
+                     && menu.Key != ConsoleKey.F);
+
+            switch (menu.Key)
+            {
+                case (ConsoleKey.A):
+                    Console.WriteLine(player.Attack());
+                    return (false);
+
+                case (ConsoleKey.I):
+                    OpenInventory(monster);
+                    return (false);
+
+                default:
+                    return (true);
+            }
+        }
+
+        static void Fight(Character monster)
+        {
             player.Target = monster;
             monster.Target = player;
-            while (player.CurrentHP > 0 && monster.CurrentHP > 0)
+            bool hasFlee = false;
+            while (player.CurrentHP > 0 && monster.CurrentHP > 0 && !hasFlee)
             {
                 --player.CurrentCooldown;
                 --monster.CurrentCooldown;
+                DisplayFightInfos(monster);
                 if (player.CurrentCooldown <= 0)
-                    Console.WriteLine(player.Attack());
+                    hasFlee = selectAction(monster);
                 if (monster.CurrentCooldown <= 0)
                     Console.WriteLine(monster.Attack());
+                System.Threading.Thread.Sleep(500);
             }
             if (player.CurrentHP > 0 && monster.CurrentHP <= 0)
                 Console.WriteLine("Well done " + player.Name + ", you raped " + monster.Name + ".\nYou have " + player.CurrentHP + "HP remaining.");
@@ -34,6 +161,8 @@ namespace SomeRPG
                 Console.WriteLine("You really sux " + player.Name + ", you've been raped by " + monster.Name + ".\nIt has " + monster.CurrentHP + "HP remaining.");
             else if (monster.CurrentHP <= 0 && player.CurrentHP <= 0)
                 Console.WriteLine("HAHA " + player.Name + " and " + monster.Name + " killed each other");
+            else if (hasFlee)
+                Console.WriteLine("You flee like a coward. You are a chicken.");
             else
                 Console.WriteLine("If you see this message, both player and monster are alive and the program is buggy");
             Console.WriteLine("Press enter");
@@ -206,6 +335,20 @@ namespace SomeRPG
             } while (menu.Key != ConsoleKey.E);
         }
 
+        static string getName()
+        {
+            string name = "";
+            string pattern = "^[a-zA-Z]{3,}$";
+            while (!Regex.IsMatch(name, pattern))
+            {
+                Console.Clear();
+                Console.WriteLine("Enter your name");
+                name = Console.ReadLine();
+            }
+
+            return (name);
+        }
+
         static void Main(string[] args)
         {
             ConsoleKeyInfo startOVer;
@@ -213,12 +356,21 @@ namespace SomeRPG
             {
                 player = new Player
                 {
-                    Name = "Cid",
+                    Name = getName(),
                     BaseHP = 42,
                     BaseCooldown = 10,
                     BaseMinAttack = 5,
                     BaseMaxAttack = 10
                 };
+
+                player.Inventory.Add(new HPPotion
+                {
+                    Name = "Lesser Healing Potion",
+                    Description = "Heals 10 HPs",
+                    Amount = 10,
+                    MaxAmount = 50,
+                    Quantity = 20
+                });
 
                 Menu();
 
