@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DataAccess;
 
 namespace Business
 {
     public class Player : Character
     {
         public List<Item> Inventory = new List<Item>();
+        public uint Money { get; set; }
 
         public override string Attack()
         {

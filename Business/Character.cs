@@ -67,6 +67,8 @@ namespace Business
         }
         public Character Target { get; set; }
 
+        public int BaseExp { set => _baseExp = value; }
+
         public int getRequiredExp
         {
             get
@@ -136,7 +138,7 @@ namespace Business
 
         public virtual string Stats()
         {
-            string result = "=== Name : " + Name + " === HP : " + BaseHP + " === Damages : " + CurrentMinAttack + " - " + CurrentMaxAttack + " === Level : " + _level + " ===\n";
+            string result = "=== Name : " + Name + " === HP : " + CurrentHP + "/" + BaseHP + " === Damages : " + CurrentMinAttack + " - " + CurrentMaxAttack + " === Level : " + _level + " ===\n";
 
             return (result);
         }

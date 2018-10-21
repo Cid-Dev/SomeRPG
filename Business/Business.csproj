@@ -45,8 +45,16 @@
     <Compile Include="IStackable.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="IUsable.cs" />
+    <Compile Include="Monster.cs" />
+    <Compile Include="Monsters.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
+      <Project>{5e6515e7-7496-4589-98ea-a1ada411fb8b}</Project>
+      <Name>DataAccess</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

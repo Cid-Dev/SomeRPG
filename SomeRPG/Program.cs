@@ -17,7 +17,7 @@ namespace SomeRPG
             Console.WriteLine(player.Stats());
             Console.WriteLine("You are fighting a monster !");
             Console.WriteLine(monster.Stats());
-            string action = "=== " + player.Name + " : " + player.CurrentCooldown + " === " + monster.Name + " : " + monster.CurrentCooldown + " ===";
+            Console.WriteLine("=== " + player.Name + " : " + player.CurrentCooldown + " === " + monster.Name + " : " + monster.CurrentCooldown + " ===");
         }
 
         static void OpenInventory(Character monster)
@@ -150,10 +150,21 @@ namespace SomeRPG
                 --monster.CurrentCooldown;
                 DisplayFightInfos(monster);
                 if (player.CurrentCooldown <= 0)
+                {
                     hasFlee = selectAction(monster);
+                    if (!hasFlee)
+                    {
+                        Console.WriteLine("Press any key");
+                        Console.ReadKey();
+                    }
+                }
                 if (monster.CurrentCooldown <= 0)
+                {
                     Console.WriteLine(monster.Attack());
-                System.Threading.Thread.Sleep(500);
+                    Console.WriteLine("Press any key");
+                    Console.ReadKey();
+                }
+                System.Threading.Thread.Sleep(100);
             }
             if (player.CurrentHP > 0 && monster.CurrentHP <= 0)
                 Console.WriteLine("Well done " + player.Name + ", you raped " + monster.Name + ".\nYou have " + player.CurrentHP + "HP remaining.");
@@ -214,67 +225,53 @@ namespace SomeRPG
         static void selectMonster()
         {
             ConsoleKeyInfo menu;
-            do
+            Monsters monsters;
+            try
             {
+                monsters = new Monsters();
+                bool back = false;
+                string error = "";
                 do
                 {
-                    Console.Clear();
-                    Console.WriteLine(player.Stats());
-                    Console.WriteLine("Select your monster");
-                    Console.WriteLine("[N]oob (easy). [R]egular (normal) [V]eteran (hard) [B]ack");
-                    menu = Console.ReadKey();
-                } while (menu.Key != ConsoleKey.N
-                         && menu.Key != ConsoleKey.R
-                         && menu.Key != ConsoleKey.V
-                         && menu.Key != ConsoleKey.B);
+                    string input;
+                    do
+                    {
+                        int i = 1;
+                        string options = "";
+                        foreach (var monster in monsters)
+                            options += "[" + i++ + "] " + monster.Name + "\n";
+                        if (i > 1)
+                        {
+                            Console.Clear();
+                            Console.WriteLine(player.Stats());
+                            Console.WriteLine(options);
+                            if (error != "")
+                                Console.WriteLine(error);
+                            Console.WriteLine("Please select a monster or go [[B]ack]");
+                        }
+                        else
+                            Console.WriteLine("No monster. Please go [[B]ack]");
+                        input = Console.ReadLine();
+                    } while (!Regex.IsMatch(input, "^(([0-9]+)|(b(ack)?))$", RegexOptions.IgnoreCase));
 
-                Character noob = new Character
-                {
-                    Name = "Noob",
-                    BaseHP = 20,
-                    BaseCooldown = 15,
-                    BaseMinAttack = 2,
-                    BaseMaxAttack = 5,
-                    GivenExp = 5
-                };
+                    if (int.TryParse(input, out int result))
+                    {
+                        if (result > 0 && result <= monsters.Count)
+                        {
+                            Difficulty(monsters[--result]);
+                        }
+                        else
+                            error = "Invalid number.";
+                    }
+                    else
+                        back = true;
 
-                Character regular = new Character
-                {
-                    Name = "Regular",
-                    BaseHP = 40,
-                    BaseCooldown = 12,
-                    BaseMinAttack = 4,
-                    BaseMaxAttack = 8
-                };
-
-                Character veteran = new Character
-                {
-                    Name = "Veteran",
-                    BaseHP = 50,
-                    BaseCooldown = 10,
-                    BaseMinAttack = 6,
-                    BaseMaxAttack = 11,
-                    GivenExp = 3
-                };
-
-                switch (menu.Key)
-                {
-                    case ConsoleKey.N:
-                        Difficulty(noob);
-                        break;
-
-                    case ConsoleKey.R:
-                        Difficulty(regular);
-                        break;
-
-                    case ConsoleKey.V:
-                        Difficulty(veteran);
-                        break;
-
-                    default:
-                        break;
-                }
-            } while (menu.Key != ConsoleKey.B && player.CurrentHP > 0);
+                } while (!back && player.CurrentHP > 0);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error while getting the monster list : " + ex.Message);
+            }
         }
 
         static void Rest()
@@ -351,6 +348,7 @@ namespace SomeRPG
 
         static void Main(string[] args)
         {
+
             ConsoleKeyInfo startOVer;
             do
             {
