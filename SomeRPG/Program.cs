@@ -224,7 +224,6 @@ namespace SomeRPG
 
         static void selectMonster()
         {
-            ConsoleKeyInfo menu;
             Monsters monsters;
             try
             {
