@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -172,9 +173,9 @@ namespace SomeRPG
                 string loot = "";
                 foreach (var item in loots)
                 {
-                    player.AddItem(item);
                     var StackInfo = ((item is IStackable) ? ((item as IStackable).Quantity + " ") : (""));
                     loot += "\t" + StackInfo + item.Name + " : " + item.Description + "\n";
+                    player.AddItem(item);
                 }
                 Console.WriteLine("Well done " + player.Name + ", you raped " + monster.Name + ".\nYou have " + player.CurrentHP + "HP remaining.");
                 if (loot != "")
@@ -212,9 +213,9 @@ namespace SomeRPG
             {
                 case ConsoleKey.E:
                     monster.Level = ((difficulty - 5) > 0 ? (difficulty - 5) : (1));
-                    ++monster.GivenExp;
-                    Fight(monster);
                     --monster.GivenExp;
+                    Fight(monster);
+                    ++monster.GivenExp;
                     break;
 
                 case ConsoleKey.N:
@@ -224,9 +225,9 @@ namespace SomeRPG
 
                 case ConsoleKey.H:
                     monster.Level = difficulty + 5;
-                    --monster.GivenExp;
-                    Fight(monster);
                     ++monster.GivenExp;
+                    Fight(monster);
+                    --monster.GivenExp;
                     break;
 
                 default:
@@ -241,11 +242,11 @@ namespace SomeRPG
             Monsters monsters;
             try
             {
-                monsters = new Monsters();
                 bool back = false;
                 string error = "";
                 do
                 {
+                    monsters = new Monsters();
                     string input;
                     do
                     {
@@ -361,7 +362,6 @@ namespace SomeRPG
 
         static void Main(string[] args)
         {
-
             ConsoleKeyInfo startOVer;
             do
             {

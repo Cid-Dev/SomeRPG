@@ -14,8 +14,8 @@ namespace Business
         private int _level = 1;
         protected int _currentExp = 0;
         private int _baseExp = 16;
-        private int _givenExp = 4;
-        private float expMultiplier = 1.5F;
+        private int _givenExp = 16;
+        private float expMultiplier = 1.9F;
         private float hpMultiplier = 1.1F;
         private float minAttackMultiplier = 1.1F;
         private float maxAttackMultiplier = 1.1F;
@@ -73,10 +73,7 @@ namespace Business
         {
             get
             {
-                int givenXP = _baseExp;
-                for (int i = 1; i < _level; ++i)
-                    givenXP = (int)(givenXP * expMultiplier);
-                return (givenXP);
+                return ((int)Math.Round((double)_baseExp * Math.Pow((double)_level, (double)expMultiplier)));
             }
         }
 
@@ -84,7 +81,7 @@ namespace Business
         {
             get
             {
-                return ((int)(getRequiredExp / _givenExp));
+                return ((int)(_givenExp * _level));
             }
         }
 

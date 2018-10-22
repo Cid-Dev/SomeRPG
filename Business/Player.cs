@@ -37,7 +37,7 @@ namespace Business
                 }
             }
             if ((NewItem as IStackable).Quantity > 0)
-                Inventory.Add(NewItem);
+                Inventory.Add(NewItem.Clone() as Item);
         }
 
         public void AddItem(Item item)
@@ -45,7 +45,7 @@ namespace Business
             if (item is IStackable)
                 StackItem(item);
             else
-                Inventory.Add(item);
+                Inventory.Add(item.Clone() as Item);
         }
 
         public override string Attack()

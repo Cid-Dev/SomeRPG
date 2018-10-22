@@ -79,7 +79,6 @@ namespace DataAccess
                 });
             }
             Close();
-            Debug.WriteLine("toto");
             return (Monsters);
         }
     }
