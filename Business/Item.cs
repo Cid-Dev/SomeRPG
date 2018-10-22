@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace Business
 {
-    public class Item
+    public class Item : ICloneable
     {
         public string Name { get; set; }
         public string Description { get; set; }
+
+        public object Clone()
+        {
+            return (this.MemberwiseClone());
+        }
     }
 }

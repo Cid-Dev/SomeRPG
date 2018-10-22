@@ -21,7 +21,7 @@ namespace Business
                 {
                     foreach (var dalMonster in temp)
                     {
-                        Add(new Monster
+                        var monster = new Monster
                         {
                             Name = dalMonster?.GetType().GetProperty("Name")?.GetValue(dalMonster, null).ToString(),
                             BaseHP = int.Parse(dalMonster?.GetType().GetProperty("HP")?.GetValue(dalMonster, null).ToString()),
@@ -30,7 +30,12 @@ namespace Business
                             BaseCooldown = int.Parse(dalMonster?.GetType().GetProperty("BaseCoolDown")?.GetValue(dalMonster, null).ToString()),
                             GivenExp = int.Parse(dalMonster?.GetType().GetProperty("GivenExp")?.GetValue(dalMonster, null).ToString()),
                             BaseExp = int.Parse(dalMonster?.GetType().GetProperty("BaseExp")?.GetValue(dalMonster, null).ToString())
-                        });
+                        };
+
+                        monster.BuildLootTable(dalMonster?.GetType().GetProperty("LootTable")?.GetValue(dalMonster, null));
+
+                        Add(monster);
+
                     }
                 }
             }

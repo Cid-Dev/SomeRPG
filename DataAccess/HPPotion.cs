@@ -11,34 +11,20 @@ namespace DataAccess
 {
     public class HPPotion : DB
     {
-        //private string TableName = "hppotion";
-
         public List<object> GetHPPotionByName(string name)
         {
-            /*
-            string sql = "SELECT * FROM " + HPPotionTable + " h "
-                       + "INNER JOIN " + ItemTable + " i "
-                       + "ON h.item_id=i.id "
-                       + "WHERE i.name = '" + name + "' "
-                       + "LIMIT 1";*/
             List<object> HPPotion = new List<object>();
             using (m_dbConnection = new SQLiteConnection(ConnectionString))
             {
                 m_dbConnection.Open();
                 using (SQLiteCommand command = m_dbConnection.CreateCommand())
                 {
-
-                    //command.CommandText = "SELECT * FROM " + HPPotionTable;
                     command.CommandText = "SELECT * FROM " + HPPotionTable + " h "
                                         + "INNER JOIN " + ItemTable + " i "
                                         + "ON h.item_id=i.id "
                                         + "WHERE i.name = @name "
                                         + "LIMIT 1";
                     command.CommandType = CommandType.Text;
-                    //Open();
-                    //SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
-                    //command.Parameters.Add("@name", System.Data.DbType.String);
-                    //command.Parameters["@name"].Value = name;
                     command.Parameters.AddWithValue("@name", name);
                     SQLiteDataReader reader = command.ExecuteReader();
                     
@@ -53,7 +39,6 @@ namespace DataAccess
                             MaxAmount = reader["max_amount"]
                         });
                     }
-                    //Close();
                 }
             }
             return (HPPotion);

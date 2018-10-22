@@ -12,6 +12,42 @@ namespace Business
         public List<Item> Inventory = new List<Item>();
         public uint Money { get; set; }
 
+        private void StackItem(Item NewItem)
+        {
+            foreach (var item in Inventory)
+            {
+                if (item.Name == NewItem.Name
+                    && item is IStackable
+                    && (NewItem as IStackable).Quantity > 0)
+                {
+                    var stackable = item as IStackable;
+                    if (stackable.Quantity < stackable.MaxAmount)
+                    {
+                        if (stackable.Quantity + (NewItem as IStackable).Quantity <= stackable.MaxAmount)
+                        {
+                            stackable.Quantity += (NewItem as IStackable).Quantity;
+                            (NewItem as IStackable).Quantity = 0;
+                        }
+                        else
+                        {
+                            (NewItem as IStackable).Quantity -= (stackable.MaxAmount - stackable.Quantity);
+                            stackable.Quantity = stackable.MaxAmount;
+                        }
+                    }
+                }
+            }
+            if ((NewItem as IStackable).Quantity > 0)
+                Inventory.Add(NewItem);
+        }
+
+        public void AddItem(Item item)
+        {
+            if (item is IStackable)
+                StackItem(item);
+            else
+                Inventory.Add(item);
+        }
+
         public override string Attack()
         {
             string report;

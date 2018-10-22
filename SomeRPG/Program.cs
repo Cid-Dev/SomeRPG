@@ -139,7 +139,7 @@ namespace SomeRPG
             }
         }
 
-        static void Fight(Character monster)
+        static void Fight(Monster monster)
         {
             player.Target = monster;
             monster.Target = player;
@@ -167,7 +167,19 @@ namespace SomeRPG
                 System.Threading.Thread.Sleep(100);
             }
             if (player.CurrentHP > 0 && monster.CurrentHP <= 0)
+            {
+                var loots = monster.GetLoots();
+                string loot = "";
+                foreach (var item in loots)
+                {
+                    player.AddItem(item);
+                    var StackInfo = ((item is IStackable) ? ((item as IStackable).Quantity + " ") : (""));
+                    loot += "\t" + StackInfo + item.Name + " : " + item.Description + "\n";
+                }
                 Console.WriteLine("Well done " + player.Name + ", you raped " + monster.Name + ".\nYou have " + player.CurrentHP + "HP remaining.");
+                if (loot != "")
+                    Console.WriteLine("You've earned : \n" + loot);
+            }
             else if (monster.CurrentHP > 0 && player.CurrentHP <= 0)
                 Console.WriteLine("You really sux " + player.Name + ", you've been raped by " + monster.Name + ".\nIt has " + monster.CurrentHP + "HP remaining.");
             else if (monster.CurrentHP <= 0 && player.CurrentHP <= 0)
@@ -180,7 +192,7 @@ namespace SomeRPG
             Console.ReadLine();
         }
 
-        static int Difficulty(Character monster)
+        static int Difficulty(Monster monster)
         {
             int difficulty = player.Level;
             ConsoleKeyInfo menu;
@@ -202,6 +214,7 @@ namespace SomeRPG
                     monster.Level = ((difficulty - 5) > 0 ? (difficulty - 5) : (1));
                     ++monster.GivenExp;
                     Fight(monster);
+                    --monster.GivenExp;
                     break;
 
                 case ConsoleKey.N:
@@ -213,6 +226,7 @@ namespace SomeRPG
                     monster.Level = difficulty + 5;
                     --monster.GivenExp;
                     Fight(monster);
+                    ++monster.GivenExp;
                     break;
 
                 default:
