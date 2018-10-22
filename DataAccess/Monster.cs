@@ -10,12 +10,12 @@ namespace DataAccess
 {
     public class Monster : DB
     {
-        private string TableName = "monster";
+        //private string TableName = "monster";
         //private string TableName = "sqlite_master";
 
         public List<object> GetAll()
         {
-            string sql = "select * from " + TableName;
+            string sql = "select * from " + MonsterTable;
             Open();
             SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();

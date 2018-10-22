@@ -11,7 +11,11 @@ namespace DataAccess
 {
     public class DB
     {
-        string ConnectionString = null;
+        protected string MonsterTable = "monster";
+        protected string HPPotionTable = "hppotion";
+        protected string ItemTable = "item";
+
+        protected string ConnectionString = null;
         protected SQLiteConnection m_dbConnection = null;
 
         public DB()

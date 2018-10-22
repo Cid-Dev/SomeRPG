@@ -55,10 +55,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>65F93C179F51585C58CCF38D99D06A659722D55E</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>8B3FC8F5F6E8DF0D1BD5BEF5DFAC98334FE7DCB5</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>SomeRPG_1_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>SomeRPG_2_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -109,6 +109,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="SomeRPG_1_TemporaryKey.pfx" />
+    <None Include="SomeRPG_2_TemporaryKey.pfx" />
     <None Include="SomeRPG_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>

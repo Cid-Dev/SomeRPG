@@ -360,15 +360,19 @@ namespace SomeRPG
                     BaseMaxAttack = 10
                 };
 
-                player.Inventory.Add(new HPPotion
+                
+                try
                 {
-                    Name = "Lesser Healing Potion",
-                    Description = "Heals 10 HPs",
-                    Amount = 10,
-                    MaxAmount = 50,
-                    Quantity = 20
-                });
-
+                    player.Inventory.Add(new HPPotion("Lesser Healing Potion")
+                    {
+                        Quantity = 20
+                    });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                
                 Menu();
 
                 do
