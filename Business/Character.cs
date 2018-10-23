@@ -20,6 +20,12 @@ namespace Business
         private float minAttackMultiplier = 1.1F;
         private float maxAttackMultiplier = 1.1F;
 
+        #region gear
+
+        public RightHand RightHand { get; set; }
+
+        #endregion gear
+
         public string Name { get; set; }
         public int Level{ get => _level; set => _level = value; }
         public int GivenExp { get => _givenExp; set => _givenExp = value; }

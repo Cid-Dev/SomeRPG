@@ -63,6 +63,7 @@
     <Compile Include="HPPotion.cs" />
     <Compile Include="Monster.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RightHand.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

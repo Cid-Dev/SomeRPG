@@ -13,7 +13,9 @@ namespace DataAccess
     {
         protected string MonsterTable = "monster";
         protected string HPPotionTable = "hppotion";
+        protected string RightHandTable = "righthand";
         protected string loot_table_monster_hppotion = "loot_table_monster_hppotion";
+        protected string loot_table_monster_righthand = "loot_table_monster_righthand";
         protected string ItemTable = "item";
 
         protected string ConnectionString = null;

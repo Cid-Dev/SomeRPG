@@ -10,7 +10,7 @@ namespace Business
     public class Player : Character
     {
         public List<Item> Inventory = new List<Item>();
-        public uint Money { get; set; }
+        public int Money { get; set; }
 
         private void StackItem(Item NewItem)
         {
@@ -64,10 +64,40 @@ namespace Business
             return (report);
         }
 
+        private string ConvertMoney(int money)
+        {
+            string result = "";
+
+            int cents;
+
+            cents = money % 100;
+            if (cents > 0)
+                result = " " + cents + " copper";
+            money /= 100;
+            if (money > 0)
+            {
+                cents = money % 100;
+                if (cents > 0)
+                    result = " " + cents + " silver" + result;
+                money /= 100;
+                if (money > 0)
+                {
+                    cents = money % 1000;
+                    if (cents > 0)
+                        result = " " + cents + " gold" + result;
+                    money /= 1000;
+                    if (money > 0)
+                        result = " " + money + " platinium" + result;
+                }
+            }
+            return (result);
+        }
+
         public override string Stats()
         {
             string result = "=== Name : " + Name + " === HP : " + CurrentHP + "/" + BaseHP + " === Damages : " + CurrentMinAttack + " - " + CurrentMaxAttack + " === Level : " + Level + " === Exp : " + _currentExp + "/" + getRequiredExp + " ===\n";
-
+            if (Money > 0)
+                result += "=== Money : " + ConvertMoney(Money) + " ===\n";
             return (result);
         }
     }

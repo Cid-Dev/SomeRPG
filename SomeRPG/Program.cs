@@ -24,7 +24,7 @@ namespace SomeRPG
         static void OpenInventory(Character monster)
         {
             bool back = false;
-            
+
             while (!back)
             {
                 string input = "";
@@ -133,11 +133,41 @@ namespace SomeRPG
 
                 case (ConsoleKey.I):
                     OpenInventory(monster);
+                    player.CurrentCooldown = player.BaseCooldown;
                     return (false);
 
                 default:
                     return (true);
             }
+        }
+
+        static string ConvertMoney(int money)
+        {
+            string result = "";
+
+            int cents;
+
+            cents = money % 100;
+            if (cents > 0)
+                result = " " + cents + " copper";
+            money /= 100;
+            if (money > 0)
+            {
+                cents = money % 100;
+                if (cents > 0)
+                    result = " " + cents + " silver" + result;
+                money /= 100;
+                if (money > 0)
+                {
+                    cents = money % 1000;
+                    if (cents > 0)
+                        result = " " + cents + " gold" + result;
+                    money /= 1000;
+                    if (money > 0)
+                        result = " " + money + " platinium" + result;
+                }
+            }
+            return (result);
         }
 
         static void Fight(Monster monster)
@@ -170,12 +200,18 @@ namespace SomeRPG
             if (player.CurrentHP > 0 && monster.CurrentHP <= 0)
             {
                 var loots = monster.GetLoots();
+                var money = monster.LootMoney();
                 string loot = "";
                 foreach (var item in loots)
                 {
                     var StackInfo = ((item is IStackable) ? ((item as IStackable).Quantity + " ") : (""));
                     loot += "\t" + StackInfo + item.Name + " : " + item.Description + "\n";
                     player.AddItem(item);
+                }
+                if (money > 0)
+                {
+                    player.Money += money;
+                    loot += "Money looted :" + ConvertMoney(money) + "\n";
                 }
                 Console.WriteLine("Well done " + player.Name + ", you raped " + monster.Name + ".\nYou have " + player.CurrentHP + "HP remaining.");
                 if (loot != "")
@@ -243,9 +279,9 @@ namespace SomeRPG
             try
             {
                 bool back = false;
-                string error = "";
                 do
                 {
+                    string error = "";
                     monsters = new Monsters();
                     string input;
                     do
@@ -300,6 +336,172 @@ namespace SomeRPG
             }
         }
 
+        static void GetInventoryGears<T>()
+        {
+            string input;
+            List<IEquipable> stuff;
+            string error;
+            bool back = false;
+            do
+            {
+                do
+                {
+                    error = "";
+                    int i = 1;
+                    string options = "";
+                    stuff = null;
+                    stuff = new List<IEquipable>();
+
+                    foreach (Item gearT in player.Inventory)
+                        if (gearT.GetType() == typeof(T)
+                            && gearT is IEquipable)
+                        {
+                            options += "[" + i++ + "] " + gearT.Name + " : " + gearT.Description + "\n";
+                            stuff.Add(gearT as IEquipable);
+                        }
+                    if (i > 1)
+                    {
+                        Console.Clear();
+                        Console.WriteLine(player.Stats());
+                        Console.WriteLine(options);
+                        if (error != "")
+                            Console.WriteLine(error);
+                        Console.WriteLine("Please select an item or go [[B]ack]");
+                    }
+                    else
+                        Console.WriteLine("No item found for that slot. Please go [[B]ack]");
+                    input = Console.ReadLine();
+                } while (!Regex.IsMatch(input, "^(([0-9]+)|(b(ack)?))$", RegexOptions.IgnoreCase));
+
+                if (int.TryParse(input, out int result))
+                {
+                    if (result > 0 && result <= stuff.Count)
+                    {
+                        stuff[--result].TakeOn(player);
+                        back = true;
+                    }
+                    else
+                        error = "Invalid number.";
+                }
+                else
+                    back = true;
+            } while (!back);
+        }
+
+        static void SeeSlot(string slotName, IEquipable item)
+        {
+            ConsoleKeyInfo menu;
+            do
+            {
+                do
+                {
+                    Console.Clear();
+                    Console.WriteLine(player.Stats());
+                    Console.WriteLine(slotName + " : " + ((item != null) ? ((item as Item).Name) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine(((item != null) ? ("[R]emove. R[e]place") : ("[E]quip")) + ". [B]ack");
+                    menu = Console.ReadKey();
+                } while (menu.Key != ConsoleKey.R
+                            && menu.Key != ConsoleKey.E
+                            && menu.Key != ConsoleKey.B);
+
+                switch (menu.Key)
+                {
+                    case ConsoleKey.R:
+                        if (item != null)
+                            item.TakeOff(player);
+                        break;
+
+                    case ConsoleKey.E:
+                        GetInventoryGears<RightHand>();
+                        break;
+
+                    default:
+                        break;
+                }
+
+            } while (menu.Key != ConsoleKey.B);
+        }
+
+        static void EquipementMenu()
+        {
+            ConsoleKeyInfo menu;
+            do
+            {
+                do
+                {
+                    Console.Clear();
+                    Console.WriteLine(player.Stats());
+                    Console.WriteLine("[R]ight hand : " + ((player.RightHand != null) ? (player.RightHand.Name) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("Select an equipement slot or go [B]ack");
+                    menu = Console.ReadKey();
+                } while (menu.Key != ConsoleKey.R
+                         && menu.Key != ConsoleKey.B);
+
+                switch (menu.Key)
+                {
+                    case ConsoleKey.R:
+                        SeeSlot("Right hand", player.RightHand);
+                        break;
+
+                    default:
+                        break;
+                }
+
+            } while (menu.Key != ConsoleKey.B);
+        }
+
+        static void CharacterMenu()
+        {
+
+            ConsoleKeyInfo menu;
+            do
+            {
+                do
+                {
+                    Console.Clear();
+                    Console.WriteLine(player.Stats());
+                    Console.WriteLine("What do you want to do?");
+                    Console.WriteLine("[E]quipement. [I]nventory. [R]est. [B]ack");
+                    menu = Console.ReadKey();
+                } while (menu.Key != ConsoleKey.E
+                         && menu.Key != ConsoleKey.I
+                         && menu.Key != ConsoleKey.R
+                         && menu.Key != ConsoleKey.B);
+
+                switch (menu.Key)
+                {
+                    case ConsoleKey.E:
+                        EquipementMenu();
+                        break;
+
+                    case ConsoleKey.I:
+                        if (player.BaseHP <= player.CurrentHP)
+                        {
+                            Console.WriteLine("You can't rest, you are already full HP");
+                            Console.WriteLine("Press enter");
+                            Console.ReadLine();
+                        }
+                        else
+                            Rest();
+                        break;
+
+                    case ConsoleKey.R:
+                        if (player.BaseHP <= player.CurrentHP)
+                        {
+                            Console.WriteLine("You can't rest, you are already full HP");
+                            Console.WriteLine("Press enter");
+                            Console.ReadLine();
+                        }
+                        else
+                            Rest();
+                        break;
+
+                    default:
+                        break;
+                }
+            } while (menu.Key != ConsoleKey.B);
+        }
+
         static void Menu()
         {
             ConsoleKeyInfo menu;
@@ -310,10 +512,11 @@ namespace SomeRPG
                     Console.Clear();
                     Console.WriteLine(player.Stats());
                     Console.WriteLine("What do you want to do?");
-                    Console.WriteLine("[A]ttack a monster. [R]est. [E]xit");
+                    Console.WriteLine("[A]ttack a monster. [C]haracter menu. [R]est. [E]xit");
                     menu = Console.ReadKey();
                 } while (menu.Key != ConsoleKey.A
                          && menu.Key != ConsoleKey.R
+                         && menu.Key != ConsoleKey.C
                          && menu.Key != ConsoleKey.E);
 
                 switch (menu.Key)
@@ -338,6 +541,10 @@ namespace SomeRPG
                         }
                         else
                             Rest();
+                        break;
+
+                    case ConsoleKey.C:
+                        CharacterMenu();
                         break;
 
                     default:
@@ -386,7 +593,7 @@ namespace SomeRPG
                 {
                     Console.WriteLine(ex.Message);
                 }
-                
+
                 Menu();
 
                 do

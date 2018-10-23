@@ -10,6 +10,18 @@ namespace Business
     public class Monster : Character
     {
         public List<Loot> LootTable = new List<Loot>();
+        public int MinMoney { get; set; }
+        public int MaxMoney { get; set; }
+        public float MoneyMultiplier { get; set; }
+
+        public int LootMoney()
+        {
+            Random seed = new Random();
+
+            int loot = seed.Next((int)Math.Round(MinMoney * MoneyMultiplier * Level), (int)Math.Round(MaxMoney * MoneyMultiplier * Level) + 1);
+
+            return (loot);
+        }
 
         public List<Item> GetLoots()
         {
@@ -38,7 +50,38 @@ namespace Business
             return (Loots);
         }
 
-        public void BuildLootTable(object lootTable)
+        private void getRightHands(object lootTable)
+        {
+            var RightHandListAnon = lootTable?.GetType().GetProperty("RightHand")?.GetValue(lootTable, null);
+            if (RightHandListAnon is IEnumerable<object>)
+            {
+                var RightHandList = RightHandListAnon as IEnumerable<object>;
+
+                foreach (var tempRightHand in RightHandList)
+                {
+                    try
+                    {
+                        var rightHand = new RightHand(tempRightHand?.GetType().GetProperty("Name")?.GetValue(tempRightHand, null).ToString());
+                        var MinAmount = int.Parse(tempRightHand?.GetType().GetProperty("MinAmount")?.GetValue(tempRightHand, null).ToString());
+                        var MaxAmount = int.Parse(tempRightHand?.GetType().GetProperty("MaxAmount")?.GetValue(tempRightHand, null).ToString());
+                        var Probability = double.Parse(tempRightHand?.GetType().GetProperty("Probability")?.GetValue(tempRightHand, null).ToString());
+                        LootTable.Add(new Loot
+                        {
+                            item = rightHand,
+                            MaxAmount = MaxAmount,
+                            MinAmount = MinAmount,
+                            Probability = Probability
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                }
+            }
+        }
+
+        private void getPotions(object lootTable)
         {
             var HPPotionListAnon = lootTable?.GetType().GetProperty("HPPotion")?.GetValue(lootTable, null);
             if (HPPotionListAnon is IEnumerable<object>)
@@ -67,6 +110,12 @@ namespace Business
                     }
                 }
             }
+        }
+
+        public void BuildLootTable(object lootTable)
+        {
+            getPotions(lootTable);
+            getRightHands(lootTable);
         }
     }
 }

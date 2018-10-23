@@ -29,7 +29,10 @@ namespace Business
                             BaseMaxAttack = int.Parse(dalMonster?.GetType().GetProperty("BaseMaxAttack")?.GetValue(dalMonster, null).ToString()),
                             BaseCooldown = int.Parse(dalMonster?.GetType().GetProperty("BaseCoolDown")?.GetValue(dalMonster, null).ToString()),
                             GivenExp = int.Parse(dalMonster?.GetType().GetProperty("GivenExp")?.GetValue(dalMonster, null).ToString()),
-                            BaseExp = int.Parse(dalMonster?.GetType().GetProperty("BaseExp")?.GetValue(dalMonster, null).ToString())
+                            BaseExp = int.Parse(dalMonster?.GetType().GetProperty("BaseExp")?.GetValue(dalMonster, null).ToString()),
+                            MinMoney = int.Parse(dalMonster?.GetType().GetProperty("MinMoney")?.GetValue(dalMonster, null).ToString()),
+                            MaxMoney = int.Parse(dalMonster?.GetType().GetProperty("MaxMoney")?.GetValue(dalMonster, null).ToString()),
+                            MoneyMultiplier = float.Parse(dalMonster?.GetType().GetProperty("MoneyMultiplier")?.GetValue(dalMonster, null).ToString())
                         };
 
                         monster.BuildLootTable(dalMonster?.GetType().GetProperty("LootTable")?.GetValue(dalMonster, null));
