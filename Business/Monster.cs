@@ -14,6 +14,18 @@ namespace Business
         public int MaxMoney { get; set; }
         public float MoneyMultiplier { get; set; }
 
+
+        public void SetLevel(int lvl)
+        {
+            float hp = BaseHP;
+            while (lvl > 1)
+            {
+                hp *= hpMultiplier;
+                --lvl;
+            }
+            BaseHP = (int)Math.Round(hp);
+        }
+
         public int LootMoney()
         {
             Random seed = new Random();

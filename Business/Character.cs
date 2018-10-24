@@ -16,13 +16,35 @@ namespace Business
         private int _baseExp = 16;
         private int _givenExp = 16;
         private float expMultiplier = 1.9F;
-        private float hpMultiplier = 1.1F;
+        protected float hpMultiplier = 1.1F;
         private float minAttackMultiplier = 1.1F;
         private float maxAttackMultiplier = 1.1F;
+        private RightHand _rightHand;
+
+        private int MinDamageBonus = 0;
+        private int MaxDamageBonus = 0;
 
         #region gear
 
-        public RightHand RightHand { get; set; }
+        public RightHand RightHand
+        {
+            get => _rightHand;
+            set
+            {
+                if (value != null)
+                {
+                    MinDamageBonus += value.MinDamageBonus;
+                    MaxDamageBonus += value.MaxDamageBonus;
+                }
+
+                if (_rightHand != null)
+                {
+                    MinDamageBonus -= _rightHand.MinDamageBonus;
+                    MaxDamageBonus -= _rightHand.MaxDamageBonus;
+                }
+                _rightHand = value;
+            }
+        }
 
         #endregion gear
 
@@ -44,10 +66,11 @@ namespace Business
         {
             get
             {
-                int curMinAtk = BaseMinAttack;
+                float curMinAtk = (float)BaseMinAttack + (float)MinDamageBonus;
                 for (int i = 1; i < _level; ++i)
-                    curMinAtk = (int)(curMinAtk * minAttackMultiplier);
-                return (curMinAtk);
+                    curMinAtk = curMinAtk * minAttackMultiplier;
+
+                return ((int)Math.Round(curMinAtk));
             }
         }
         public int BaseMaxAttack { get; set; }
@@ -55,12 +78,13 @@ namespace Business
         {
             get
             {
-                int curMaxAtk = BaseMaxAttack;
+                float curMaxAtk = (float)BaseMaxAttack + (float)MaxDamageBonus;
                 for (int i = 1; i < _level; ++i)
-                    curMaxAtk = (int)(curMaxAtk * maxAttackMultiplier);
-                return (curMaxAtk);
+                    curMaxAtk = curMaxAtk * maxAttackMultiplier;
+                return ((int)Math.Round(curMaxAtk));
             }
         }
+
         public int CurrentCooldown { get; set; }
         public int BaseCooldown
         {
