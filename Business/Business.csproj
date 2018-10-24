@@ -46,6 +46,7 @@
     <Compile Include="IStackable.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="IUsable.cs" />
+    <Compile Include="LoadManager.cs" />
     <Compile Include="Loot.cs" />
     <Compile Include="Monster.cs" />
     <Compile Include="Monsters.cs" />

@@ -638,11 +638,12 @@ namespace SomeRPG
                     Console.Clear();
                     Console.WriteLine(player.Stats());
                     Console.WriteLine("What do you want to do?");
-                    Console.WriteLine("[A]ttack a monster. [C]haracter menu. [R]est. [E]xit");
+                    Console.WriteLine("[A]ttack a monster. [C]haracter menu. [R]est. [S]ave game. [E]xit");
                     menu = Console.ReadKey();
                 } while (menu.Key != ConsoleKey.A
                          && menu.Key != ConsoleKey.R
                          && menu.Key != ConsoleKey.C
+                         && menu.Key != ConsoleKey.S
                          && menu.Key != ConsoleKey.E);
 
                 switch (menu.Key)
@@ -673,6 +674,22 @@ namespace SomeRPG
                         CharacterMenu();
                         break;
 
+                    case ConsoleKey.S:
+                        string result = player.Save();
+                        if (result == "")
+                        {
+                            Console.WriteLine("Game Saved.");
+                            Console.WriteLine("Press enter");
+                            Console.ReadLine();
+                        }
+                        else
+                        {
+                            Console.WriteLine("Error saving game : " + result);
+                            Console.WriteLine("Press enter");
+                            Console.ReadLine();
+                        }
+                        break;
+
                     default:
                         break;
                 }
@@ -683,52 +700,131 @@ namespace SomeRPG
         {
             string name = "";
             string pattern = "^[a-zA-Z]{3,}$";
+            LoadManager loadManager = new LoadManager();
+
             while (!Regex.IsMatch(name, pattern))
             {
                 Console.Clear();
                 Console.WriteLine("Enter your name");
                 name = Console.ReadLine();
+                if (!loadManager.CheckName(name))
+                {
+                    name = "";
+                    Console.WriteLine("Name already in saved games");
+                    Console.WriteLine("Press enter");
+                    Console.ReadLine();
+                }
             }
 
             return (name);
         }
 
+        static void Load()
+        {
+            string input;
+            bool back = false;
+            LoadManager loadManager;
+            do
+            {
+                do
+                {
+                    loadManager = new LoadManager();
+                    string gameList = loadManager.ShowSavedGames();
+                    Console.Clear();
+                    if (gameList != "")
+                    {
+                        Console.WriteLine(gameList);
+                        Console.WriteLine("Select your save or go [[B]ack]");
+                    }
+                    else
+                        Console.WriteLine("No saved game. Please go [[B]ack]");
+                    input = Console.ReadLine();
+                } while (!Regex.IsMatch(input, "^(([0-9]+)|(b(ack)?))$", RegexOptions.IgnoreCase));
+
+                if (int.TryParse(input, out int result))
+                {
+                    player = loadManager.GetPlayer(result);
+                    back = player != null;
+                }
+                else
+                    back = true;
+            } while (!back);
+        }
+
+        static bool welcome()
+        {
+            ConsoleKeyInfo menu;
+            bool isExiting = false;
+            do
+            {
+                do
+                {
+                    Console.Clear();
+                    Console.WriteLine("Welcome to SomeRPG :)");
+                    Console.WriteLine("[L]oad game. [N]ew game. [E]xit");
+                    menu = Console.ReadKey();
+                } while (menu.Key != ConsoleKey.L
+                         && menu.Key != ConsoleKey.N
+                         && menu.Key != ConsoleKey.E);
+
+                switch (menu.Key)
+                {
+                    case ConsoleKey.L:
+                        Load();
+                        break;
+
+                    case ConsoleKey.N:
+                        player = new Player
+                        {
+                            Name = getName(),
+                            BaseHP = 42,
+                            BaseCooldown = 10,
+                            BaseMinAttack = 5,
+                            BaseMaxAttack = 10
+                        };
+
+                        try
+                        {
+                            player.Inventory.Add(new HPPotion("Lesser Healing Potion")
+                            {
+                                Quantity = 20
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                        break;
+
+                    default:
+                        isExiting = true;
+                        break;
+                }
+            } while (player == null && menu.Key != ConsoleKey.E);
+            return (isExiting);
+        }
+
         static void Main(string[] args)
         {
             ConsoleKeyInfo startOVer;
+            bool isExiting = false;
             do
             {
-                player = new Player
+                if (!welcome())
                 {
-                    Name = getName(),
-                    BaseHP = 42,
-                    BaseCooldown = 10,
-                    BaseMinAttack = 5,
-                    BaseMaxAttack = 10
-                };
-
-                
-                try
-                {
-                    player.Inventory.Add(new HPPotion("Lesser Healing Potion")
+                    Menu();
+                    do
                     {
-                        Quantity = 20
-                    });
+                        Console.WriteLine("Game over. Exit? y/n");
+                        startOVer = Console.ReadKey();
+                    } while (startOVer.Key != ConsoleKey.Y
+                             && startOVer.Key != ConsoleKey.N);
+                    if (startOVer.Key == ConsoleKey.Y)
+                        isExiting = true;
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-
-                Menu();
-
-                do
-                {
-                    Console.WriteLine("Game over. Start over? y/n");
-                    startOVer = Console.ReadKey();
-                } while (startOVer.Key != ConsoleKey.Y
-                         && startOVer.Key != ConsoleKey.N);
-            } while (startOVer.Key == ConsoleKey.Y);
+                else
+                    isExiting = true;
+            } while (!isExiting);
         }
     }
 }

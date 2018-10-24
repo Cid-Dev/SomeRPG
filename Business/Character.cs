@@ -12,11 +12,11 @@ namespace Business
         private int _baseHP;
         protected int _baseCooldown;
         private int _level = 1;
-        protected int _currentExp = 0;
+        public int _currentExp = 0;
         private int _baseExp = 16;
         private int _givenExp = 16;
         private float expMultiplier = 1.9F;
-        protected float hpMultiplier = 1.1F;
+        public float hpMultiplier = 1.1F;
         private float minAttackMultiplier = 1.1F;
         private float maxAttackMultiplier = 1.1F;
         private RightHand _rightHand;
