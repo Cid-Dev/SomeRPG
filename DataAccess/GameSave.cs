@@ -51,7 +51,6 @@ namespace DataAccess
             else
             {
                 var di = Directory.CreateDirectory(SaveFolder);
-                Debug.WriteLine(di.ToString());
                 playerSaves = new List<PlayerSave>();
             }
             if (!playerFound)

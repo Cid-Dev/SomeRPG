@@ -10,5 +10,6 @@ namespace DataAccess
     {
         public List<HPPotionsSave> HPPotions = new List<HPPotionsSave>();
         public List<RightHandsSave> RightHands = new List<RightHandsSave>();
+        public List<ChestArmorSave> ChestArmors = new List<ChestArmorSave>();
     }
 }

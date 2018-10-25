@@ -431,15 +431,21 @@ namespace SomeRPG
                     Console.Clear();
                     Console.WriteLine(player.Stats());
                     Console.WriteLine("[R]ight hand : " + ((player.RightHand != null) ? (player.RightHand.Name) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("[C]hest : " + ((player.ChestArmor != null) ? (player.ChestArmor.Name) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("Select an equipement slot or go [B]ack");
                     menu = Console.ReadKey();
                 } while (menu.Key != ConsoleKey.R
+                         && menu.Key != ConsoleKey.C
                          && menu.Key != ConsoleKey.B);
 
                 switch (menu.Key)
                 {
                     case ConsoleKey.R:
                         SeeSlot<RightHand>("Right hand", player.RightHand);
+                        break;
+
+                    case ConsoleKey.C:
+                        SeeSlot<ChestArmor>("Chest armor", player.ChestArmor);
                         break;
 
                     default:

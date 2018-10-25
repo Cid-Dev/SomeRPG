@@ -14,8 +14,11 @@ namespace DataAccess
         protected string MonsterTable = "monster";
         protected string HPPotionTable = "hppotion";
         protected string RightHandTable = "righthand";
+        protected string ChestArmorTable = "chestarmor";
+        protected string ArmorTypeTable = "armortype";
         protected string loot_table_monster_hppotion = "loot_table_monster_hppotion";
         protected string loot_table_monster_righthand = "loot_table_monster_righthand";
+        protected string loot_table_monster_chestarmor = "loot_table_monster_chestarmor";
         protected string ItemTable = "item";
 
         protected string ConnectionString = null;

@@ -53,7 +53,7 @@ namespace Business
             string report;
             CurrentCooldown = _baseCooldown;
             int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
-            int TargetHP = Target.Defend(damage);
+            int TargetHP = Target.Defend(ref damage);
             report = Name + " attacked " + Target.Name + " and dealt " + damage + " damage.\n";
             report += Target.Name + " has " + TargetHP + " HP remaining.\n";
             if (TargetHP <= 0)
@@ -146,7 +146,7 @@ namespace Business
                     var hppotion = (item as HPPotion);
                     HPPotions.Add(new HPPotionsSave
                     {
-                        Name = hppotion.Name,
+                        Id = hppotion.Id,
                         Quantity = hppotion.Quantity
                     });
                 }
@@ -164,11 +164,28 @@ namespace Business
                     var rightHand = (item as RightHand);
                     RightHands.Add(new RightHandsSave
                     {
-                        Name = rightHand.Name
+                        Id = rightHand.Id
                     });
                 }
             }
             return (RightHands);
+        }
+
+        private List<ChestArmorSave> getChestArmors()
+        {
+            var ChestArmors = new List<ChestArmorSave>();
+            foreach (var item in Inventory)
+            {
+                if (item is ChestArmor)
+                {
+                    var chestArmor = (item as ChestArmor);
+                    ChestArmors.Add(new ChestArmorSave
+                    {
+                        Id = chestArmor.Id
+                    });
+                }
+            }
+            return (ChestArmors);
         }
 
         public string Save()
@@ -183,28 +200,15 @@ namespace Business
                     CurrentExp = _currentExp,
                     Money = Money,
                     CurrentHP = CurrentHP,
-                    RightHand = ((RightHand != null) ? (RightHand.Name) : ("")),
+                    RightHand = ((RightHand != null) ? (RightHand.Id) : (0)),
+                    ChestArmor = ((ChestArmor != null) ? (ChestArmor.Id) : (0)),
                     Inventory = new InventorySave
                     {
                         HPPotions = getHPPotions(),
-                        RightHands = getRightHands()
+                        RightHands = getRightHands(),
+                        ChestArmors = getChestArmors()
                     }
                 });
-                /*
-                var data = new
-                {
-                    Name,
-                    Level,
-                    CurrentExp = _currentExp,
-                    Money,
-                    RightHand = RightHand.Name,
-                    Inventory = new
-                    {
-                        HPPotions = getAnonHPPotions(),
-                        RightHands = getAnonRightHands()
-                    }
-                };
-                */
             }
             catch (Exception ex)
             {

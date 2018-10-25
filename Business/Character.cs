@@ -46,6 +46,8 @@ namespace Business
             }
         }
 
+        public ChestArmor ChestArmor { get; set; }
+
         #endregion gear
 
         public string Name { get; set; }
@@ -142,8 +144,13 @@ namespace Business
             CurrentHP = ((CurrentHP + amount > BaseHP) ? (BaseHP) : (CurrentHP + amount));
         }
 
-        public int Defend(int damage)
+        public int Defend(ref int damage)
         {
+            if (ChestArmor != null)
+            {
+                damage = ((damage - ChestArmor.Defense >= 0) ? (damage - ChestArmor.Defense) : (0));
+                damage = (int)Math.Round((double)damage * ((100.0 - ChestArmor.ArmorType.Absorbency) / 100.0));
+            }
             CurrentHP -= damage;
             if (CurrentHP <= 0)
                 CurrentHP = 0;
@@ -155,7 +162,7 @@ namespace Business
             string report;
             CurrentCooldown = _baseCooldown;
             int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
-            int TargetHP = Target.Defend(damage);
+            int TargetHP = Target.Defend(ref damage);
             report = Name + " attacked " + Target.Name + " and dealt " + damage + " damage.\n";
             report += Target.Name + " has " + TargetHP + " HP remaining.\n";
             if (TargetHP <= 0)

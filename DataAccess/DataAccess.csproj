@@ -62,6 +62,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChestArmor.cs" />
+    <Compile Include="ChestArmorSave.cs" />
     <Compile Include="DB.cs" />
     <Compile Include="GameSave.cs" />
     <Compile Include="HPPotion.cs" />

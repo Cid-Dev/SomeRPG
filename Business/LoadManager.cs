@@ -40,7 +40,8 @@ namespace Business
                     BaseMinAttack = 5,
                     BaseMaxAttack = 10,
                     Money = SavedGames[index].Money,
-                    RightHand = ((SavedGames[index].RightHand != "") ? (new RightHand(SavedGames[index].RightHand)) : (null)),
+                    RightHand = ((SavedGames[index].RightHand != 0) ? (new RightHand(SavedGames[index].RightHand)) : (null)),
+                    ChestArmor = ((SavedGames[index].ChestArmor != 0) ? (new ChestArmor(SavedGames[index].ChestArmor)) : (null)),
                     Inventory = new List<Item>()
                 };
 
@@ -48,14 +49,14 @@ namespace Business
                 player.CurrentHP = SavedGames[index].CurrentHP;
                 foreach (var hPPotion in SavedGames[index].Inventory.HPPotions)
                 {
-                    player.Inventory.Add(new HPPotion(hPPotion.Name)
+                    player.Inventory.Add(new HPPotion(hPPotion.Id)
                     {
                         Quantity = hPPotion.Quantity
                     });
                 }
 
                 foreach (var rightHand in SavedGames[index].Inventory.RightHands)
-                    player.Inventory.Add(new RightHand(rightHand.Name));
+                    player.Inventory.Add(new RightHand(rightHand.Id));
                 return (player);
             }
             return (null);

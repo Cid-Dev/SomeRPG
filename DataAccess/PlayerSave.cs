@@ -13,7 +13,8 @@ namespace DataAccess
         public int CurrentExp { get; set; }
         public int Money { get; set; }
         public int CurrentHP { get; set; }
-        public string RightHand { get; set; }
+        public int RightHand { get; set; }
+        public int ChestArmor { get; set; }
         public InventorySave Inventory = new InventorySave();
     }
 }

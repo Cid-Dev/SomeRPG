@@ -40,7 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Armor.cs" />
+    <Compile Include="ArmorType.cs" />
     <Compile Include="Character.cs" />
+    <Compile Include="ChestArmor.cs" />
     <Compile Include="HPPotion.cs" />
     <Compile Include="IEquipable.cs" />
     <Compile Include="IStackable.cs" />

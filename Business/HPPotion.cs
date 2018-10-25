@@ -10,6 +10,7 @@ namespace Business
 {
     public class HPPotion : Item, IUsable, IStackable
     {
+        public int Id { get; set; }
         /// <summary>
         /// Amount of HP Restored
         /// </summary>
@@ -27,6 +28,31 @@ namespace Business
         {
             target.Heal(Amount);
             --Quantity;
+        }
+
+        public HPPotion(int id)
+        {
+            try
+            {
+                DataAccess.HPPotion DalHPPotion = new DataAccess.HPPotion();
+                var temp = DalHPPotion.GetHPPotionById(id);
+                if (temp != null)
+                {
+                    foreach (var dalHPPotion in temp)
+                    {
+                        Name = dalHPPotion?.GetType().GetProperty("Name")?.GetValue(dalHPPotion, null).ToString();
+                        Description = dalHPPotion?.GetType().GetProperty("Description")?.GetValue(dalHPPotion, null).ToString();
+                        Amount = int.Parse(dalHPPotion?.GetType().GetProperty("Amount")?.GetValue(dalHPPotion, null).ToString());
+                        MaxAmount = int.Parse(dalHPPotion?.GetType().GetProperty("MaxAmount")?.GetValue(dalHPPotion, null).ToString());
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //Debug.WriteLine(ex.Message);
+                throw ex;
+            }
         }
 
         public HPPotion(string name)

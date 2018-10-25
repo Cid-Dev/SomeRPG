@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccess
+namespace Business
 {
-    public class HPPotionsSave
+    public class ArmorType
     {
         public int Id { get; set; }
-        public int Quantity { get; set; }
+        public string Name { get; set; }
+        public double Absorbency { get; set; }
     }
 }

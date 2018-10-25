@@ -1,27 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Data.SQLite;
-using System.Data;
 
 namespace DataAccess
 {
-    public class RightHand : DB
+    public class ChestArmor : DB
     {
-        public List<object> GetRightHandById(int id)
+        public List<object> GetChestArmorById(int id)
         {
-            List<object> RightHand = new List<object>();
+            List<object> ChestArmor = new List<object>();
             using (m_dbConnection = new SQLiteConnection(ConnectionString))
             {
                 m_dbConnection.Open();
                 using (SQLiteCommand command = m_dbConnection.CreateCommand())
                 {
-                    command.CommandText = "SELECT i.name AS name, i.description AS description, r.id AS id, r.mindamagebonus AS mindamagebonus, r.maxdamagebonus AS maxdamagebonus FROM " + RightHandTable + " r "
+                    command.CommandText = "SELECT a.id AS id, a.defense AS defense, i.name AS name, i.description AS description, t.name AS type_name, t.absorbency as absorbency FROM " + ChestArmorTable + " a "
                                         + "INNER JOIN " + ItemTable + " i "
-                                        + "ON r.item_id=i.id "
-                                        + "WHERE r.id = @id "
+                                        + "ON a.item_id=i.id "
+                                        + "INNER JOIN " + ArmorTypeTable + " t "
+                                        + "ON a.armortype_id=t.id "
+                                        + "WHERE a.id = @id "
                                         + "LIMIT 1";
                     command.CommandType = CommandType.Text;
                     command.Parameters.AddWithValue("@id", id);
@@ -30,31 +32,34 @@ namespace DataAccess
                     while (reader.Read())
                     {
                         //Debug.WriteLine("Name: " + reader["name"] + "\tDescription: " + reader["description"] + "\tAmount: " + reader["amount"] + "\tMaxAmount: " + reader["max_amount"]);
-                        RightHand.Add(new
+                        ChestArmor.Add(new
                         {
                             Id = reader["id"],
                             Name = reader["name"],
                             Description = reader["description"],
-                            MinDamageBonus = reader["mindamagebonus"],
-                            MaxDamageBonus = reader["maxdamagebonus"]
+                            ArmorTypeName = reader["type_name"],
+                            Absorbency = reader["absorbency"],
+                            Defense = reader["defense"]
                         });
                     }
                 }
             }
-            return (RightHand);
+            return (ChestArmor);
         }
 
-        public List<object> GetRightHandByName(string name)
+        public List<object> GetChestArmorByName(string name)
         {
-            List<object> RightHand = new List<object>();
+            List<object> ChestArmor = new List<object>();
             using (m_dbConnection = new SQLiteConnection(ConnectionString))
             {
                 m_dbConnection.Open();
                 using (SQLiteCommand command = m_dbConnection.CreateCommand())
                 {
-                    command.CommandText = "SELECT i.name AS name, i.description AS description, r.id AS id, r.mindamagebonus AS mindamagebonus, r.maxdamagebonus AS maxdamagebonus FROM " + RightHandTable + " r "
+                    command.CommandText = "SELECT a.id AS id, a.defense AS defense, i.name AS name, i.description AS description, t.name AS type_name, t.absorbency as absorbency FROM " + ChestArmorTable + " a "
                                         + "INNER JOIN " + ItemTable + " i "
-                                        + "ON r.item_id=i.id "
+                                        + "ON a.item_id=i.id "
+                                        + "INNER JOIN " + ArmorTypeTable + " t "
+                                        + "ON a.armortype_id=t.id "
                                         + "WHERE i.name = @name "
                                         + "LIMIT 1";
                     command.CommandType = CommandType.Text;
@@ -64,18 +69,19 @@ namespace DataAccess
                     while (reader.Read())
                     {
                         //Debug.WriteLine("Name: " + reader["name"] + "\tDescription: " + reader["description"] + "\tAmount: " + reader["amount"] + "\tMaxAmount: " + reader["max_amount"]);
-                        RightHand.Add(new
+                        ChestArmor.Add(new
                         {
                             Id = reader["id"],
                             Name = reader["name"],
                             Description = reader["description"],
-                            MinDamageBonus = reader["mindamagebonus"],
-                            MaxDamageBonus = reader["maxdamagebonus"]
+                            ArmorTypeName = reader["type_name"],
+                            Absorbency = reader["absorbency"],
+                            Defense = reader["defense"]
                         });
                     }
                 }
             }
-            return (RightHand);
+            return (ChestArmor);
         }
     }
 }

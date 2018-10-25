@@ -18,6 +18,7 @@ namespace Business
         public void SetLevel(int lvl)
         {
             float hp = BaseHP;
+            Level = lvl;
             while (lvl > 1)
             {
                 hp *= hpMultiplier;
@@ -93,6 +94,37 @@ namespace Business
             }
         }
 
+        private void getChestArmor(object lootTable)
+        {
+            var ArmorChestListAnon = lootTable?.GetType().GetProperty("ArmorChest")?.GetValue(lootTable, null);
+            if (ArmorChestListAnon is IEnumerable<object>)
+            {
+                var ArmorChestList = ArmorChestListAnon as IEnumerable<object>;
+
+                foreach (var tempArmorChest in ArmorChestList)
+                {
+                    try
+                    {
+                        var chestArmor = new ChestArmor(tempArmorChest?.GetType().GetProperty("Name")?.GetValue(tempArmorChest, null).ToString());
+                        var MinAmount = int.Parse(tempArmorChest?.GetType().GetProperty("MinAmount")?.GetValue(tempArmorChest, null).ToString());
+                        var MaxAmount = int.Parse(tempArmorChest?.GetType().GetProperty("MaxAmount")?.GetValue(tempArmorChest, null).ToString());
+                        var Probability = double.Parse(tempArmorChest?.GetType().GetProperty("Probability")?.GetValue(tempArmorChest, null).ToString());
+                        LootTable.Add(new Loot
+                        {
+                            item = chestArmor,
+                            MaxAmount = MaxAmount,
+                            MinAmount = MinAmount,
+                            Probability = Probability
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                }
+            }
+        }
+
         private void getPotions(object lootTable)
         {
             var HPPotionListAnon = lootTable?.GetType().GetProperty("HPPotion")?.GetValue(lootTable, null);
@@ -128,6 +160,7 @@ namespace Business
         {
             getPotions(lootTable);
             getRightHands(lootTable);
+            getChestArmor(lootTable);
         }
     }
 }

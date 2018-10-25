@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace DataAccess
 {
-    public class HPPotionsSave
+    public class ChestArmorSave
     {
         public int Id { get; set; }
-        public int Quantity { get; set; }
     }
 }
