@@ -40,6 +40,7 @@ namespace Business
                 {
                     foreach (var dalHPPotion in temp)
                     {
+                        Id = int.Parse(dalHPPotion?.GetType().GetProperty("Id")?.GetValue(dalHPPotion, null).ToString());
                         Name = dalHPPotion?.GetType().GetProperty("Name")?.GetValue(dalHPPotion, null).ToString();
                         Description = dalHPPotion?.GetType().GetProperty("Description")?.GetValue(dalHPPotion, null).ToString();
                         Amount = int.Parse(dalHPPotion?.GetType().GetProperty("Amount")?.GetValue(dalHPPotion, null).ToString());
@@ -65,6 +66,7 @@ namespace Business
                 {
                     foreach (var dalHPPotion in temp)
                     {
+                        Id = int.Parse(dalHPPotion?.GetType().GetProperty("Id")?.GetValue(dalHPPotion, null).ToString());
                         Name = dalHPPotion?.GetType().GetProperty("Name")?.GetValue(dalHPPotion, null).ToString();
                         Description = dalHPPotion?.GetType().GetProperty("Description")?.GetValue(dalHPPotion, null).ToString();
                         Amount = int.Parse(dalHPPotion?.GetType().GetProperty("Amount")?.GetValue(dalHPPotion, null).ToString());

@@ -12,6 +12,12 @@ namespace SomeRPG
     {
         static Player player;
 
+        public static void ClearKeyBuffer()
+        {
+            while (Console.KeyAvailable)
+                Console.ReadKey(true);
+        }
+
         static void DisplayFightInfos(Character monster)
         {
             Console.Clear();
@@ -73,7 +79,8 @@ namespace SomeRPG
                             DisplayFightInfos(monster);
                             Console.WriteLine("Please select a target for " + (usables[result] as Item).Name);
                             Console.WriteLine("[Y]ourself. [M]onster. [B]ack");
-                            menu = Console.ReadKey();
+                            ClearKeyBuffer();
+                            menu = Console.ReadKey(true);
                         } while (menu.Key != ConsoleKey.Y
                                  && menu.Key != ConsoleKey.M
                                  && menu.Key != ConsoleKey.B);
@@ -121,7 +128,8 @@ namespace SomeRPG
                 DisplayFightInfos(monster);
                 Console.WriteLine("Select your action");
                 Console.WriteLine("[A]ttack. [I]nventory. [F]lee like a coward");
-                menu = Console.ReadKey();
+                ClearKeyBuffer();
+                menu = Console.ReadKey(true);
             } while (menu.Key != ConsoleKey.A
                      && menu.Key != ConsoleKey.I
                      && menu.Key != ConsoleKey.F);
@@ -187,14 +195,16 @@ namespace SomeRPG
                     if (!hasFlee)
                     {
                         Console.WriteLine("Press any key");
-                        Console.ReadKey();
+                        ClearKeyBuffer();
+                        Console.ReadKey(true);
                     }
                 }
                 if (monster.CurrentCooldown <= 0)
                 {
                     Console.WriteLine(monster.Attack());
                     Console.WriteLine("Press any key");
-                    Console.ReadKey();
+                    ClearKeyBuffer();
+                    Console.ReadKey(true);
                 }
                 System.Threading.Thread.Sleep(100);
             }
@@ -240,7 +250,8 @@ namespace SomeRPG
                 Console.WriteLine(player.Stats());
                 Console.WriteLine("Select your difficulty");
                 Console.WriteLine("[E]asy. [N]normal [H]hard [B]ack");
-                menu = Console.ReadKey();
+                ClearKeyBuffer();
+                menu = Console.ReadKey(true);
             } while (menu.Key != ConsoleKey.E
                      && menu.Key != ConsoleKey.N
                      && menu.Key != ConsoleKey.H
@@ -400,7 +411,8 @@ namespace SomeRPG
                 Console.WriteLine(player.Stats());
                 Console.WriteLine(slotName + " : " + ((item != null) ? ((item as Item).Name) : ("Nothing equiped")) + "\n");
                 Console.WriteLine(((item != null) ? ("[R]emove. R[e]place") : ("[E]quip")) + ". [B]ack");
-                menu = Console.ReadKey();
+                ClearKeyBuffer();
+                menu = Console.ReadKey(true);
             } while (menu.Key != ConsoleKey.R
                         && menu.Key != ConsoleKey.E
                         && menu.Key != ConsoleKey.B);
@@ -433,7 +445,8 @@ namespace SomeRPG
                     Console.WriteLine("[R]ight hand : " + ((player.RightHand != null) ? (player.RightHand.Name) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("[C]hest : " + ((player.ChestArmor != null) ? (player.ChestArmor.Name) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("Select an equipement slot or go [B]ack");
-                    menu = Console.ReadKey();
+                    ClearKeyBuffer();
+                    menu = Console.ReadKey(true);
                 } while (menu.Key != ConsoleKey.R
                          && menu.Key != ConsoleKey.C
                          && menu.Key != ConsoleKey.B);
@@ -565,8 +578,8 @@ namespace SomeRPG
                     }
                     else
                         Console.WriteLine("No item in inventory. Please go [B]ack]");
-
-                    menu = Console.ReadKey();
+                    ClearKeyBuffer();
+                    menu = Console.ReadKey(true);
                 } while (menu.Key != ConsoleKey.U
                          && menu.Key != ConsoleKey.E
                          && menu.Key != ConsoleKey.B);
@@ -601,7 +614,8 @@ namespace SomeRPG
                     Console.WriteLine(player.Stats());
                     Console.WriteLine("What do you want to do?");
                     Console.WriteLine("[E]quipement. [I]nventory. [R]est. [B]ack");
-                    menu = Console.ReadKey();
+                    ClearKeyBuffer();
+                    menu = Console.ReadKey(true);
                 } while (menu.Key != ConsoleKey.E
                          && menu.Key != ConsoleKey.I
                          && menu.Key != ConsoleKey.R
@@ -645,7 +659,8 @@ namespace SomeRPG
                     Console.WriteLine(player.Stats());
                     Console.WriteLine("What do you want to do?");
                     Console.WriteLine("[A]ttack a monster. [C]haracter menu. [R]est. [S]ave game. [E]xit");
-                    menu = Console.ReadKey();
+                    ClearKeyBuffer();
+                    menu = Console.ReadKey(true);
                 } while (menu.Key != ConsoleKey.A
                          && menu.Key != ConsoleKey.R
                          && menu.Key != ConsoleKey.C
@@ -768,7 +783,8 @@ namespace SomeRPG
                     Console.Clear();
                     Console.WriteLine("Welcome to SomeRPG :)");
                     Console.WriteLine("[L]oad game. [N]ew game. [E]xit");
-                    menu = Console.ReadKey();
+                    ClearKeyBuffer();
+                    menu = Console.ReadKey(true);
                 } while (menu.Key != ConsoleKey.L
                          && menu.Key != ConsoleKey.N
                          && menu.Key != ConsoleKey.E);
@@ -822,7 +838,8 @@ namespace SomeRPG
                     do
                     {
                         Console.WriteLine("Game over. Exit? y/n");
-                        startOVer = Console.ReadKey();
+                        ClearKeyBuffer();
+                        startOVer = Console.ReadKey(true);
                     } while (startOVer.Key != ConsoleKey.Y
                              && startOVer.Key != ConsoleKey.N);
                     if (startOVer.Key == ConsoleKey.Y)
