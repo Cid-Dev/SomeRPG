@@ -249,19 +249,19 @@ namespace SomeRPG
             switch (menu.Key)
             {
                 case ConsoleKey.E:
-                    monster.Level = ((difficulty - 5) > 0 ? (difficulty - 5) : (1));
+                    monster.SetLevel((difficulty - 5) > 0 ? (difficulty - 5) : (1));
                     --monster.GivenExp;
                     Fight(monster);
                     ++monster.GivenExp;
                     break;
 
                 case ConsoleKey.N:
-                    monster.Level = difficulty;
+                    monster.SetLevel(difficulty);
                     Fight(monster);
                     break;
 
                 case ConsoleKey.H:
-                    monster.Level = difficulty + 5;
+                    monster.SetLevel(difficulty + 5);
                     ++monster.GivenExp;
                     Fight(monster);
                     --monster.GivenExp;
