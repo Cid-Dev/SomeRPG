@@ -45,7 +45,8 @@ namespace Business
                     Inventory = new List<Item>()
                 };
 
-                player.BaseHP = (int)(42 * ((SavedGames[index].Level > 1) ? ((SavedGames[index].Level - 1) * player.hpMultiplier) : (1)));
+                player.BaseHP = (int)(42 * Math.Pow(1.1, SavedGames[index].Level - 1));
+                //player.BaseHP = (int)(42 * ((SavedGames[index].Level > 1) ? ((SavedGames[index].Level - 1) * player.hpMultiplier) : (1)));
                 player.CurrentHP = SavedGames[index].CurrentHP;
                 foreach (var hPPotion in SavedGames[index].Inventory.HPPotions)
                 {

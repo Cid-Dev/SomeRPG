@@ -148,8 +148,8 @@ namespace Business
         {
             if (ChestArmor != null)
             {
-                damage = ((damage - ChestArmor.Defense >= 0) ? (damage - ChestArmor.Defense) : (0));
-                damage = (int)Math.Round((double)damage * ((100.0 - ChestArmor.ArmorType.Absorbency) / 100.0));
+                damage = ((damage - this.ChestArmor.Defense >= 0) ? (damage - this.ChestArmor.Defense) : (0));
+                damage = (int)Math.Round((double)damage * ((100.0 - this.ChestArmor.ArmorType.Absorbency) / 100.0));
             }
             CurrentHP -= damage;
             if (CurrentHP <= 0)
