@@ -53,8 +53,9 @@ namespace Business
             string report;
             CurrentCooldown = _baseCooldown;
             int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
-            int TargetHP = Target.Defend(ref damage);
-            report = Name + " attacked " + Target.Name + " and dealt " + damage + " damage.\n";
+            string bodyPart;
+            int TargetHP = Target.Defend(ref damage, out bodyPart);
+            report = Name + " attacked " + Target.Name + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
             report += Target.Name + " has " + TargetHP + " HP remaining.\n";
             if (TargetHP <= 0)
             {
@@ -136,6 +137,26 @@ namespace Business
             return (RightHands);
         }
 
+        /*
+        private List<T1> getItems<T1, T2>() where T1 : class where T2 : class
+        {
+            var ItemsToGet = new List<T1>();
+            foreach (var item in Inventory)
+            {
+                if (item is T2)
+                {
+                    var itemToGet = (item as T2);
+                    ItemsToGet.Add(new T1
+                    {
+                        Id = itemToGet.Id,
+                        Quantity = itemToGet.Quantity
+                    });
+                }
+            }
+            return (ItemsToGet);
+        }
+        */
+
         private List<HPPotionsSave> getHPPotions()
         {
             var HPPotions = new List<HPPotionsSave>();
@@ -188,6 +209,91 @@ namespace Business
             return (ChestArmors);
         }
 
+        private List<LegsArmorSave> getLegsArmors()
+        {
+            var LegsArmors = new List<LegsArmorSave>();
+            foreach (var item in Inventory)
+            {
+                if (item is LegsArmor)
+                {
+                    var legsArmor = (item as LegsArmor);
+                    LegsArmors.Add(new LegsArmorSave
+                    {
+                        Id = legsArmor.Id
+                    });
+                }
+            }
+            return (LegsArmors);
+        }
+
+        private List<SleevesArmorSave> getSleevesArmors()
+        {
+            var SleevesArmor = new List<SleevesArmorSave>();
+            foreach (var item in Inventory)
+            {
+                if (item is SleevesArmor)
+                {
+                    var sleevesArmor = (item as SleevesArmor);
+                    SleevesArmor.Add(new SleevesArmorSave
+                    {
+                        Id = sleevesArmor.Id
+                    });
+                }
+            }
+            return (SleevesArmor);
+        }
+
+        private List<FeetArmorSave> getFeetArmors()
+        {
+            var FeetArmors = new List<FeetArmorSave>();
+            foreach (var item in Inventory)
+            {
+                if (item is FeetArmor)
+                {
+                    var feetArmor = (item as FeetArmor);
+                    FeetArmors.Add(new FeetArmorSave
+                    {
+                        Id = feetArmor.Id
+                    });
+                }
+            }
+            return (FeetArmors);
+        }
+
+        private List<HandsArmorSave> getHandsArmors()
+        {
+            var HandsArmors = new List<HandsArmorSave>();
+            foreach (var item in Inventory)
+            {
+                if (item is HandsArmor)
+                {
+                    var handsArmor = (item as HandsArmor);
+                    HandsArmors.Add(new HandsArmorSave
+                    {
+                        Id = handsArmor.Id
+                    });
+                }
+            }
+            return (HandsArmors);
+        }
+
+        private List<HeadArmorSave> getHeadArmors()
+        {
+            var HeadArmors = new List<HeadArmorSave>();
+            foreach (var item in Inventory)
+            {
+                if (item is HeadArmor)
+                {
+                    var headArmor = (item as HeadArmor);
+                    HeadArmors.Add(new HeadArmorSave
+                    {
+                        Id = headArmor.Id
+                    });
+                }
+            }
+            return (HeadArmors);
+        }
+
         public string Save()
         {
             try
@@ -202,11 +308,21 @@ namespace Business
                     CurrentHP = CurrentHP,
                     RightHand = ((RightHand != null) ? (RightHand.Id) : (0)),
                     ChestArmor = ((ChestArmor != null) ? (ChestArmor.Id) : (0)),
+                    LegsArmor = ((LegsArmor != null) ? (LegsArmor.Id) : (0)),
+                    SleevesArmor = ((SleevesArmor != null) ? (SleevesArmor.Id) : (0)),
+                    FeetArmor = ((FeetArmor != null) ? (FeetArmor.Id) : (0)),
+                    HandsArmor = ((HandsArmor != null) ? (HandsArmor.Id) : (0)),
+                    HeadArmor = ((HeadArmor != null) ? (HeadArmor.Id) : (0)),
                     Inventory = new InventorySave
                     {
                         HPPotions = getHPPotions(),
                         RightHands = getRightHands(),
-                        ChestArmors = getChestArmors()
+                        ChestArmors = getChestArmors(),
+                        SleevesArmors = getSleevesArmors(),
+                        LegsArmors = getLegsArmors(),
+                        FeetArmors = getFeetArmors(),
+                        HandsArmors = getHandsArmors(),
+                        HeadArmors = getHeadArmors()
                     }
                 });
             }

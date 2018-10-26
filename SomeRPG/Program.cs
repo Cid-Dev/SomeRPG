@@ -444,11 +444,21 @@ namespace SomeRPG
                     Console.WriteLine(player.Stats());
                     Console.WriteLine("[R]ight hand : " + ((player.RightHand != null) ? (player.RightHand.Name) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("[C]hest : " + ((player.ChestArmor != null) ? (player.ChestArmor.Name) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("[L]egs : " + ((player.LegsArmor != null) ? (player.LegsArmor.Name) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("[A]rms : " + ((player.SleevesArmor != null) ? (player.SleevesArmor.Name) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("[F]eet : " + ((player.FeetArmor != null) ? (player.FeetArmor.Name) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("[H]and : " + ((player.HandsArmor != null) ? (player.HandsArmor.Name) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("H[e]ad : " + ((player.HeadArmor != null) ? (player.HeadArmor.Name) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("Select an equipement slot or go [B]ack");
                     ClearKeyBuffer();
                     menu = Console.ReadKey(true);
                 } while (menu.Key != ConsoleKey.R
                          && menu.Key != ConsoleKey.C
+                         && menu.Key != ConsoleKey.L
+                         && menu.Key != ConsoleKey.A
+                         && menu.Key != ConsoleKey.F
+                         && menu.Key != ConsoleKey.H
+                         && menu.Key != ConsoleKey.E
                          && menu.Key != ConsoleKey.B);
 
                 switch (menu.Key)
@@ -459,6 +469,26 @@ namespace SomeRPG
 
                     case ConsoleKey.C:
                         SeeSlot<ChestArmor>("Chest armor", player.ChestArmor);
+                        break;
+
+                    case ConsoleKey.L:
+                        SeeSlot<LegsArmor>("Legs armor", player.LegsArmor);
+                        break;
+
+                    case ConsoleKey.A:
+                        SeeSlot<SleevesArmor>("Arms armor", player.SleevesArmor);
+                        break;
+
+                    case ConsoleKey.F:
+                        SeeSlot<FeetArmor>("Feet armor", player.FeetArmor);
+                        break;
+
+                    case ConsoleKey.H:
+                        SeeSlot<HandsArmor>("Hands armor", player.HandsArmor);
+                        break;
+
+                    case ConsoleKey.E:
+                        SeeSlot<HeadArmor>("Head armor", player.HeadArmor);
                         break;
 
                     default:

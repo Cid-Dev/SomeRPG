@@ -42,11 +42,15 @@ namespace Business
                     Money = SavedGames[index].Money,
                     RightHand = ((SavedGames[index].RightHand != 0) ? (new RightHand(SavedGames[index].RightHand)) : (null)),
                     ChestArmor = ((SavedGames[index].ChestArmor != 0) ? (new ChestArmor(SavedGames[index].ChestArmor)) : (null)),
+                    LegsArmor = ((SavedGames[index].LegsArmor != 0) ? (new LegsArmor(SavedGames[index].LegsArmor)) : (null)),
+                    SleevesArmor = ((SavedGames[index].SleevesArmor != 0) ? (new SleevesArmor(SavedGames[index].SleevesArmor)) : (null)),
+                    FeetArmor = ((SavedGames[index].FeetArmor != 0) ? (new FeetArmor(SavedGames[index].FeetArmor)) : (null)),
+                    HandsArmor = ((SavedGames[index].HandsArmor != 0) ? (new HandsArmor(SavedGames[index].HandsArmor)) : (null)),
+                    HeadArmor = ((SavedGames[index].HeadArmor != 0) ? (new HeadArmor(SavedGames[index].HeadArmor)) : (null)),
                     Inventory = new List<Item>()
                 };
 
                 player.BaseHP = (int)(42 * Math.Pow(1.1, SavedGames[index].Level - 1));
-                //player.BaseHP = (int)(42 * ((SavedGames[index].Level > 1) ? ((SavedGames[index].Level - 1) * player.hpMultiplier) : (1)));
                 player.CurrentHP = SavedGames[index].CurrentHP;
                 foreach (var hPPotion in SavedGames[index].Inventory.HPPotions)
                 {
@@ -56,8 +60,20 @@ namespace Business
                     });
                 }
 
-                foreach (var rightHand in SavedGames[index].Inventory.RightHands)
-                    player.Inventory.Add(new RightHand(rightHand.Id));
+                foreach (var item in SavedGames[index].Inventory.RightHands)
+                    player.Inventory.Add(new RightHand(item.Id));
+                foreach (var item in SavedGames[index].Inventory.ChestArmors)
+                    player.Inventory.Add(new ChestArmor(item.Id));
+                foreach (var item in SavedGames[index].Inventory.LegsArmors)
+                    player.Inventory.Add(new LegsArmor(item.Id));
+                foreach (var item in SavedGames[index].Inventory.SleevesArmors)
+                    player.Inventory.Add(new SleevesArmor(item.Id));
+                foreach (var item in SavedGames[index].Inventory.FeetArmors)
+                    player.Inventory.Add(new FeetArmor(item.Id));
+                foreach (var item in SavedGames[index].Inventory.HandsArmors)
+                    player.Inventory.Add(new HandsArmor(item.Id));
+                foreach (var item in SavedGames[index].Inventory.HeadArmors)
+                    player.Inventory.Add(new HeadArmor(item.Id));
                 return (player);
             }
             return (null);

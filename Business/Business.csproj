@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Business</RootNamespace>
     <AssemblyName>Business</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,12 +44,15 @@
     <Compile Include="Armor.cs" />
     <Compile Include="ArmorType.cs" />
     <Compile Include="Character.cs" />
+    <Compile Include="HandsArmor.cs" />
+    <Compile Include="HeadArmor.cs" />
     <Compile Include="ChestArmor.cs" />
     <Compile Include="HPPotion.cs" />
     <Compile Include="IEquipable.cs" />
     <Compile Include="IStackable.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="IUsable.cs" />
+    <Compile Include="LegsArmor.cs" />
     <Compile Include="LoadManager.cs" />
     <Compile Include="Loot.cs" />
     <Compile Include="Monster.cs" />
@@ -56,6 +60,8 @@
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RightHand.cs" />
+    <Compile Include="FeetArmor.cs" />
+    <Compile Include="SleevesArmor.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj">

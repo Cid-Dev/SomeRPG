@@ -15,6 +15,11 @@ namespace DataAccess
         public int CurrentHP { get; set; }
         public int RightHand { get; set; }
         public int ChestArmor { get; set; }
+        public int LegsArmor { get; set; }
+        public int SleevesArmor { get; set; }
+        public int FeetArmor { get; set; }
+        public int HandsArmor { get; set; }
+        public int HeadArmor { get; set; }
         public InventorySave Inventory = new InventorySave();
     }
 }

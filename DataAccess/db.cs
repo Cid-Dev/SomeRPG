@@ -15,10 +15,20 @@ namespace DataAccess
         protected string HPPotionTable = "hppotion";
         protected string RightHandTable = "righthand";
         protected string ChestArmorTable = "chestarmor";
+        protected string LegsArmorTable = "legsarmor";
+        protected string SleevesArmorTable = "sleevesarmor";
+        protected string FeetArmorTable = "feetarmor";
+        protected string HandsArmorTable = "handsarmor";
+        protected string HeadArmorTable = "headarmor";
         protected string ArmorTypeTable = "armortype";
         protected string loot_table_monster_hppotion = "loot_table_monster_hppotion";
         protected string loot_table_monster_righthand = "loot_table_monster_righthand";
         protected string loot_table_monster_chestarmor = "loot_table_monster_chestarmor";
+        protected string loot_table_monster_legsarmor = "loot_table_monster_legsarmor";
+        protected string loot_table_monster_sleevesarmor = "loot_table_monster_sleevesarmor";
+        protected string loot_table_monster_feetarmor = "loot_table_monster_feetarmor";
+        protected string loot_table_monster_handsarmor = "loot_table_monster_handsarmor";
+        protected string loot_table_monster_headarmor = "loot_table_monster_headarmor";
         protected string ItemTable = "item";
 
         protected string ConnectionString = null;

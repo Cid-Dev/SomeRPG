@@ -9,6 +9,7 @@ namespace Business
     public class Character
     {
         protected Random seed = new Random();
+        protected Random seedBodyPart = new Random();
         private int _baseHP;
         protected int _baseCooldown;
         private int _level = 1;
@@ -23,6 +24,13 @@ namespace Business
 
         private int MinDamageBonus = 0;
         private int MaxDamageBonus = 0;
+
+        private double headChance = 5;
+        private double handsChance = 10;
+        private double feetChance = 10;
+        private double armsChance = 15;
+        private double legsChance = 25;
+        private double chestChance = 35;
 
         #region gear
 
@@ -47,6 +55,11 @@ namespace Business
         }
 
         public ChestArmor ChestArmor { get; set; }
+        public LegsArmor LegsArmor { get; set; }
+        public SleevesArmor SleevesArmor { get; set; }
+        public FeetArmor FeetArmor { get; set; }
+        public HandsArmor HandsArmor { get; set; }
+        public HeadArmor HeadArmor { get; set; }
 
         #endregion gear
 
@@ -120,7 +133,6 @@ namespace Business
         protected string setExp(int exp)
         {
             string result = "";
-
             int levels = 0;
             while (exp > 0)
             {
@@ -144,12 +156,48 @@ namespace Business
             CurrentHP = ((CurrentHP + amount > BaseHP) ? (BaseHP) : (CurrentHP + amount));
         }
 
-        public int Defend(ref int damage)
+        public int Defend(ref int damage, out string bodyPart)
         {
-            if (ChestArmor != null)
+            bodyPart = "";
+
+            int aim = seedBodyPart.Next(1, 101);
+            Armor armorPart = null;
+            switch (aim)
             {
-                damage = ((damage - this.ChestArmor.Defense >= 0) ? (damage - this.ChestArmor.Defense) : (0));
-                damage = (int)Math.Round((double)damage * ((100.0 - this.ChestArmor.ArmorType.Absorbency) / 100.0));
+                case int n when (n <= headChance):
+                    bodyPart = "head";
+                    armorPart = HeadArmor;
+                    break;
+
+                case int n when (n <= headChance + handsChance):
+                    bodyPart = "hands";
+                    armorPart = HandsArmor;
+                    break;
+
+                case int n when (n <= headChance + handsChance + feetChance):
+                    bodyPart = "feet";
+                    armorPart = FeetArmor;
+                    break;
+
+                case int n when (n <= headChance + handsChance + feetChance + armsChance):
+                    bodyPart = "arms";
+                    armorPart = SleevesArmor;
+                    break;
+
+                case int n when (n <= headChance + handsChance + feetChance + armsChance + legsChance):
+                    bodyPart = "legs";
+                    armorPart = LegsArmor;
+                    break;
+
+                default:
+                    bodyPart = "chest";
+                    armorPart = ChestArmor;
+                    break;
+            }
+            if (armorPart != null)
+            {
+                damage = ((damage - armorPart.Defense >= 0) ? (damage - armorPart.Defense) : (0));
+                damage = (int)Math.Round((double)damage * ((100.0 - armorPart.ArmorType.Absorbency) / 100.0));
             }
             CurrentHP -= damage;
             if (CurrentHP <= 0)
@@ -162,8 +210,9 @@ namespace Business
             string report;
             CurrentCooldown = _baseCooldown;
             int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
-            int TargetHP = Target.Defend(ref damage);
-            report = Name + " attacked " + Target.Name + " and dealt " + damage + " damage.\n";
+            string bodyPart;
+            int TargetHP = Target.Defend(ref damage, out bodyPart);
+            report = Name + " attacked " + Target.Name + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
             report += Target.Name + " has " + TargetHP + " HP remaining.\n";
             if (TargetHP <= 0)
                 report += Name + " killed " + Target.Name;

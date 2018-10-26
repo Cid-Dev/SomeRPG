@@ -63,17 +63,27 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChestArmor.cs" />
+    <Compile Include="HeadArmorSave.cs" />
+    <Compile Include="HandsArmorSave.cs" />
+    <Compile Include="FeetArmorSave.cs" />
+    <Compile Include="SleevesArmorSave.cs" />
+    <Compile Include="LegsArmorSave.cs" />
     <Compile Include="ChestArmorSave.cs" />
     <Compile Include="DB.cs" />
+    <Compile Include="HandsArmor.cs" />
+    <Compile Include="HeadArmor.cs" />
     <Compile Include="GameSave.cs" />
     <Compile Include="HPPotion.cs" />
     <Compile Include="HPPotionsSave.cs" />
     <Compile Include="InventorySave.cs" />
+    <Compile Include="LegsArmor.cs" />
     <Compile Include="Monster.cs" />
     <Compile Include="PlayerSave.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RightHand.cs" />
     <Compile Include="RightHandsSave.cs" />
+    <Compile Include="FeetArmor.cs" />
+    <Compile Include="SleevesArmor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
