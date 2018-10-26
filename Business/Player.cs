@@ -65,7 +65,7 @@ namespace Business
             return (report);
         }
 
-        private string ConvertMoney(int money)
+        public string ConvertMoney(int money)
         {
             string result = "";
 

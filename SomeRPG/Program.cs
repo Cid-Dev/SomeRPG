@@ -20,12 +20,42 @@ namespace SomeRPG
                 Console.ReadKey(true);
         }
 
+        public static void Stats()
+        {
+            Console.Write("=== Name : " + player.Name + " === HP : ");
+            if ((player.CurrentHP * 100) / player.BaseHP <= 25)
+                Console.ForegroundColor = ConsoleColor.Red;
+            else if ((player.CurrentHP * 100) / player.BaseHP <= 50)
+                Console.ForegroundColor = ConsoleColor.Yellow;
+            else
+                Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write(player.CurrentHP);
+            Console.ResetColor();
+            Console.WriteLine("/" + player.BaseHP + " === Damages : " + player.CurrentMinAttack + " - " + player.CurrentMaxAttack + " === Level : " + player.Level + " === Exp : " + player._currentExp + "/" + player.getRequiredExp + " ===\n");
+            if (player.Money > 0)
+                Console.WriteLine("=== Money : " + player.ConvertMoney(player.Money) + " ===\n");
+        }
+
+        public static void MonsterStats(Character monster)
+        {
+            Console.Write("=== Name : " + monster.Name + " === HP : ");
+            if ((monster.CurrentHP * 100) / monster.BaseHP <= 25)
+                Console.ForegroundColor = ConsoleColor.Red;
+            else if ((monster.CurrentHP * 100) / monster.BaseHP <= 50)
+                Console.ForegroundColor = ConsoleColor.Yellow;
+            else
+                Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write(monster.CurrentHP);
+            Console.ResetColor();
+            Console.WriteLine("/" + monster.BaseHP + " === Damages : " + monster.CurrentMinAttack + " - " + monster.CurrentMaxAttack + " === Level : " + monster.Level + "\n");
+        }
+
         static void DisplayFightInfos(Character monster)
         {
             Console.Clear();
-            Console.WriteLine(player.Stats());
+            Stats();
             Console.WriteLine("You are fighting a monster !");
-            Console.WriteLine(monster.Stats());
+            MonsterStats(monster);
             Console.WriteLine("=== " + player.Name + " : " + player.CurrentCooldown + " === " + monster.Name + " : " + monster.CurrentCooldown + " ===");
         }
 
@@ -250,7 +280,7 @@ namespace SomeRPG
             do
             {
                 Console.Clear();
-                Console.WriteLine(player.Stats());
+                Stats();
                 Console.WriteLine("Select your difficulty");
                 Console.WriteLine("[E]asy. [N]normal [H]hard [B]ack");
                 ClearKeyBuffer();
@@ -308,7 +338,7 @@ namespace SomeRPG
                         if (i > 1)
                         {
                             Console.Clear();
-                            Console.WriteLine(player.Stats());
+                            Stats();
                             Console.WriteLine(options);
                             if (error != "")
                                 Console.WriteLine(error);
@@ -354,7 +384,7 @@ namespace SomeRPG
             while (!WakeUp && player.BaseHP > player.CurrentHP)
             {
                 Console.Clear();
-                Console.WriteLine(player.Stats());
+                Stats();
                 Console.WriteLine("You are resting. " + (player.BaseHP - player.CurrentHP) + " seconds left before being fully rested. [W]ake up?");
                 Thread.Sleep(1000);
                 ++player.CurrentHP;
@@ -391,7 +421,7 @@ namespace SomeRPG
                     if (i > 1)
                     {
                         Console.Clear();
-                        Console.WriteLine(player.Stats());
+                        Stats();
                         Console.WriteLine(options);
                         if (error != "")
                             Console.WriteLine(error);
@@ -424,7 +454,7 @@ namespace SomeRPG
             do
             {
                 Console.Clear();
-                Console.WriteLine(player.Stats());
+                Stats();
                 Console.WriteLine(slotName + " : " + ((item != null) ? ((item as Item).Name) : ("Nothing equiped")) + "\n");
                 Console.WriteLine(((item != null) ? ("[R]emove. R[e]place") : ("[E]quip")) + ". [B]ack");
                 ClearKeyBuffer();
@@ -457,7 +487,7 @@ namespace SomeRPG
                 do
                 {
                     Console.Clear();
-                    Console.WriteLine(player.Stats());
+                    Stats();
                     Console.WriteLine("[R]ight hand : " + ((player.RightHand != null) ? (player.RightHand.Name) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("[C]hest : " + ((player.ChestArmor != null) ? (player.ChestArmor.Name) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("[L]egs : " + ((player.LegsArmor != null) ? (player.LegsArmor.Name) : ("Nothing equiped")) + "\n");
@@ -548,7 +578,7 @@ namespace SomeRPG
                         }
 
                         Console.Clear();
-                        Console.WriteLine(player.Stats());
+                        Stats();
 
                         if (i > 1)
                         {
@@ -618,7 +648,7 @@ namespace SomeRPG
                         }
 
                         Console.Clear();
-                        Console.WriteLine(player.Stats());
+                        Stats();
                         Console.WriteLine(options);
                         Console.WriteLine("[U]sables. [E]quipement. [B]ack");
                     }
@@ -657,7 +687,7 @@ namespace SomeRPG
                 do
                 {
                     Console.Clear();
-                    Console.WriteLine(player.Stats());
+                    Stats();
                     Console.WriteLine("What do you want to do?");
                     Console.WriteLine("[E]quipement. [I]nventory. [R]est. [B]ack");
                     ClearKeyBuffer();
@@ -702,7 +732,7 @@ namespace SomeRPG
                 do
                 {
                     Console.Clear();
-                    Console.WriteLine(player.Stats());
+                    Stats();
                     Console.WriteLine("What do you want to do?");
                     Console.WriteLine("[A]ttack a monster. [C]haracter menu. [R]est. [S]ave game. [E]xit");
                     ClearKeyBuffer();
