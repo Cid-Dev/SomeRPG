@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Business;
 
 namespace SomeRPG
@@ -38,6 +40,7 @@ namespace SomeRPG
                 List<IUsable> usables;
                 do
                 {
+                    i = 1;
                     usables = null;
                     usables = new List<IUsable>();
                     string options = "Inventory :\n";
@@ -206,7 +209,7 @@ namespace SomeRPG
                     ClearKeyBuffer();
                     Console.ReadKey(true);
                 }
-                System.Threading.Thread.Sleep(100);
+                Thread.Sleep(100);
             }
             if (player.CurrentHP > 0 && monster.CurrentHP <= 0)
             {
@@ -336,16 +339,29 @@ namespace SomeRPG
             }
         }
 
+        static volatile bool WakeUp = false;
         static void Rest()
         {
-            while (player.BaseHP > player.CurrentHP)
+            var tokenSource2 = new CancellationTokenSource();
+            CancellationToken ct = tokenSource2.Token;
+
+            Task.Factory.StartNew(() =>
+            {
+                while (!ct.IsCancellationRequested && Console.ReadKey(true).Key != ConsoleKey.W) ;
+                WakeUp = true;
+            }, tokenSource2.Token);
+
+            while (!WakeUp && player.BaseHP > player.CurrentHP)
             {
                 Console.Clear();
                 Console.WriteLine(player.Stats());
-                Console.WriteLine("You are resting. " + (player.BaseHP - player.CurrentHP) + " seconds left before being fully rested.");
-                System.Threading.Thread.Sleep(1000);
+                Console.WriteLine("You are resting. " + (player.BaseHP - player.CurrentHP) + " seconds left before being fully rested. [W]ake up?");
+                Thread.Sleep(1000);
                 ++player.CurrentHP;
             }
+            WakeUp = false;
+            tokenSource2.Cancel();
+            tokenSource2.Dispose();
         }
 
         static void GetInventoryGears<T>()
