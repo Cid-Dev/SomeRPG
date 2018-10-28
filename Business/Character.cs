@@ -32,6 +32,36 @@ namespace Business
         private double legsChance = 25;
         private double chestChance = 35;
 
+        /// <summary>
+        /// The strengh of the character.
+        /// Adds 0.01 to both minAttackMultiplier and maxAttackMultiplier
+        /// </summary>
+        public int Strengh { get; set; }
+
+        /// <summary>
+        /// The vitality of the character.
+        /// Adds 0.01 to the hpMultiplier
+        /// </summary>
+        public int Vitality { get; set; }
+
+        /// <summary>
+        /// The agility of the character.
+        /// Used to determine the ability of evading
+        /// </summary>
+        public int Agility { get; set; }
+
+        /// <summary>
+        /// The dexterity of the character.
+        /// User to determine the ability of parrying and blocking
+        /// </summary>
+        public int Dexterity { get; set; }
+
+        /// <summary>
+        /// The precision of the character.
+        /// Works against target's Agility and Dexterity
+        /// </summary>
+        public int Precision { get; set; }
+
         #region gear
 
         public RightHand RightHand
