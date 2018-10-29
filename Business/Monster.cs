@@ -17,14 +17,18 @@ namespace Business
 
         public void SetLevel(int lvl)
         {
-            float hp = BaseHP;
+            //float hp = BaseHP;
             Level = lvl;
+            BaseStrengh += (lvl - 1);
+            BaseHP *= (int)Math.Round(Math.Pow(hpMultiplier, lvl - 1));
+            /*
             while (lvl > 1)
             {
                 hp *= hpMultiplier;
                 --lvl;
             }
             BaseHP = (int)Math.Round(hp);
+            */
         }
 
         public int LootMoney()

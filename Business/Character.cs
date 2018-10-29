@@ -18,8 +18,8 @@ namespace Business
         private int _givenExp = 16;
         private float expMultiplier = 1.9F;
         public float hpMultiplier = 1.1F;
-        private float minAttackMultiplier = 1.1F;
-        private float maxAttackMultiplier = 1.1F;
+        private float minAttackMultiplier = 1F;
+        private float maxAttackMultiplier = 1F;
         private RightHand _rightHand;
 
         private int MinDamageBonus = 0;
@@ -33,10 +33,31 @@ namespace Business
         private double chestChance = 35;
 
         /// <summary>
+        /// The base strengh of the character
+        /// </summary>
+        public int BaseStrengh { get; set; }
+
+        /// <summary>
+        /// The amount of points added by the player to the strengh
+        /// </summary>
+        public int AddedStrengh { get; set; }
+
+        /// <summary>
+        /// The amount of points added by buffs and items to the strengh 
+        /// </summary>
+        public int BonusStrengh { get; set; }
+
+        /// <summary>
         /// The strengh of the character.
         /// Adds 0.01 to both minAttackMultiplier and maxAttackMultiplier
         /// </summary>
-        public int Strengh { get; set; }
+        public int Strengh
+        {
+            get
+            {
+                return (BaseStrengh + AddedStrengh + BonusStrengh);
+            }
+        }
 
         /// <summary>
         /// The vitality of the character.
@@ -111,10 +132,13 @@ namespace Business
         {
             get
             {
-                float curMinAtk = (float)BaseMinAttack + (float)MinDamageBonus;
+                var curMinAtk = (1 + (0.01 * Strengh)) * (BaseMinAttack + MinDamageBonus);
+                //float curMinAtk = (float)BaseMinAttack + (float)MinDamageBonus;
+                //double curMinAtk = (double)BaseMinAttack * (Math.Pow(minAttackMultiplier + (Strengh / 100.0F), Level - 1)) + (double)MinDamageBonus;
+                /*
                 for (int i = 1; i < _level; ++i)
                     curMinAtk = curMinAtk * minAttackMultiplier;
-
+                    */
                 return ((int)Math.Round(curMinAtk));
             }
         }
@@ -123,13 +147,16 @@ namespace Business
         {
             get
             {
+                var curMaxAtk = (1 + (0.01 * Strengh)) * (BaseMaxAttack + MaxDamageBonus);
+                /*
                 float curMaxAtk = (float)BaseMaxAttack + (float)MaxDamageBonus;
                 for (int i = 1; i < _level; ++i)
                     curMaxAtk = curMaxAtk * maxAttackMultiplier;
+                    */
                 return ((int)Math.Round(curMaxAtk));
             }
         }
-
+        //(1 + 0.05) * (5 + 0)
         public int CurrentCooldown { get; set; }
         public int BaseCooldown
         {
@@ -160,6 +187,15 @@ namespace Business
             }
         }
 
+        protected void LevelUp()
+        {
+            ++_level;
+            ++BaseStrengh;
+            _currentExp = 0;
+            BaseHP = (int)(BaseHP * hpMultiplier);
+
+        }
+
         protected string setExp(int exp)
         {
             string result = "";
@@ -170,10 +206,8 @@ namespace Business
                 exp = _currentExp - getRequiredExp;
                 if (exp >= 0)
                 {
+                    LevelUp();
                     ++levels;
-                    ++_level;
-                    _currentExp = 0;
-                    BaseHP = (int)(BaseHP * hpMultiplier);
                 }
             }
             if (levels > 0)

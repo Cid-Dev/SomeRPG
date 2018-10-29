@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,22 @@ namespace Business
     {
         public List<Item> Inventory = new List<Item>();
         public int Money { get; set; }
+
+        public void SetLevel(int lvl)
+        {
+            //float hp = BaseHP;
+            Level = lvl;
+            BaseStrengh += (lvl - 1);
+            BaseHP = (int)Math.Round(BaseHP * Math.Pow((double)hpMultiplier, (double)(lvl - 1)));
+            /*
+            while (lvl > 1)
+            {
+                hp *= hpMultiplier;
+                --lvl;
+            }
+            BaseHP = (int)Math.Round(hp);
+            */
+        }
 
         private void StackItem(Item NewItem)
         {

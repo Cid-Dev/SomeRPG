@@ -361,6 +361,7 @@ namespace DataAccess
                     MinMoney = reader["MinMoney"],
                     MaxMoney = reader["MaxMoney"],
                     MoneyMultiplier = reader["MoneyMultiplier"],
+                    BaseStrengh = reader["BaseStrengh"],
                     LootTable = new
                     {
                         HPPotion = GetHPPotionLootTable(int.Parse(reader["id"].ToString())),

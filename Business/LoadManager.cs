@@ -34,11 +34,12 @@ namespace Business
                 Player player = new Player
                 {
                     Name = SavedGames[index].Name,
-                    Level = SavedGames[index].Level,
                     _currentExp = SavedGames[index].CurrentExp,
                     BaseCooldown = 10,
                     BaseMinAttack = 5,
                     BaseMaxAttack = 10,
+                    BaseStrengh = 10,
+                    BaseHP = 42,
                     Money = SavedGames[index].Money,
                     RightHand = ((SavedGames[index].RightHand != 0) ? (new RightHand(SavedGames[index].RightHand)) : (null)),
                     ChestArmor = ((SavedGames[index].ChestArmor != 0) ? (new ChestArmor(SavedGames[index].ChestArmor)) : (null)),
@@ -49,8 +50,8 @@ namespace Business
                     HeadArmor = ((SavedGames[index].HeadArmor != 0) ? (new HeadArmor(SavedGames[index].HeadArmor)) : (null)),
                     Inventory = new List<Item>()
                 };
-
-                player.BaseHP = (int)(42 * Math.Pow(1.1, SavedGames[index].Level - 1));
+                player.SetLevel(SavedGames[index].Level);
+                //player.BaseHP = (int)(42 * Math.Pow(1.1, SavedGames[index].Level - 1));
                 player.CurrentHP = SavedGames[index].CurrentHP;
                 foreach (var hPPotion in SavedGames[index].Inventory.HPPotions)
                 {

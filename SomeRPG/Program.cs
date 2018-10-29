@@ -36,6 +36,21 @@ namespace SomeRPG
                 Console.WriteLine("=== Money : " + player.ConvertMoney(player.Money) + " ===\n");
         }
 
+        public static string ArmorDetail(Armor armor)
+        {
+            string result = "";
+            if (armor != null)
+                result += "Defense : " + armor.Defense + " - Type : " + armor.ArmorType.Name + " - Absorbency : " + armor.ArmorType.Absorbency + "%";
+            return (result);
+        }
+
+        public static void DetailedStats()
+        {
+            Console.WriteLine("=== Stats ===\n");
+            Console.WriteLine("\tStrengh : " + player.Strengh);
+            Console.WriteLine();
+        }
+
         public static void MonsterStats(Character monster)
         {
             Console.Write("=== Name : " + monster.Name + " === HP : ");
@@ -415,7 +430,7 @@ namespace SomeRPG
                         if (gearT.GetType() == typeof(T)
                             && gearT is IEquipable)
                         {
-                            options += "[" + i++ + "] " + gearT.Name + " : " + gearT.Description + "\n";
+                            options += "[" + i++ + "] " + gearT.Name + " : " + gearT.Description + ((gearT is Armor) ? (" - " + ArmorDetail(gearT as Armor)) : ("")) + "\n";
                             stuff.Add(gearT as IEquipable);
                         }
                     if (i > 1)
@@ -455,7 +470,7 @@ namespace SomeRPG
             {
                 Console.Clear();
                 Stats();
-                Console.WriteLine(slotName + " : " + ((item != null) ? ((item as Item).Name) : ("Nothing equiped")) + "\n");
+                Console.WriteLine(slotName + " : " + ((item != null) ? ((item as Item).Name + " : " + (item as Item).Description + ((item is Armor) ? (" - " + ArmorDetail(item as Armor)) : (""))) : ("Nothing equiped")) + "\n");
                 Console.WriteLine(((item != null) ? ("[R]emove. R[e]place") : ("[E]quip")) + ". [B]ack");
                 ClearKeyBuffer();
                 menu = Console.ReadKey(true);
@@ -489,12 +504,12 @@ namespace SomeRPG
                     Console.Clear();
                     Stats();
                     Console.WriteLine("[R]ight hand : " + ((player.RightHand != null) ? (player.RightHand.Name) : ("Nothing equiped")) + "\n");
-                    Console.WriteLine("[C]hest : " + ((player.ChestArmor != null) ? (player.ChestArmor.Name) : ("Nothing equiped")) + "\n");
-                    Console.WriteLine("[L]egs : " + ((player.LegsArmor != null) ? (player.LegsArmor.Name) : ("Nothing equiped")) + "\n");
-                    Console.WriteLine("[A]rms : " + ((player.SleevesArmor != null) ? (player.SleevesArmor.Name) : ("Nothing equiped")) + "\n");
-                    Console.WriteLine("[F]eet : " + ((player.FeetArmor != null) ? (player.FeetArmor.Name) : ("Nothing equiped")) + "\n");
-                    Console.WriteLine("[H]and : " + ((player.HandsArmor != null) ? (player.HandsArmor.Name) : ("Nothing equiped")) + "\n");
-                    Console.WriteLine("H[e]ad : " + ((player.HeadArmor != null) ? (player.HeadArmor.Name) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("[C]hest : " + ((player.ChestArmor != null) ? (player.ChestArmor.Name + " : " + player.ChestArmor.Description + " - " + ArmorDetail(player.ChestArmor)) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("[L]egs : " + ((player.LegsArmor != null) ? (player.LegsArmor.Name + " : " + player.LegsArmor.Description + " - " + ArmorDetail(player.LegsArmor)) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("[A]rms : " + ((player.SleevesArmor != null) ? (player.SleevesArmor.Name + " : " + player.SleevesArmor.Description + " - " + ArmorDetail(player.SleevesArmor)) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("[F]eet : " + ((player.FeetArmor != null) ? (player.FeetArmor.Name + " : " + player.FeetArmor.Description + " - " + ArmorDetail(player.FeetArmor)) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("[H]and : " + ((player.HandsArmor != null) ? (player.HandsArmor.Name + " : " + player.HandsArmor.Description + " - " + ArmorDetail(player.HandsArmor)) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("H[e]ad : " + ((player.HeadArmor != null) ? (player.HeadArmor.Name + " : " + player.HeadArmor.Description + " - " + ArmorDetail(player.HeadArmor)) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("Select an equipement slot or go [B]ack");
                     ClearKeyBuffer();
                     menu = Console.ReadKey(true);
@@ -572,7 +587,10 @@ namespace SomeRPG
                                     var stackable = item as IStackable;
                                     stack = "(" + stackable.Quantity + "/" + stackable.MaxAmount + ") ";
                                 }
-                                options += "[" + i++ + "] - " + item.Name + " " + stack + ": " + item.Description + "\n";
+                                options += "[" + i++ + "] - " + item.Name + " " + stack + ": " + item.Description;
+                                if (item is Armor)
+                                    options += " " + ArmorDetail(item as Armor);
+                                options += "\n";
                                 items.Add(item as T);
                             }
                         }
@@ -688,6 +706,7 @@ namespace SomeRPG
                 {
                     Console.Clear();
                     Stats();
+                    DetailedStats();
                     Console.WriteLine("What do you want to do?");
                     Console.WriteLine("[E]quipement. [I]nventory. [R]est. [B]ack");
                     ClearKeyBuffer();
@@ -878,7 +897,8 @@ namespace SomeRPG
                             BaseHP = 42,
                             BaseCooldown = 10,
                             BaseMinAttack = 5,
-                            BaseMaxAttack = 10
+                            BaseMaxAttack = 10,
+                            BaseStrengh = 10
                         };
 
                         try
