@@ -18,7 +18,9 @@ namespace Business
             //float hp = BaseHP;
             Level = lvl;
             BaseStrengh += (lvl - 1);
-            BaseHP = (int)Math.Round(BaseHP * Math.Pow((double)hpMultiplier, (double)(lvl - 1)));
+            BaseVitality += (int)Math.Floor((double)lvl / 2);
+            CurrentHP = HP;
+            //BaseHP = (int)Math.Round(BaseHP * Math.Pow((double)hpMultiplier, (double)(lvl - 1)));
             /*
             while (lvl > 1)
             {
@@ -113,7 +115,7 @@ namespace Business
 
         public override string Stats()
         {
-            string result = "=== Name : " + Name + " === HP : " + CurrentHP + "/" + BaseHP + " === Damages : " + CurrentMinAttack + " - " + CurrentMaxAttack + " === Level : " + Level + " === Exp : " + _currentExp + "/" + getRequiredExp + " ===\n";
+            string result = "=== Name : " + Name + " === HP : " + CurrentHP + "/" + HP + " === Damages : " + CurrentMinAttack + " - " + CurrentMaxAttack + " === Level : " + Level + " === Exp : " + _currentExp + "/" + getRequiredExp + " ===\n";
             if (Money > 0)
                 result += "=== Money : " + ConvertMoney(Money) + " ===\n";
             return (result);

@@ -39,6 +39,7 @@ namespace Business
                     BaseMinAttack = 5,
                     BaseMaxAttack = 10,
                     BaseStrengh = 10,
+                    BaseVitality = 10,
                     BaseHP = 42,
                     Money = SavedGames[index].Money,
                     RightHand = ((SavedGames[index].RightHand != 0) ? (new RightHand(SavedGames[index].RightHand)) : (null)),

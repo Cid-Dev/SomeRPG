@@ -24,6 +24,7 @@ namespace Business
 
         private int MinDamageBonus = 0;
         private int MaxDamageBonus = 0;
+        private int HPBonus = 0;
 
         private double headChance = 5;
         private double handsChance = 10;
@@ -60,10 +61,31 @@ namespace Business
         }
 
         /// <summary>
+        /// The base vitality of the character
+        /// </summary>
+        public int BaseVitality { get; set; }
+
+        /// <summary>
+        /// The amount of points added by the player to the strengh
+        /// </summary>
+        public int AddedVitality { get; set; }
+
+        /// <summary>
+        /// The amount of points added by buffs and items to the strengh 
+        /// </summary>
+        public int BonusVitality { get; set; }
+
+        /// <summary>
         /// The vitality of the character.
         /// Adds 0.01 to the hpMultiplier
         /// </summary>
-        public int Vitality { get; set; }
+        public int Vitality
+        {
+            get
+            {
+                return (BaseVitality + AddedVitality + BonusVitality);
+            }
+        }
 
         /// <summary>
         /// The agility of the character.
@@ -118,6 +140,14 @@ namespace Business
         public int Level{ get => _level; set => _level = value; }
         public int GivenExp { get => _givenExp; set => _givenExp = value; }
         public int CurrentHP { get; set; }
+        public int HP
+        {
+            get
+            {
+                var curHP = (1 + (0.01 * Vitality)) * BaseHP * Level + HPBonus;
+                return ((int)Math.Round(curHP));
+            }
+        }
         public int BaseHP
         {
             get => _baseHP;
@@ -156,7 +186,7 @@ namespace Business
                 return ((int)Math.Round(curMaxAtk));
             }
         }
-        //(1 + 0.05) * (5 + 0)
+        
         public int CurrentCooldown { get; set; }
         public int BaseCooldown
         {
@@ -191,9 +221,10 @@ namespace Business
         {
             ++_level;
             ++BaseStrengh;
+            if (_level % 2 == 0)
+                ++BaseVitality;
             _currentExp = 0;
-            BaseHP = (int)(BaseHP * hpMultiplier);
-
+            CurrentHP = HP;
         }
 
         protected string setExp(int exp)
@@ -217,7 +248,7 @@ namespace Business
 
         public void Heal(int amount)
         {
-            CurrentHP = ((CurrentHP + amount > BaseHP) ? (BaseHP) : (CurrentHP + amount));
+            CurrentHP = ((CurrentHP + amount > HP) ? (HP) : (CurrentHP + amount));
         }
 
         public int Defend(ref int damage, out string bodyPart)
@@ -285,7 +316,7 @@ namespace Business
 
         public virtual string Stats()
         {
-            string result = "=== Name : " + Name + " === HP : " + CurrentHP + "/" + BaseHP + " === Damages : " + CurrentMinAttack + " - " + CurrentMaxAttack + " === Level : " + _level + " ===\n";
+            string result = "=== Name : " + Name + " === HP : " + CurrentHP + "/" + HP + " === Damages : " + CurrentMinAttack + " - " + CurrentMaxAttack + " === Level : " + _level + " ===\n";
 
             return (result);
         }

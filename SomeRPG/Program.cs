@@ -23,15 +23,15 @@ namespace SomeRPG
         public static void Stats()
         {
             Console.Write("=== Name : " + player.Name + " === HP : ");
-            if ((player.CurrentHP * 100) / player.BaseHP <= 25)
+            if ((player.CurrentHP * 100) / player.HP <= 25)
                 Console.ForegroundColor = ConsoleColor.Red;
-            else if ((player.CurrentHP * 100) / player.BaseHP <= 50)
+            else if ((player.CurrentHP * 100) / player.HP <= 50)
                 Console.ForegroundColor = ConsoleColor.Yellow;
             else
                 Console.ForegroundColor = ConsoleColor.Green;
             Console.Write(player.CurrentHP);
             Console.ResetColor();
-            Console.WriteLine("/" + player.BaseHP + " === Damages : " + player.CurrentMinAttack + " - " + player.CurrentMaxAttack + " === Level : " + player.Level + " === Exp : " + player._currentExp + "/" + player.getRequiredExp + " ===\n");
+            Console.WriteLine("/" + player.HP + " === Damages : " + player.CurrentMinAttack + " - " + player.CurrentMaxAttack + " === Level : " + player.Level + " === Exp : " + player._currentExp + "/" + player.getRequiredExp + " ===\n");
             if (player.Money > 0)
                 Console.WriteLine("=== Money : " + player.ConvertMoney(player.Money) + " ===\n");
         }
@@ -48,21 +48,22 @@ namespace SomeRPG
         {
             Console.WriteLine("=== Stats ===\n");
             Console.WriteLine("\tStrengh : " + player.Strengh);
+            Console.WriteLine("\tVitality : " + player.Vitality);
             Console.WriteLine();
         }
 
         public static void MonsterStats(Character monster)
         {
             Console.Write("=== Name : " + monster.Name + " === HP : ");
-            if ((monster.CurrentHP * 100) / monster.BaseHP <= 25)
+            if ((monster.CurrentHP * 100) / monster.HP <= 25)
                 Console.ForegroundColor = ConsoleColor.Red;
-            else if ((monster.CurrentHP * 100) / monster.BaseHP <= 50)
+            else if ((monster.CurrentHP * 100) / monster.HP <= 50)
                 Console.ForegroundColor = ConsoleColor.Yellow;
             else
                 Console.ForegroundColor = ConsoleColor.Green;
             Console.Write(monster.CurrentHP);
             Console.ResetColor();
-            Console.WriteLine("/" + monster.BaseHP + " === Damages : " + monster.CurrentMinAttack + " - " + monster.CurrentMaxAttack + " === Level : " + monster.Level + "\n");
+            Console.WriteLine("/" + monster.HP + " === Damages : " + monster.CurrentMinAttack + " - " + monster.CurrentMaxAttack + " === Level : " + monster.Level + "\n");
         }
 
         static void DisplayFightInfos(Character monster)
@@ -396,11 +397,11 @@ namespace SomeRPG
                 WakeUp = true;
             }, tokenSource2.Token);
 
-            while (!WakeUp && player.BaseHP > player.CurrentHP)
+            while (!WakeUp && player.HP > player.CurrentHP)
             {
                 Console.Clear();
                 Stats();
-                Console.WriteLine("You are resting. " + (player.BaseHP - player.CurrentHP) + " seconds left before being fully rested. [W]ake up?");
+                Console.WriteLine("You are resting. " + (player.HP - player.CurrentHP) + " seconds left before being fully rested. [W]ake up?");
                 Thread.Sleep(1000);
                 ++player.CurrentHP;
             }
@@ -727,7 +728,7 @@ namespace SomeRPG
                         break;
 
                     case ConsoleKey.R:
-                        if (player.BaseHP <= player.CurrentHP)
+                        if (player.HP <= player.CurrentHP)
                         {
                             Console.WriteLine("You can't rest, you are already full HP");
                             Console.WriteLine("Press enter");
@@ -776,7 +777,7 @@ namespace SomeRPG
                         break;
 
                     case ConsoleKey.R:
-                        if (player.BaseHP <= player.CurrentHP)
+                        if (player.HP <= player.CurrentHP)
                         {
                             Console.WriteLine("You can't rest, you are already full HP");
                             Console.WriteLine("Press enter");
@@ -898,7 +899,8 @@ namespace SomeRPG
                             BaseCooldown = 10,
                             BaseMinAttack = 5,
                             BaseMaxAttack = 10,
-                            BaseStrengh = 10
+                            BaseStrengh = 10,
+                            BaseVitality = 10
                         };
 
                         try

@@ -33,6 +33,7 @@ namespace Business
                             MinMoney = int.Parse(dalMonster?.GetType().GetProperty("MinMoney")?.GetValue(dalMonster, null).ToString()),
                             MaxMoney = int.Parse(dalMonster?.GetType().GetProperty("MaxMoney")?.GetValue(dalMonster, null).ToString()),
                             BaseStrengh = int.Parse(dalMonster?.GetType().GetProperty("BaseStrengh")?.GetValue(dalMonster, null).ToString()),
+                            BaseVitality = int.Parse(dalMonster?.GetType().GetProperty("BaseVitality")?.GetValue(dalMonster, null).ToString()),
                             MoneyMultiplier = float.Parse(dalMonster?.GetType().GetProperty("MoneyMultiplier")?.GetValue(dalMonster, null).ToString())
                         };
 

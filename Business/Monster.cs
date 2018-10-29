@@ -20,7 +20,9 @@ namespace Business
             //float hp = BaseHP;
             Level = lvl;
             BaseStrengh += (lvl - 1);
-            BaseHP *= (int)Math.Round(Math.Pow(hpMultiplier, lvl - 1));
+            BaseVitality += (int)Math.Floor((double)lvl / 2);
+            CurrentHP = HP;
+            //BaseHP *= (int)Math.Round(Math.Pow(hpMultiplier, lvl - 1));
             /*
             while (lvl > 1)
             {
