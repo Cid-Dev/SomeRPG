@@ -242,7 +242,7 @@ namespace Business
                 }
             }
             if (levels > 0)
-                result = "You've earned " + levels + " levels ! You are now level " + _level + "\n";
+                result = "You've earned " + levels + " level" + ((levels < 2) ? ("") : ("s")) + " ! You are now level " + _level + "\n";
             return (result);
         }
 
