@@ -19,6 +19,7 @@ namespace Business
             Level = lvl;
             BaseStrengh += (lvl - 1);
             BaseVitality += (int)Math.Floor((double)lvl / 2);
+            BaseAgility += (int)Math.Floor((double)lvl / 5);
             CurrentHP = HP;
             //BaseHP = (int)Math.Round(BaseHP * Math.Pow((double)hpMultiplier, (double)(lvl - 1)));
             /*
@@ -71,15 +72,22 @@ namespace Business
         {
             string report;
             CurrentCooldown = _baseCooldown;
-            int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
-            string bodyPart;
-            int TargetHP = Target.Defend(ref damage, out bodyPart);
-            report = Name + " attacked " + Target.Name + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
-            report += Target.Name + " has " + TargetHP + " HP remaining.\n";
-            if (TargetHP <= 0)
+            if (IsAttackEvaded())
             {
-                report += "You killed " + Target.Name + " and have earned " + Target.getGivenExp + " exp\n";
-                report += setExp(Target.getGivenExp);
+                report = Name + " attacked " + Target.Name + " but " + Target.Name + " evaded the blow.";
+            }
+            else
+            {
+                int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
+                string bodyPart;
+                int TargetHP = Target.Defend(ref damage, out bodyPart);
+                report = Name + " attacked " + Target.Name + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
+                report += Target.Name + " has " + TargetHP + " HP remaining.\n";
+                if (TargetHP <= 0)
+                {
+                    report += "You killed " + Target.Name + " and have earned " + Target.getGivenExp + " exp\n";
+                    report += setExp(Target.getGivenExp);
+                }
             }
             return (report);
         }

@@ -363,6 +363,7 @@ namespace DataAccess
                     MoneyMultiplier = reader["MoneyMultiplier"],
                     BaseStrengh = reader["BaseStrengh"],
                     BaseVitality = reader["BaseVitality"],
+                    BaseAgility = reader["BaseAgility"],
                     LootTable = new
                     {
                         HPPotion = GetHPPotionLootTable(int.Parse(reader["id"].ToString())),

@@ -21,6 +21,7 @@ namespace Business
             Level = lvl;
             BaseStrengh += (lvl - 1);
             BaseVitality += (int)Math.Floor((double)lvl / 2);
+            BaseAgility += (int)Math.Floor((double)lvl / 5);
             CurrentHP = HP;
             //BaseHP *= (int)Math.Round(Math.Pow(hpMultiplier, lvl - 1));
             /*

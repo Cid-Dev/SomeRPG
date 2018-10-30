@@ -900,7 +900,8 @@ namespace SomeRPG
                             BaseMinAttack = 5,
                             BaseMaxAttack = 10,
                             BaseStrengh = 10,
-                            BaseVitality = 10
+                            BaseVitality = 10,
+                            BaseAgility = 10
                         };
 
                         try
