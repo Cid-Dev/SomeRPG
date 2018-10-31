@@ -364,6 +364,7 @@ namespace DataAccess
                     BaseStrengh = reader["BaseStrengh"],
                     BaseVitality = reader["BaseVitality"],
                     BaseAgility = reader["BaseAgility"],
+                    BasePrecision = reader["BasePrecision"],
                     LootTable = new
                     {
                         HPPotion = GetHPPotionLootTable(int.Parse(reader["id"].ToString())),

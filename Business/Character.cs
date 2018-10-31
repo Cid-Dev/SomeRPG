@@ -122,10 +122,31 @@ namespace Business
         public int Dexterity { get; set; }
 
         /// <summary>
+        /// The base agility of the character
+        /// </summary>
+        public int BasePrecision { get; set; }
+
+        /// <summary>
+        /// The amount of points added by the player to the agility
+        /// </summary>
+        public int AddedPrecision { get; set; }
+
+        /// <summary>
+        /// The amount of points added by buffs and items to the agility 
+        /// </summary>
+        public int BonusPrecision { get; set; }
+
+        /// <summary>
         /// The precision of the character.
         /// Works against target's Agility and Dexterity
         /// </summary>
-        public int Precision { get; set; }
+        public int Precision
+        {
+            get
+            {
+                return (BasePrecision + AddedPrecision + BonusPrecision);
+            }
+        }
 
         #region gear
 
@@ -247,6 +268,8 @@ namespace Business
                 ++BaseVitality;
             if (_level % 5 == 0)
                 ++BaseAgility;
+            if (_level % 5 == 0)
+                ++BasePrecision;
             _currentExp = 0;
             CurrentHP = HP;
         }

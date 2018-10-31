@@ -49,6 +49,8 @@ namespace SomeRPG
             Console.WriteLine("=== Stats ===\n");
             Console.WriteLine("\tStrengh : " + player.Strengh);
             Console.WriteLine("\tVitality : " + player.Vitality);
+            Console.WriteLine("\tAgility : " + player.Agility);
+            Console.WriteLine("\tPrecision : " + player.Precision);
             Console.WriteLine();
         }
 
@@ -901,7 +903,8 @@ namespace SomeRPG
                             BaseMaxAttack = 10,
                             BaseStrengh = 10,
                             BaseVitality = 10,
-                            BaseAgility = 10
+                            BaseAgility = 10,
+                            BasePrecision = 10
                         };
 
                         try
