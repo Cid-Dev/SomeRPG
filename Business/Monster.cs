@@ -23,6 +23,7 @@ namespace Business
             BaseVitality += (int)Math.Floor((double)lvl / 2);
             BaseAgility += (int)Math.Floor((double)lvl / 5);
             BasePrecision += (int)Math.Floor((double)lvl / 5);
+            BaseDexterity += (int)Math.Floor((double)lvl / 3);
             CurrentHP = HP;
             //BaseHP *= (int)Math.Round(Math.Pow(hpMultiplier, lvl - 1));
             /*

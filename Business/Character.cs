@@ -10,6 +10,7 @@ namespace Business
     {
         protected Random seed = new Random();
         protected Random seedEvasion = new Random();
+        protected Random seedParry = new Random();
         protected Random seedBodyPart = new Random();
         private int _baseHP;
         protected int _baseCooldown;
@@ -116,10 +117,31 @@ namespace Business
         }
 
         /// <summary>
+        /// The base agility of the character
+        /// </summary>
+        public int BaseDexterity { get; set; }
+
+        /// <summary>
+        /// The amount of points added by the player to the agility
+        /// </summary>
+        public int AddedDexterity { get; set; }
+
+        /// <summary>
+        /// The amount of points added by buffs and items to the agility 
+        /// </summary>
+        public int BonusDexterity { get; set; }
+
+        /// <summary>
         /// The dexterity of the character.
         /// User to determine the ability of parrying and blocking
         /// </summary>
-        public int Dexterity { get; set; }
+        public int Dexterity
+        {
+            get
+            {
+                return (BaseDexterity + AddedDexterity + BonusDexterity);
+            }
+        }
 
         /// <summary>
         /// The base agility of the character
@@ -270,6 +292,8 @@ namespace Business
                 ++BaseAgility;
             if (_level % 5 == 0)
                 ++BasePrecision;
+            if (_level % 3 == 0)
+                ++BaseDexterity;
             _currentExp = 0;
             CurrentHP = HP;
         }
@@ -361,6 +385,22 @@ namespace Business
                 return (true);
             return (false);
         }
+        //BaseDexterity
+
+        protected bool IsAttackParried()
+        {
+            int baseParry = 10;
+            int factor = Target.Agility - Precision;
+            if (factor < 0)
+                factor = 0;
+            int finalParry = baseParry + factor;
+            if (finalParry > 90)
+                finalParry = 90;
+            int parryResult = seedParry.Next(101);
+            if (parryResult <= finalParry)
+                return (true);
+            return (false);
+        }
 
         public virtual string Attack()
         {
@@ -369,6 +409,10 @@ namespace Business
             if (IsAttackEvaded())
             {
                 report = Name + " attacked " + Target.Name + " but " + Target.Name + " evaded the blow.";
+            }
+            else if (IsAttackParried())
+            {
+                report = Name + " attacked " + Target.Name + " but " + Target.Name + " parried the blow.";
             }
             else
             {

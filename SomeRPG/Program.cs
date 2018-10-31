@@ -51,6 +51,7 @@ namespace SomeRPG
             Console.WriteLine("\tVitality : " + player.Vitality);
             Console.WriteLine("\tAgility : " + player.Agility);
             Console.WriteLine("\tPrecision : " + player.Precision);
+            Console.WriteLine("\tDexterity : " + player.Dexterity);
             Console.WriteLine();
         }
 
@@ -904,7 +905,8 @@ namespace SomeRPG
                             BaseStrengh = 10,
                             BaseVitality = 10,
                             BaseAgility = 10,
-                            BasePrecision = 10
+                            BasePrecision = 10,
+                            BaseDexterity = 10
                         };
 
                         try

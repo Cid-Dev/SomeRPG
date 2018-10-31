@@ -36,6 +36,7 @@ namespace Business
                             BaseAgility = int.Parse(dalMonster?.GetType().GetProperty("BaseAgility")?.GetValue(dalMonster, null).ToString()),
                             BaseVitality = int.Parse(dalMonster?.GetType().GetProperty("BaseVitality")?.GetValue(dalMonster, null).ToString()),
                             BasePrecision = int.Parse(dalMonster?.GetType().GetProperty("BasePrecision")?.GetValue(dalMonster, null).ToString()),
+                            BaseDexterity = int.Parse(dalMonster?.GetType().GetProperty("BaseDexterity")?.GetValue(dalMonster, null).ToString()),
                             MoneyMultiplier = float.Parse(dalMonster?.GetType().GetProperty("MoneyMultiplier")?.GetValue(dalMonster, null).ToString())
                         };
 
