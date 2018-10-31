@@ -9,6 +9,7 @@ namespace Business
     public class Character
     {
         protected Random seed = new Random();
+        protected Random seedEvasion = new Random();
         protected Random seedBodyPart = new Random();
         private int _baseHP;
         protected int _baseCooldown;
@@ -66,12 +67,12 @@ namespace Business
         public int BaseVitality { get; set; }
 
         /// <summary>
-        /// The amount of points added by the player to the strengh
+        /// The amount of points added by the player to the vitality
         /// </summary>
         public int AddedVitality { get; set; }
 
         /// <summary>
-        /// The amount of points added by buffs and items to the strengh 
+        /// The amount of points added by buffs and items to the vitality 
         /// </summary>
         public int BonusVitality { get; set; }
 
@@ -88,10 +89,31 @@ namespace Business
         }
 
         /// <summary>
+        /// The base agility of the character
+        /// </summary>
+        public int BaseAgility { get; set; }
+
+        /// <summary>
+        /// The amount of points added by the player to the agility
+        /// </summary>
+        public int AddedAgility { get; set; }
+
+        /// <summary>
+        /// The amount of points added by buffs and items to the agility 
+        /// </summary>
+        public int BonusAgility { get; set; }
+
+        /// <summary>
         /// The agility of the character.
         /// Used to determine the ability of evading
         /// </summary>
-        public int Agility { get; set; }
+        public int Agility
+        {
+            get
+            {
+                return (BaseAgility + AddedAgility + BonusAgility);
+            }
+        }
 
         /// <summary>
         /// The dexterity of the character.
@@ -223,6 +245,8 @@ namespace Business
             ++BaseStrengh;
             if (_level % 2 == 0)
                 ++BaseVitality;
+            if (_level % 5 == 0)
+                ++BaseAgility;
             _currentExp = 0;
             CurrentHP = HP;
         }
@@ -300,17 +324,39 @@ namespace Business
             return (CurrentHP);
         }
 
+        protected bool IsAttackEvaded()
+        {
+            int baseEvasion = 10;
+            int factor = Target.Agility - Precision;
+            if (factor < 0)
+                factor = 0;
+            int finalEvasion = baseEvasion + factor;
+            if (finalEvasion > 90)
+                finalEvasion = 90;
+            int evadResult = seedEvasion.Next(101);
+            if (evadResult <= finalEvasion)
+                return (true);
+            return (false);
+        }
+
         public virtual string Attack()
         {
-            string report;
+            string report = "";
             CurrentCooldown = _baseCooldown;
-            int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
-            string bodyPart;
-            int TargetHP = Target.Defend(ref damage, out bodyPart);
-            report = Name + " attacked " + Target.Name + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
-            report += Target.Name + " has " + TargetHP + " HP remaining.\n";
-            if (TargetHP <= 0)
-                report += Name + " killed " + Target.Name;
+            if (IsAttackEvaded())
+            {
+                report = Name + " attacked " + Target.Name + " but " + Target.Name + " evaded the blow.";
+            }
+            else
+            {
+                int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
+                string bodyPart;
+                int TargetHP = Target.Defend(ref damage, out bodyPart);
+                report = Name + " attacked " + Target.Name + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
+                report += Target.Name + " has " + TargetHP + " HP remaining.\n";
+                if (TargetHP <= 0)
+                    report += Name + " killed " + Target.Name;
+            }
             return (report);
         }
 
