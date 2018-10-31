@@ -62,10 +62,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuffSave.cs" />
     <Compile Include="ChestArmor.cs" />
     <Compile Include="HeadArmorSave.cs" />
     <Compile Include="HandsArmorSave.cs" />
     <Compile Include="FeetArmorSave.cs" />
+    <Compile Include="Buff.cs" />
+    <Compile Include="StatusEffectPotionSave.cs" />
+    <Compile Include="StatusEffectPotion.cs" />
     <Compile Include="SleevesArmorSave.cs" />
     <Compile Include="LegsArmorSave.cs" />
     <Compile Include="ChestArmorSave.cs" />

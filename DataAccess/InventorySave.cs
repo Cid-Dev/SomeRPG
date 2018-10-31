@@ -16,5 +16,6 @@ namespace DataAccess
         public List<FeetArmorSave> FeetArmors = new List<FeetArmorSave>();
         public List<HandsArmorSave> HandsArmors = new List<HandsArmorSave>();
         public List<HeadArmorSave> HeadArmors = new List<HeadArmorSave>();
+        public List<StatusEffectPotionSave> StatusEffectPotions = new List<StatusEffectPotionSave>();
     }
 }

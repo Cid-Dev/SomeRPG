@@ -20,6 +20,8 @@ namespace DataAccess
         public int FeetArmor { get; set; }
         public int HandsArmor { get; set; }
         public int HeadArmor { get; set; }
+        public List<BuffSave> Buffs = new List<BuffSave>();
+        public List<BuffSave> DeBuffs = new List<BuffSave>();
         public InventorySave Inventory = new InventorySave();
     }
 }

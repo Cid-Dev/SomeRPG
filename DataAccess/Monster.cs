@@ -339,6 +339,47 @@ namespace DataAccess
             return (result);
         }
 
+        public List<object> GetStatusEffectPotionLootTable(int monster_id)
+        {
+            List<object> result = new List<object>();
+
+            using (var m_dbConnection = new SQLiteConnection(ConnectionString))
+            {
+                m_dbConnection.Open();
+                using (SQLiteCommand command = m_dbConnection.CreateCommand())
+                {
+                    command.CommandText = "SELECT i.name AS Name, "
+                                               + "l.min_amount AS MinAmount, "
+                                               + "l.max_amount AS MaxAmount, "
+                                               + "l.probability AS Probability "
+                                        + "FROM " + MonsterTable + " m "
+                                        + "INNER JOIN " + loot_table_monster_statuseffectpotions + " l "
+                                        + "ON l.monster_id=m.id "
+                                        + "INNER JOIN " + StatusEffectPotionTable + " s "
+                                        + "ON l.statuseffectpotions_id=s.id "
+                                        + "INNER JOIN " + ItemTable + " i "
+                                        + "ON s.item_id=i.id "
+                                        + "WHERE m.id = @monster_id";
+                    command.CommandType = CommandType.Text;
+                    command.Parameters.AddWithValue("@monster_id", monster_id);
+                    SQLiteDataReader reader = command.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        //Debug.WriteLine("Name: " + reader["name"] + "\tDescription: " + reader["description"] + "\tAmount: " + reader["amount"] + "\tMaxAmount: " + reader["max_amount"]);
+                        result.Add(new
+                        {
+                            Name = reader["Name"],
+                            MinAmount = reader["MinAmount"],
+                            MaxAmount = reader["MaxAmount"],
+                            Probability = reader["Probability"]
+                        });
+                    }
+                }
+            }
+            return (result);
+        }
+
         public List<object> GetAll()
         {
             string sql = "select * from " + MonsterTable;
@@ -375,7 +416,8 @@ namespace DataAccess
                         ArmorLegs = GetArmorLegsLootTable(int.Parse(reader["id"].ToString())),
                         ArmorFeet = GetArmorFeetLootTable(int.Parse(reader["id"].ToString())),
                         ArmorHands = GetArmorHandsLootTable(int.Parse(reader["id"].ToString())),
-                        ArmorHead = GetArmorHeadLootTable(int.Parse(reader["id"].ToString()))
+                        ArmorHead = GetArmorHeadLootTable(int.Parse(reader["id"].ToString())),
+                        StatusEffectPotion = GetStatusEffectPotionLootTable(int.Parse(reader["id"].ToString()))
                     }
                 });
             }

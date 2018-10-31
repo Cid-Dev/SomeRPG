@@ -26,7 +26,7 @@ namespace Business
 
         private int MinDamageBonus = 0;
         private int MaxDamageBonus = 0;
-        private int HPBonus = 0;
+        public int HPBonus = 0;
 
         private double headChance = 5;
         private double handsChance = 10;
@@ -169,6 +169,9 @@ namespace Business
                 return (BasePrecision + AddedPrecision + BonusPrecision);
             }
         }
+
+        public List<Buff> Buffs = new List<Buff>();
+        public List<Buff> DeBuffs = new List<Buff>();
 
         #region gear
 

@@ -52,6 +52,8 @@ namespace Business
                     FeetArmor = ((SavedGames[index].FeetArmor != 0) ? (new FeetArmor(SavedGames[index].FeetArmor)) : (null)),
                     HandsArmor = ((SavedGames[index].HandsArmor != 0) ? (new HandsArmor(SavedGames[index].HandsArmor)) : (null)),
                     HeadArmor = ((SavedGames[index].HeadArmor != 0) ? (new HeadArmor(SavedGames[index].HeadArmor)) : (null)),
+                    Buffs = new List<Buff>(),
+                    DeBuffs = new List<Buff>(),
                     Inventory = new List<Item>()
                 };
                 player.SetLevel(SavedGames[index].Level);
@@ -63,6 +65,20 @@ namespace Business
                     {
                         Quantity = hPPotion.Quantity
                     });
+                }
+
+                foreach (var buff in SavedGames[index].Buffs)
+                {
+                    Buff _buff = new Buff(buff.Id);
+                    _buff.Apply(player);
+                    _buff.RemainingDuration = buff.RemainingDuration;
+                }
+
+                foreach (var deBuff in SavedGames[index].DeBuffs)
+                {
+                    Buff _buff = new Buff(deBuff.Id);
+                    _buff.Apply(player);
+                    _buff.RemainingDuration = deBuff.RemainingDuration;
                 }
 
                 foreach (var item in SavedGames[index].Inventory.RightHands)
@@ -79,6 +95,8 @@ namespace Business
                     player.Inventory.Add(new HandsArmor(item.Id));
                 foreach (var item in SavedGames[index].Inventory.HeadArmors)
                     player.Inventory.Add(new HeadArmor(item.Id));
+                foreach (var item in SavedGames[index].Inventory.StatusEffectPotions)
+                    player.Inventory.Add(new StatusEffectPotion(item.Id) { Quantity = item.Quantity });
                 return (player);
             }
             return (null);

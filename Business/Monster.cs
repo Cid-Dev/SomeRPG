@@ -17,7 +17,6 @@ namespace Business
 
         public void SetLevel(int lvl)
         {
-            //float hp = BaseHP;
             Level = lvl;
             BaseStrengh += (lvl - 1);
             BaseVitality += (int)Math.Floor((double)lvl / 2);
@@ -25,15 +24,6 @@ namespace Business
             BasePrecision += (int)Math.Floor((double)lvl / 5);
             BaseDexterity += (int)Math.Floor((double)lvl / 3);
             CurrentHP = HP;
-            //BaseHP *= (int)Math.Round(Math.Pow(hpMultiplier, lvl - 1));
-            /*
-            while (lvl > 1)
-            {
-                hp *= hpMultiplier;
-                --lvl;
-            }
-            BaseHP = (int)Math.Round(hp);
-            */
         }
 
         public int LootMoney()
@@ -320,6 +310,37 @@ namespace Business
             }
         }
 
+        private void getStatusEffectPotions(object lootTable)
+        {
+            var StatusEffectPotionListAnon = lootTable?.GetType().GetProperty("StatusEffectPotion")?.GetValue(lootTable, null);
+            if (StatusEffectPotionListAnon is IEnumerable<object>)
+            {
+                var StatusEffectPotionList = StatusEffectPotionListAnon as IEnumerable<object>;
+
+                foreach (var tempStatusEffectPotion in StatusEffectPotionList)
+                {
+                    try
+                    {
+                        var statusEffectPotion = new StatusEffectPotion(tempStatusEffectPotion?.GetType().GetProperty("Name")?.GetValue(tempStatusEffectPotion, null).ToString());
+                        var MinAmount = int.Parse(tempStatusEffectPotion?.GetType().GetProperty("MinAmount")?.GetValue(tempStatusEffectPotion, null).ToString());
+                        var MaxAmount = int.Parse(tempStatusEffectPotion?.GetType().GetProperty("MaxAmount")?.GetValue(tempStatusEffectPotion, null).ToString());
+                        var Probability = double.Parse(tempStatusEffectPotion?.GetType().GetProperty("Probability")?.GetValue(tempStatusEffectPotion, null).ToString());
+                        LootTable.Add(new Loot
+                        {
+                            item = statusEffectPotion,
+                            MaxAmount = MaxAmount,
+                            MinAmount = MinAmount,
+                            Probability = Probability
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                }
+            }
+        }
+
         public void BuildLootTable(object lootTable)
         {
             getPotions(lootTable);
@@ -330,6 +351,7 @@ namespace Business
             getHandsArmor(lootTable);
             getHeadArmor(lootTable);
             getLegsArmor(lootTable);
+            getStatusEffectPotions(lootTable);
         }
     }
 }

@@ -15,7 +15,6 @@ namespace Business
 
         public void SetLevel(int lvl)
         {
-            //float hp = BaseHP;
             Level = lvl;
             BaseStrengh += (lvl - 1);
             BaseVitality += (int)Math.Floor((double)lvl / 2);
@@ -23,15 +22,6 @@ namespace Business
             BasePrecision += (int)Math.Floor((double)lvl / 5);
             BaseDexterity += (int)Math.Floor((double)lvl / 3);
             CurrentHP = HP;
-            //BaseHP = (int)Math.Round(BaseHP * Math.Pow((double)hpMultiplier, (double)(lvl - 1)));
-            /*
-            while (lvl > 1)
-            {
-                hp *= hpMultiplier;
-                --lvl;
-            }
-            BaseHP = (int)Math.Round(hp);
-            */
         }
 
         private void StackItem(Item NewItem)
@@ -323,6 +313,40 @@ namespace Business
             return (HeadArmors);
         }
 
+        private List<StatusEffectPotionSave> getStatusEffectPotions()
+        {
+            var StatusEffectPotions = new List<StatusEffectPotionSave>();
+            foreach (var item in Inventory)
+            {
+                if (item is StatusEffectPotion)
+                {
+                    var statusEffectPotions = (item as StatusEffectPotion);
+                    StatusEffectPotions.Add(new StatusEffectPotionSave
+                    {
+                        Id = statusEffectPotions.Id,
+                        Quantity = statusEffectPotions.Quantity
+                    });
+                }
+            }
+            return (StatusEffectPotions);
+        }
+
+        private List<BuffSave> GetActiveBuffs(List<Buff> buffs)
+        {
+            List<BuffSave> buffSaves = new List<BuffSave>();
+
+            foreach (var buff in buffs)
+            {
+                buffSaves.Add(new BuffSave
+                {
+                    Id = buff.Id,
+                    RemainingDuration = buff.RemainingDuration
+                });
+            }
+
+            return (buffSaves);
+        }
+
         public string Save()
         {
             try
@@ -342,6 +366,8 @@ namespace Business
                     FeetArmor = ((FeetArmor != null) ? (FeetArmor.Id) : (0)),
                     HandsArmor = ((HandsArmor != null) ? (HandsArmor.Id) : (0)),
                     HeadArmor = ((HeadArmor != null) ? (HeadArmor.Id) : (0)),
+                    Buffs = GetActiveBuffs(Buffs),
+                    DeBuffs = GetActiveBuffs(DeBuffs),
                     Inventory = new InventorySave
                     {
                         HPPotions = getHPPotions(),
@@ -351,7 +377,8 @@ namespace Business
                         LegsArmors = getLegsArmors(),
                         FeetArmors = getFeetArmors(),
                         HandsArmors = getHandsArmors(),
-                        HeadArmors = getHeadArmors()
+                        HeadArmors = getHeadArmors(),
+                        StatusEffectPotions = getStatusEffectPotions()
                     }
                 });
             }

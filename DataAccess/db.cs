@@ -21,6 +21,8 @@ namespace DataAccess
         protected string HandsArmorTable = "handsarmor";
         protected string HeadArmorTable = "headarmor";
         protected string ArmorTypeTable = "armortype";
+        protected string BuffTable = "buff";
+        protected string StatusEffectPotionTable = "statuseffectpotion";
         protected string loot_table_monster_hppotion = "loot_table_monster_hppotion";
         protected string loot_table_monster_righthand = "loot_table_monster_righthand";
         protected string loot_table_monster_chestarmor = "loot_table_monster_chestarmor";
@@ -29,6 +31,7 @@ namespace DataAccess
         protected string loot_table_monster_feetarmor = "loot_table_monster_feetarmor";
         protected string loot_table_monster_handsarmor = "loot_table_monster_handsarmor";
         protected string loot_table_monster_headarmor = "loot_table_monster_headarmor";
+        protected string loot_table_monster_statuseffectpotions = "loot_table_monster_statuseffectpotions";
         protected string ItemTable = "item";
 
         protected string ConnectionString = null;

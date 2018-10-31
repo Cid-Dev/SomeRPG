@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Armor.cs" />
     <Compile Include="ArmorType.cs" />
+    <Compile Include="Buff.cs" />
     <Compile Include="Character.cs" />
     <Compile Include="HandsArmor.cs" />
     <Compile Include="HeadArmor.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="RightHand.cs" />
     <Compile Include="FeetArmor.cs" />
     <Compile Include="SleevesArmor.cs" />
+    <Compile Include="StatusEffectPotion.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj">

@@ -34,6 +34,18 @@ namespace SomeRPG
             Console.WriteLine("/" + player.HP + " === Damages : " + player.CurrentMinAttack + " - " + player.CurrentMaxAttack + " === Level : " + player.Level + " === Exp : " + player._currentExp + "/" + player.getRequiredExp + " ===\n");
             if (player.Money > 0)
                 Console.WriteLine("=== Money : " + player.ConvertMoney(player.Money) + " ===\n");
+            if (player.Buffs.Count > 0)
+            {
+                Console.WriteLine("=== Buff" + ((player.Buffs.Count > 1) ? ("s") : ("")) + ":\n");
+                foreach (Buff buff in player.Buffs)
+                    Console.WriteLine(buff.Description());
+            }
+            if (player.DeBuffs.Count > 0)
+            {
+                Console.WriteLine("=== Debuff" + ((player.DeBuffs.Count > 1) ? ("s") : ("")) + ":\n");
+                foreach (Buff deBuff in player.DeBuffs)
+                    Console.WriteLine(deBuff.Description());
+            }
         }
 
         public static string ArmorDetail(Armor armor)
@@ -67,6 +79,18 @@ namespace SomeRPG
             Console.Write(monster.CurrentHP);
             Console.ResetColor();
             Console.WriteLine("/" + monster.HP + " === Damages : " + monster.CurrentMinAttack + " - " + monster.CurrentMaxAttack + " === Level : " + monster.Level + "\n");
+            if (monster.Buffs.Count > 0)
+            {
+                Console.WriteLine("=== Buff" + ((monster.Buffs.Count > 1) ? ("s") : ("")) + ":\n");
+                foreach (Buff buff in monster.Buffs)
+                    Console.WriteLine(buff.Description());
+            }
+            if (monster.DeBuffs.Count > 0)
+            {
+                Console.WriteLine("=== Debuff" + ((monster.DeBuffs.Count > 1) ? ("s") : ("")) + ":\n");
+                foreach (Buff deBuff in monster.DeBuffs)
+                    Console.WriteLine(deBuff.Description());
+            }
         }
 
         static void DisplayFightInfos(Character monster)
@@ -231,6 +255,22 @@ namespace SomeRPG
             return (result);
         }
 
+        static void ManageEffectStatus(Character target)
+        {
+            for (int i = 0; i < target.Buffs.Count; ++i)
+            {
+                --target.Buffs[i].RemainingDuration;
+                if (target.Buffs[i].RemainingDuration <= 0)
+                    target.Buffs[i].RemoveEffect(target);
+            }
+            for (int i = 0; i < target.DeBuffs.Count; ++i)
+            {
+                --target.DeBuffs[i].RemainingDuration;
+                if (target.DeBuffs[i].RemainingDuration <= 0)
+                    target.DeBuffs[i].RemoveEffect(target);
+            }
+        }
+
         static void Fight(Monster monster)
         {
             player.Target = monster;
@@ -240,6 +280,8 @@ namespace SomeRPG
             {
                 --player.CurrentCooldown;
                 --monster.CurrentCooldown;
+                ManageEffectStatus(player);
+                ManageEffectStatus(monster);
                 DisplayFightInfos(monster);
                 if (player.CurrentCooldown <= 0)
                 {
@@ -402,6 +444,7 @@ namespace SomeRPG
 
             while (!WakeUp && player.HP > player.CurrentHP)
             {
+                ManageEffectStatus(player);
                 Console.Clear();
                 Stats();
                 Console.WriteLine("You are resting. " + (player.HP - player.CurrentHP) + " seconds left before being fully rested. [W]ake up?");
@@ -633,6 +676,14 @@ namespace SomeRPG
 
                             case IUsable us:
                                 us.Use(player);
+                                if (us is IStackable)
+                                {
+                                    var stackable = us as IStackable;
+                                    if (stackable.Quantity <= 0)
+                                        player.Inventory.Remove(stackable as Item);
+                                }
+                                else
+                                    player.Inventory.Remove(us as Item);
                                 back = true;
                                 break;
 
