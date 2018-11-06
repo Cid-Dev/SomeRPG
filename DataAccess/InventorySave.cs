@@ -9,7 +9,7 @@ namespace DataAccess
     public class InventorySave
     {
         public List<HPPotionsSave> HPPotions = new List<HPPotionsSave>();
-        public List<RightHandsSave> RightHands = new List<RightHandsSave>();
+        public List<WeaponsSave> Weapons = new List<WeaponsSave>();
         public List<ChestArmorSave> ChestArmors = new List<ChestArmorSave>();
         public List<LegsArmorSave> LegsArmors = new List<LegsArmorSave>();
         public List<SleevesArmorSave> SleevesArmors = new List<SleevesArmorSave>();

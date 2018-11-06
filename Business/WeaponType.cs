@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccess
+namespace Business
 {
-    public class RightHandsSave
+    public enum WeaponType
     {
-        public int Id { get; set; }
+        Slash,
+        Blunt,
+        Thrust
     }
 }

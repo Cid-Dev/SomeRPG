@@ -31,7 +31,11 @@ namespace SomeRPG
                 Console.ForegroundColor = ConsoleColor.Green;
             Console.Write(player.CurrentHP);
             Console.ResetColor();
-            Console.WriteLine("/" + player.HP + " === Damages : " + player.CurrentMinAttack + " - " + player.CurrentMaxAttack + " === Level : " + player.Level + " === Exp : " + player._currentExp + "/" + player.getRequiredExp + " ===\n");
+            Console.Write("/" + player.HP + " === Damages : Right hand [" + player.CurrentRightMinAttack + " - " + player.CurrentRightMaxAttack + "]");
+            if (player.CurrentLeftMinAttack > 0
+                || player.CurrentLeftMaxAttack > 0)
+                Console.Write(" Left hand [" + player.CurrentLeftMinAttack + " - " + player.CurrentLeftMaxAttack + "]");
+            Console.WriteLine(" === Level : " + player.Level + " === Exp : " + player._currentExp + "/" + player.getRequiredExp + " ===\n");
             if (player.Money > 0)
                 Console.WriteLine("=== Money : " + player.ConvertMoney(player.Money) + " ===\n");
             if (player.Buffs.Count > 0)
@@ -46,6 +50,14 @@ namespace SomeRPG
                 foreach (Buff deBuff in player.DeBuffs)
                     Console.WriteLine(deBuff.Description());
             }
+        }
+
+        public static string WeaponDetail(Weapon weapon)
+        {
+            string result = "";
+            if (weapon != null)
+                result += "Min attack : " + weapon.MinDamageBonus + " - Max attack : " + weapon.MaxDamageBonus + " - Type : " + weapon.TypeName.ToString() + ((weapon.isTwoHand) ? (" Two-Handed") : (""));
+            return (result);
         }
 
         public static string ArmorDetail(Armor armor)
@@ -78,7 +90,11 @@ namespace SomeRPG
                 Console.ForegroundColor = ConsoleColor.Green;
             Console.Write(monster.CurrentHP);
             Console.ResetColor();
-            Console.WriteLine("/" + monster.HP + " === Damages : " + monster.CurrentMinAttack + " - " + monster.CurrentMaxAttack + " === Level : " + monster.Level + "\n");
+            Console.Write("/" + monster.HP + " === Damages : Right hand [" + monster.CurrentRightMinAttack + " - " + monster.CurrentRightMaxAttack + "]");
+            if (monster.CurrentLeftMinAttack > 0
+                || monster.CurrentLeftMaxAttack > 0)
+                Console.Write(" Left hand [" + monster.CurrentLeftMinAttack + " - " + monster.CurrentLeftMaxAttack + "]");
+            Console.WriteLine(" === Level : " + monster.Level + "\n");
             if (monster.Buffs.Count > 0)
             {
                 Console.WriteLine("=== Buff" + ((monster.Buffs.Count > 1) ? ("s") : ("")) + ":\n");
@@ -456,7 +472,7 @@ namespace SomeRPG
             tokenSource2.Dispose();
         }
 
-        static void GetInventoryGears<T>()
+        static void GetInventoryGears<T>(bool IsLeftHand)
         {
             string input;
             List<IEquipable> stuff;
@@ -477,7 +493,7 @@ namespace SomeRPG
                         if (gearT.GetType() == typeof(T)
                             && gearT is IEquipable)
                         {
-                            options += "[" + i++ + "] " + gearT.Name + " : " + gearT.Description + ((gearT is Armor) ? (" - " + ArmorDetail(gearT as Armor)) : ("")) + "\n";
+                            options += "[" + i++ + "] " + gearT.Name + " : " + gearT.Description + ((gearT is Armor) ? (" - " + ArmorDetail(gearT as Armor)) : ((gearT is Weapon) ? (WeaponDetail(gearT as Weapon)) : (""))) + "\n";
                             stuff.Add(gearT as IEquipable);
                         }
                     if (i > 1)
@@ -499,7 +515,9 @@ namespace SomeRPG
                 {
                     if (result > 0 && result <= stuff.Count)
                     {
-                        stuff[--result].TakeOn(player);
+                        if (stuff[--result] is Weapon)
+                            (stuff[result] as Weapon).IsTargetingRightHand = !IsLeftHand;
+                        stuff[result].TakeOn(player);
                         back = true;
                     }
                     else
@@ -517,7 +535,7 @@ namespace SomeRPG
             {
                 Console.Clear();
                 Stats();
-                Console.WriteLine(slotName + " : " + ((item != null) ? ((item as Item).Name + " : " + (item as Item).Description + ((item is Armor) ? (" - " + ArmorDetail(item as Armor)) : (""))) : ("Nothing equiped")) + "\n");
+                Console.WriteLine(slotName + " : " + ((item != null) ? ((item as Item).Name + " : " + (item as Item).Description + ((item is Armor) ? (" - " + ArmorDetail(item as Armor)) : ((item is Weapon) ? (WeaponDetail(item as Weapon)) : ("")))) : ("Nothing equiped")) + "\n");
                 Console.WriteLine(((item != null) ? ("[R]emove. R[e]place") : ("[E]quip")) + ". [B]ack");
                 ClearKeyBuffer();
                 menu = Console.ReadKey(true);
@@ -533,7 +551,8 @@ namespace SomeRPG
                     break;
 
                 case ConsoleKey.E:
-                    GetInventoryGears<T>();
+                    bool IsLeftHand = (slotName == "Left hand");
+                    GetInventoryGears<T>(IsLeftHand);
                     break;
 
                 default:
@@ -550,13 +569,14 @@ namespace SomeRPG
                 {
                     Console.Clear();
                     Stats();
-                    Console.WriteLine("[R]ight hand : " + ((player.RightHand != null) ? (player.RightHand.Name) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("[R]ight hand : " + ((player.RightHand != null) ? (player.RightHand.Name + ((player.RightHand is Weapon) ? (" : " + WeaponDetail(player.RightHand as Weapon)) : (""))) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("[L]eft hand : " + ((player.LeftHand != null) ? (player.LeftHand.Name + ((player.LeftHand is Weapon) ? (" : " + WeaponDetail(player.LeftHand as Weapon)) : (""))) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("[C]hest : " + ((player.ChestArmor != null) ? (player.ChestArmor.Name + " : " + player.ChestArmor.Description + " - " + ArmorDetail(player.ChestArmor)) : ("Nothing equiped")) + "\n");
-                    Console.WriteLine("[L]egs : " + ((player.LegsArmor != null) ? (player.LegsArmor.Name + " : " + player.LegsArmor.Description + " - " + ArmorDetail(player.LegsArmor)) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("l[e]gs : " + ((player.LegsArmor != null) ? (player.LegsArmor.Name + " : " + player.LegsArmor.Description + " - " + ArmorDetail(player.LegsArmor)) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("[A]rms : " + ((player.SleevesArmor != null) ? (player.SleevesArmor.Name + " : " + player.SleevesArmor.Description + " - " + ArmorDetail(player.SleevesArmor)) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("[F]eet : " + ((player.FeetArmor != null) ? (player.FeetArmor.Name + " : " + player.FeetArmor.Description + " - " + ArmorDetail(player.FeetArmor)) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("[H]and : " + ((player.HandsArmor != null) ? (player.HandsArmor.Name + " : " + player.HandsArmor.Description + " - " + ArmorDetail(player.HandsArmor)) : ("Nothing equiped")) + "\n");
-                    Console.WriteLine("H[e]ad : " + ((player.HeadArmor != null) ? (player.HeadArmor.Name + " : " + player.HeadArmor.Description + " - " + ArmorDetail(player.HeadArmor)) : ("Nothing equiped")) + "\n");
+                    Console.WriteLine("Hea[d] : " + ((player.HeadArmor != null) ? (player.HeadArmor.Name + " : " + player.HeadArmor.Description + " - " + ArmorDetail(player.HeadArmor)) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("Select an equipement slot or go [B]ack");
                     ClearKeyBuffer();
                     menu = Console.ReadKey(true);
@@ -567,19 +587,24 @@ namespace SomeRPG
                          && menu.Key != ConsoleKey.F
                          && menu.Key != ConsoleKey.H
                          && menu.Key != ConsoleKey.E
+                         && menu.Key != ConsoleKey.D
                          && menu.Key != ConsoleKey.B);
 
                 switch (menu.Key)
                 {
                     case ConsoleKey.R:
-                        SeeSlot<RightHand>("Right hand", player.RightHand);
+                        SeeSlot<Weapon>("Right hand", player.RightHand);
+                        break;
+
+                    case ConsoleKey.L:
+                        SeeSlot<Weapon>("Left hand", player.LeftHand);
                         break;
 
                     case ConsoleKey.C:
                         SeeSlot<ChestArmor>("Chest armor", player.ChestArmor);
                         break;
 
-                    case ConsoleKey.L:
+                    case ConsoleKey.E:
                         SeeSlot<LegsArmor>("Legs armor", player.LegsArmor);
                         break;
 
@@ -595,7 +620,7 @@ namespace SomeRPG
                         SeeSlot<HandsArmor>("Hands armor", player.HandsArmor);
                         break;
 
-                    case ConsoleKey.E:
+                    case ConsoleKey.D:
                         SeeSlot<HeadArmor>("Head armor", player.HeadArmor);
                         break;
 
@@ -637,6 +662,8 @@ namespace SomeRPG
                                 options += "[" + i++ + "] - " + item.Name + " " + stack + ": " + item.Description;
                                 if (item is Armor)
                                     options += " " + ArmorDetail(item as Armor);
+                                else if (item is Weapon)
+                                    options += " " + WeaponDetail(item as Weapon);
                                 options += "\n";
                                 items.Add(item as T);
                             }
@@ -951,8 +978,10 @@ namespace SomeRPG
                             Name = getName(),
                             BaseHP = 42,
                             BaseCooldown = 10,
-                            BaseMinAttack = 5,
-                            BaseMaxAttack = 10,
+                            BaseRightMinAttack = 5,
+                            BaseRightMaxAttack = 10,
+                            BaseLeftMinAttack = 0,
+                            BaseLeftMaxAttack = 0,
                             BaseStrengh = 10,
                             BaseVitality = 10,
                             BaseAgility = 10,

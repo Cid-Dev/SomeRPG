@@ -45,6 +45,7 @@
     <Compile Include="ArmorType.cs" />
     <Compile Include="Buff.cs" />
     <Compile Include="Character.cs" />
+    <Compile Include="HandGear.cs" />
     <Compile Include="HandsArmor.cs" />
     <Compile Include="HeadArmor.cs" />
     <Compile Include="ChestArmor.cs" />
@@ -60,10 +61,11 @@
     <Compile Include="Monsters.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RightHand.cs" />
+    <Compile Include="Weapon.cs" />
     <Compile Include="FeetArmor.cs" />
     <Compile Include="SleevesArmor.cs" />
     <Compile Include="StatusEffectPotion.cs" />
+    <Compile Include="WeaponType.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj">

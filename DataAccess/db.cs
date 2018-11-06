@@ -11,9 +11,11 @@ namespace DataAccess
 {
     public class DB
     {
+        protected string ItemTable = "item";
         protected string MonsterTable = "monster";
         protected string HPPotionTable = "hppotion";
-        protected string RightHandTable = "righthand";
+        protected string WeaponTable = "weapon";
+        protected string WeaponTypeTable = "weapon_type";
         protected string ChestArmorTable = "chestarmor";
         protected string LegsArmorTable = "legsarmor";
         protected string SleevesArmorTable = "sleevesarmor";
@@ -24,7 +26,7 @@ namespace DataAccess
         protected string BuffTable = "buff";
         protected string StatusEffectPotionTable = "statuseffectpotion";
         protected string loot_table_monster_hppotion = "loot_table_monster_hppotion";
-        protected string loot_table_monster_righthand = "loot_table_monster_righthand";
+        protected string loot_table_monster_weapon = "loot_table_monster_weapon";
         protected string loot_table_monster_chestarmor = "loot_table_monster_chestarmor";
         protected string loot_table_monster_legsarmor = "loot_table_monster_legsarmor";
         protected string loot_table_monster_sleevesarmor = "loot_table_monster_sleevesarmor";
@@ -32,7 +34,6 @@ namespace DataAccess
         protected string loot_table_monster_handsarmor = "loot_table_monster_handsarmor";
         protected string loot_table_monster_headarmor = "loot_table_monster_headarmor";
         protected string loot_table_monster_statuseffectpotions = "loot_table_monster_statuseffectpotions";
-        protected string ItemTable = "item";
 
         protected string ConnectionString = null;
         protected SQLiteConnection m_dbConnection = null;

@@ -25,8 +25,10 @@ namespace Business
                         {
                             Name = dalMonster?.GetType().GetProperty("Name")?.GetValue(dalMonster, null).ToString(),
                             BaseHP = int.Parse(dalMonster?.GetType().GetProperty("HP")?.GetValue(dalMonster, null).ToString()),
-                            BaseMinAttack = int.Parse(dalMonster?.GetType().GetProperty("BaseMinAttack")?.GetValue(dalMonster, null).ToString()),
-                            BaseMaxAttack = int.Parse(dalMonster?.GetType().GetProperty("BaseMaxAttack")?.GetValue(dalMonster, null).ToString()),
+                            BaseRightMinAttack = int.Parse(dalMonster?.GetType().GetProperty("BaseRightMinAttack")?.GetValue(dalMonster, null).ToString()),
+                            BaseRightMaxAttack = int.Parse(dalMonster?.GetType().GetProperty("BaseRightMaxAttack")?.GetValue(dalMonster, null).ToString()),
+                            BaseLeftMinAttack = int.Parse(dalMonster?.GetType().GetProperty("BaseLeftMinAttack")?.GetValue(dalMonster, null).ToString()),
+                            BaseLeftMaxAttack = int.Parse(dalMonster?.GetType().GetProperty("BaseLeftMaxAttack")?.GetValue(dalMonster, null).ToString()),
                             BaseCooldown = int.Parse(dalMonster?.GetType().GetProperty("BaseCoolDown")?.GetValue(dalMonster, null).ToString()),
                             GivenExp = int.Parse(dalMonster?.GetType().GetProperty("GivenExp")?.GetValue(dalMonster, null).ToString()),
                             BaseExp = int.Parse(dalMonster?.GetType().GetProperty("BaseExp")?.GetValue(dalMonster, null).ToString()),

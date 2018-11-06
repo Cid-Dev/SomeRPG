@@ -62,24 +62,24 @@ namespace Business
             return (Loots);
         }
 
-        private void getRightHands(object lootTable)
+        private void getWeapons(object lootTable)
         {
-            var RightHandListAnon = lootTable?.GetType().GetProperty("RightHand")?.GetValue(lootTable, null);
-            if (RightHandListAnon is IEnumerable<object>)
+            var WeaponListAnon = lootTable?.GetType().GetProperty("Weapon")?.GetValue(lootTable, null);
+            if (WeaponListAnon is IEnumerable<object>)
             {
-                var RightHandList = RightHandListAnon as IEnumerable<object>;
+                var WeaponList = WeaponListAnon as IEnumerable<object>;
 
-                foreach (var tempRightHand in RightHandList)
+                foreach (var tempWeapon in WeaponList)
                 {
                     try
                     {
-                        var rightHand = new RightHand(tempRightHand?.GetType().GetProperty("Name")?.GetValue(tempRightHand, null).ToString());
-                        var MinAmount = int.Parse(tempRightHand?.GetType().GetProperty("MinAmount")?.GetValue(tempRightHand, null).ToString());
-                        var MaxAmount = int.Parse(tempRightHand?.GetType().GetProperty("MaxAmount")?.GetValue(tempRightHand, null).ToString());
-                        var Probability = double.Parse(tempRightHand?.GetType().GetProperty("Probability")?.GetValue(tempRightHand, null).ToString());
+                        var weapon = new Weapon(tempWeapon?.GetType().GetProperty("Name")?.GetValue(tempWeapon, null).ToString());
+                        var MinAmount = int.Parse(tempWeapon?.GetType().GetProperty("MinAmount")?.GetValue(tempWeapon, null).ToString());
+                        var MaxAmount = int.Parse(tempWeapon?.GetType().GetProperty("MaxAmount")?.GetValue(tempWeapon, null).ToString());
+                        var Probability = double.Parse(tempWeapon?.GetType().GetProperty("Probability")?.GetValue(tempWeapon, null).ToString());
                         LootTable.Add(new Loot
                         {
-                            item = rightHand,
+                            item = weapon,
                             MaxAmount = MaxAmount,
                             MinAmount = MinAmount,
                             Probability = Probability
@@ -344,7 +344,7 @@ namespace Business
         public void BuildLootTable(object lootTable)
         {
             getPotions(lootTable);
-            getRightHands(lootTable);
+            getWeapons(lootTable);
             getChestArmor(lootTable);
             getSleevesArmor(lootTable);
             getFeetArmor(lootTable);

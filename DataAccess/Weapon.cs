@@ -8,20 +8,22 @@ using System.Data;
 
 namespace DataAccess
 {
-    public class RightHand : DB
+    public class Weapon : DB
     {
-        public List<object> GetRightHandById(int id)
+        public List<object> GetWeaponById(int id)
         {
-            List<object> RightHand = new List<object>();
+            List<object> Weapon = new List<object>();
             using (m_dbConnection = new SQLiteConnection(ConnectionString))
             {
                 m_dbConnection.Open();
                 using (SQLiteCommand command = m_dbConnection.CreateCommand())
                 {
-                    command.CommandText = "SELECT i.name AS name, i.description AS description, r.id AS id, r.mindamagebonus AS mindamagebonus, r.maxdamagebonus AS maxdamagebonus FROM " + RightHandTable + " r "
+                    command.CommandText = "SELECT i.name AS name, i.description AS description, w.id AS id, w.mindamagebonus AS mindamagebonus, w.maxdamagebonus AS maxdamagebonus, w.isTwoHand as isTwoHand, t.name AS TypeName FROM " + WeaponTable + " w "
                                         + "INNER JOIN " + ItemTable + " i "
-                                        + "ON r.item_id=i.id "
-                                        + "WHERE r.id = @id "
+                                        + "ON w.item_id=i.id "
+                                        + "INNER JOIN " + WeaponTypeTable + " t "
+                                        + "ON w.type_id=t.id "
+                                        + "WHERE w.id = @id "
                                         + "LIMIT 1";
                     command.CommandType = CommandType.Text;
                     command.Parameters.AddWithValue("@id", id);
@@ -29,32 +31,35 @@ namespace DataAccess
 
                     while (reader.Read())
                     {
-                        //Debug.WriteLine("Name: " + reader["name"] + "\tDescription: " + reader["description"] + "\tAmount: " + reader["amount"] + "\tMaxAmount: " + reader["max_amount"]);
-                        RightHand.Add(new
+                        Weapon.Add(new
                         {
                             Id = reader["id"],
                             Name = reader["name"],
                             Description = reader["description"],
                             MinDamageBonus = reader["mindamagebonus"],
-                            MaxDamageBonus = reader["maxdamagebonus"]
+                            MaxDamageBonus = reader["maxdamagebonus"],
+                            isTwoHand = reader["isTwoHand"],
+                            TypeName = reader["TypeName"]
                         });
                     }
                 }
             }
-            return (RightHand);
+            return (Weapon);
         }
 
-        public List<object> GetRightHandByName(string name)
+        public List<object> GetWeaponByName(string name)
         {
-            List<object> RightHand = new List<object>();
+            List<object> Weapon = new List<object>();
             using (m_dbConnection = new SQLiteConnection(ConnectionString))
             {
                 m_dbConnection.Open();
                 using (SQLiteCommand command = m_dbConnection.CreateCommand())
                 {
-                    command.CommandText = "SELECT i.name AS name, i.description AS description, r.id AS id, r.mindamagebonus AS mindamagebonus, r.maxdamagebonus AS maxdamagebonus FROM " + RightHandTable + " r "
+                    command.CommandText = "SELECT i.name AS name, i.description AS description, w.id AS id, w.mindamagebonus AS mindamagebonus, w.maxdamagebonus AS maxdamagebonus, w.isTwoHand as isTwoHand, t.name AS TypeName FROM " + WeaponTable + " w "
                                         + "INNER JOIN " + ItemTable + " i "
-                                        + "ON r.item_id=i.id "
+                                        + "ON w.item_id=i.id "
+                                        + "INNER JOIN " + WeaponTypeTable + " t "
+                                        + "ON w.type_id=t.id "
                                         + "WHERE i.name = @name "
                                         + "LIMIT 1";
                     command.CommandType = CommandType.Text;
@@ -63,19 +68,20 @@ namespace DataAccess
 
                     while (reader.Read())
                     {
-                        //Debug.WriteLine("Name: " + reader["name"] + "\tDescription: " + reader["description"] + "\tAmount: " + reader["amount"] + "\tMaxAmount: " + reader["max_amount"]);
-                        RightHand.Add(new
+                        Weapon.Add(new
                         {
                             Id = reader["id"],
                             Name = reader["name"],
                             Description = reader["description"],
                             MinDamageBonus = reader["mindamagebonus"],
-                            MaxDamageBonus = reader["maxdamagebonus"]
+                            MaxDamageBonus = reader["maxdamagebonus"],
+                            isTwoHand = reader["isTwoHand"],
+                            TypeName = reader["TypeName"]
                         });
                     }
                 }
             }
-            return (RightHand);
+            return (Weapon);
         }
     }
 }
