@@ -22,10 +22,13 @@ namespace Business
         public float hpMultiplier = 1.1F;
         private float minAttackMultiplier = 1F;
         private float maxAttackMultiplier = 1F;
-        private RightHand _rightHand;
+        private HandGear _rightHand;
+        private HandGear _leftHand;
 
-        private int MinDamageBonus = 0;
-        private int MaxDamageBonus = 0;
+        private int RightMinDamageBonus = 0;
+        private int RightMaxDamageBonus = 0;
+        private int LeftMinDamageBonus = 0;
+        private int LeftMaxDamageBonus = 0;
         public int HPBonus = 0;
 
         private double headChance = 5;
@@ -175,23 +178,51 @@ namespace Business
 
         #region gear
 
-        public RightHand RightHand
+        public HandGear RightHand
         {
             get => _rightHand;
             set
             {
-                if (value != null)
+                if (value != null
+                    && value is Weapon)
                 {
-                    MinDamageBonus += value.MinDamageBonus;
-                    MaxDamageBonus += value.MaxDamageBonus;
+                    var weapon = value as Weapon;
+                    RightMinDamageBonus += weapon.MinDamageBonus;
+                    RightMaxDamageBonus += weapon.MaxDamageBonus;
                 }
 
-                if (_rightHand != null)
+                if (_rightHand != null
+                    && _rightHand is Weapon)
                 {
-                    MinDamageBonus -= _rightHand.MinDamageBonus;
-                    MaxDamageBonus -= _rightHand.MaxDamageBonus;
+                    var oldWeapon = _rightHand as Weapon;
+                    RightMinDamageBonus -= oldWeapon.MinDamageBonus;
+                    RightMaxDamageBonus -= oldWeapon.MaxDamageBonus;
                 }
                 _rightHand = value;
+            }
+        }
+
+        public HandGear LeftHand
+        {
+            get => _leftHand;
+            set
+            {
+                if (value != null
+                    && value is Weapon)
+                {
+                    var weapon = value as Weapon;
+                    LeftMinDamageBonus += weapon.MinDamageBonus;
+                    LeftMaxDamageBonus += weapon.MaxDamageBonus;
+                }
+
+                if (_leftHand != null
+                    && _leftHand is Weapon)
+                {
+                    var oldWeapon = _leftHand as Weapon;
+                    LeftMinDamageBonus -= oldWeapon.MinDamageBonus;
+                    LeftMaxDamageBonus -= oldWeapon.MaxDamageBonus;
+                }
+                _leftHand = value;
             }
         }
 
@@ -225,36 +256,43 @@ namespace Business
                 CurrentHP = value;
             }
         }
-        public int BaseMinAttack { get; set; }
-        public int CurrentMinAttack
+        public int BaseRightMinAttack { get; set; }
+        public int BaseLeftMinAttack { get; set; }
+        public int CurrentRightMinAttack
         {
             get
             {
-                var curMinAtk = (1 + (0.01 * Strengh)) * (BaseMinAttack + MinDamageBonus);
-                //float curMinAtk = (float)BaseMinAttack + (float)MinDamageBonus;
-                //double curMinAtk = (double)BaseMinAttack * (Math.Pow(minAttackMultiplier + (Strengh / 100.0F), Level - 1)) + (double)MinDamageBonus;
-                /*
-                for (int i = 1; i < _level; ++i)
-                    curMinAtk = curMinAtk * minAttackMultiplier;
-                    */
+                var curMinAtk = (1 + (0.01 * Strengh)) * (BaseRightMinAttack + RightMinDamageBonus);
                 return ((int)Math.Round(curMinAtk));
             }
         }
-        public int BaseMaxAttack { get; set; }
-        public int CurrentMaxAttack
+        public int CurrentLeftMinAttack
         {
             get
             {
-                var curMaxAtk = (1 + (0.01 * Strengh)) * (BaseMaxAttack + MaxDamageBonus);
-                /*
-                float curMaxAtk = (float)BaseMaxAttack + (float)MaxDamageBonus;
-                for (int i = 1; i < _level; ++i)
-                    curMaxAtk = curMaxAtk * maxAttackMultiplier;
-                    */
+                var curMinAtk = (1 + (0.01 * Strengh)) * (BaseLeftMinAttack + LeftMinDamageBonus);
+                return ((int)Math.Round(curMinAtk));
+            }
+        }
+        public int BaseRightMaxAttack { get; set; }
+        public int BaseLeftMaxAttack { get; set; }
+        public int CurrentRightMaxAttack
+        {
+            get
+            {
+                var curMaxAtk = (1 + (0.01 * Strengh)) * (BaseRightMaxAttack + RightMaxDamageBonus);
                 return ((int)Math.Round(curMaxAtk));
             }
         }
-        
+        public int CurrentLeftMaxAttack
+        {
+            get
+            {
+                var curMaxAtk = (1 + (0.01 * Strengh)) * (BaseLeftMaxAttack + LeftMaxDamageBonus);
+                return ((int)Math.Round(curMaxAtk));
+            }
+        }
+
         public int CurrentCooldown { get; set; }
         public int BaseCooldown
         {
@@ -325,7 +363,7 @@ namespace Business
             CurrentHP = ((CurrentHP + amount > HP) ? (HP) : (CurrentHP + amount));
         }
 
-        public int Defend(ref int damage, out string bodyPart)
+        public int Defend(ref int damage, HandGear handGear, out string bodyPart)
         {
             bodyPart = "";
 
@@ -367,6 +405,70 @@ namespace Business
             {
                 damage = ((damage - armorPart.Defense >= 0) ? (damage - armorPart.Defense) : (0));
                 damage = (int)Math.Round((double)damage * ((100.0 - armorPart.ArmorType.Absorbency) / 100.0));
+                if (handGear != null && handGear is Weapon)
+                {
+                    var weaponType = (handGear as Weapon).TypeName;
+
+                    switch (weaponType)
+                    {
+                        case WeaponType.Slash:
+                            switch (armorPart.ArmorType.Name)
+                            {
+                                case "Plate":
+                                    damage -= (int)(damage * 25.0 / 100.0);
+                                    break;
+
+                                case "Studded leather":
+                                    damage += (int)(damage * 50.0 / 100.0);
+                                    break;
+
+                                case "Leather":
+                                    damage += (int)(damage * 50.0 / 100.0);
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                            break;
+
+                        case WeaponType.Blunt:
+                            switch (armorPart.ArmorType.Name)
+                            {
+                                case "Plate":
+                                    damage += (int)(damage * 50.0 / 100.0);
+                                    break;
+
+                                case "Mail":
+                                    damage -= (int)(damage * 25.0 / 100.0);
+                                    break;
+
+                                default:
+                                    break;
+
+                            }
+                            break;
+
+                        case WeaponType.Thrust:
+                            switch (armorPart.ArmorType.Name)
+                            {
+                                case "Mail":
+                                    damage += (int)(damage * 50.0 / 100.0);
+                                    break;
+
+                                case "Studded leather":
+                                    damage -= (int)(damage * 25.0 / 100.0);
+                                    break;
+
+                                case "Leather":
+                                    damage -= (int)(damage * 25.0 / 100.0);
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                            break;
+                    }
+                }
             }
             CurrentHP -= damage;
             if (CurrentHP <= 0)
@@ -405,34 +507,54 @@ namespace Business
             return (false);
         }
 
-        public virtual string Attack()
+        protected virtual string AnyHandAttack(HandGear handGear, int CurrentMinAttack, int CurrentMaxAttack)
         {
             string report = "";
-            CurrentCooldown = _baseCooldown;
+
             if (IsAttackEvaded())
             {
-                report = Name + " attacked " + Target.Name + " but " + Target.Name + " evaded the blow.";
+                report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " but " + Target.Name + " evaded the blow.";
             }
             else if (IsAttackParried())
             {
-                report = Name + " attacked " + Target.Name + " but " + Target.Name + " parried the blow.";
+                report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " but " + Target.Name + " parried the blow.";
             }
             else
             {
                 int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
                 string bodyPart;
-                int TargetHP = Target.Defend(ref damage, out bodyPart);
-                report = Name + " attacked " + Target.Name + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
+                int TargetHP = Target.Defend(ref damage, handGear, out bodyPart);
+                report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
                 report += Target.Name + " has " + TargetHP + " HP remaining.\n";
                 if (TargetHP <= 0)
                     report += Name + " killed " + Target.Name;
             }
+
+            return (report);
+        }
+
+        public virtual string Attack()
+        {
+            string report = "";
+            CurrentCooldown = _baseCooldown;
+            if (CurrentRightMinAttack > 0
+                || CurrentRightMaxAttack > 0)
+                report += AnyHandAttack(RightHand, CurrentRightMinAttack, CurrentRightMaxAttack);
+
+            if (Target.CurrentHP > 0
+                && (CurrentLeftMinAttack > 0
+                || CurrentLeftMaxAttack > 0))
+                report += AnyHandAttack(LeftHand, CurrentLeftMinAttack, CurrentLeftMaxAttack);
             return (report);
         }
 
         public virtual string Stats()
         {
-            string result = "=== Name : " + Name + " === HP : " + CurrentHP + "/" + HP + " === Damages : " + CurrentMinAttack + " - " + CurrentMaxAttack + " === Level : " + _level + " ===\n";
+            string result = "=== Name : " + Name + " === HP : " + CurrentHP + "/" + HP + " === Damages : Right hand [" + CurrentRightMinAttack + " - " + CurrentRightMaxAttack + "]";
+            if (CurrentLeftMinAttack > 0
+                || CurrentLeftMaxAttack > 0)
+                result += " Left hand [" + CurrentLeftMinAttack + " - " + CurrentLeftMaxAttack + "]";
+            result += " === Level : " + _level + " ===\n";
 
             return (result);
         }

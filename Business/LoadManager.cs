@@ -36,8 +36,10 @@ namespace Business
                     Name = SavedGames[index].Name,
                     _currentExp = SavedGames[index].CurrentExp,
                     BaseCooldown = 10,
-                    BaseMinAttack = 5,
-                    BaseMaxAttack = 10,
+                    BaseRightMinAttack = 5,
+                    BaseRightMaxAttack = 10,
+                    BaseLeftMinAttack = 0,
+                    BaseLeftMaxAttack = 0,
                     BaseStrengh = 10,
                     BaseVitality = 10,
                     BaseAgility = 10,
@@ -45,7 +47,8 @@ namespace Business
                     BaseDexterity = 10,
                     BaseHP = 42,
                     Money = SavedGames[index].Money,
-                    RightHand = ((SavedGames[index].RightHand != 0) ? (new RightHand(SavedGames[index].RightHand)) : (null)),
+                    RightHand = ((SavedGames[index].RightHand != 0) ? (new Weapon(SavedGames[index].RightHand)) : (null)),
+                    LeftHand = ((SavedGames[index].LeftHand != 0) ? (new Weapon(SavedGames[index].LeftHand)) : (null)),
                     ChestArmor = ((SavedGames[index].ChestArmor != 0) ? (new ChestArmor(SavedGames[index].ChestArmor)) : (null)),
                     LegsArmor = ((SavedGames[index].LegsArmor != 0) ? (new LegsArmor(SavedGames[index].LegsArmor)) : (null)),
                     SleevesArmor = ((SavedGames[index].SleevesArmor != 0) ? (new SleevesArmor(SavedGames[index].SleevesArmor)) : (null)),
@@ -81,8 +84,8 @@ namespace Business
                     _buff.RemainingDuration = deBuff.RemainingDuration;
                 }
 
-                foreach (var item in SavedGames[index].Inventory.RightHands)
-                    player.Inventory.Add(new RightHand(item.Id));
+                foreach (var item in SavedGames[index].Inventory.Weapons)
+                    player.Inventory.Add(new Weapon(item.Id));
                 foreach (var item in SavedGames[index].Inventory.ChestArmors)
                     player.Inventory.Add(new ChestArmor(item.Id));
                 foreach (var item in SavedGames[index].Inventory.LegsArmors)

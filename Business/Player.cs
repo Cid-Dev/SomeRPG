@@ -60,6 +60,35 @@ namespace Business
                 Inventory.Add(item.Clone() as Item);
         }
 
+        protected override string AnyHandAttack(HandGear handGear, int CurrentMinAttack, int CurrentMaxAttack)
+        {
+            string report = "";
+
+            if (IsAttackEvaded())
+            {
+                report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " but " + Target.Name + " evaded the blow.";
+            }
+            else if (IsAttackParried())
+            {
+                report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " but " + Target.Name + " parried the blow.";
+            }
+            else
+            {
+                int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
+                string bodyPart;
+                int TargetHP = Target.Defend(ref damage, out bodyPart);
+                report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
+                report += Target.Name + " has " + TargetHP + " HP remaining.\n";
+                if (TargetHP <= 0)
+                {
+                    report += "You killed " + Target.Name + " and have earned " + Target.getGivenExp + " exp\n";
+                    report += setExp(Target.getGivenExp);
+                }
+            }
+
+            return (report);
+        }
+        /*
         public override string Attack()
         {
             string report;
@@ -83,7 +112,7 @@ namespace Business
             }
             return (report);
         }
-
+        */
         public string ConvertMoney(int money)
         {
             string result = "";
@@ -115,7 +144,11 @@ namespace Business
 
         public override string Stats()
         {
-            string result = "=== Name : " + Name + " === HP : " + CurrentHP + "/" + HP + " === Damages : " + CurrentMinAttack + " - " + CurrentMaxAttack + " === Level : " + Level + " === Exp : " + _currentExp + "/" + getRequiredExp + " ===\n";
+            string result = "=== Name : " + Name + " === HP : " + CurrentHP + "/" + HP + " === Damages : Right hand [" + CurrentRightMinAttack + " - " + CurrentRightMaxAttack + "]";
+            if (CurrentLeftMinAttack > 0
+                || CurrentLeftMaxAttack > 0)
+                result += " Left hand [" + CurrentLeftMinAttack + " - " + CurrentLeftMaxAttack + "]";
+            result += " === Level : " + Level + " === Exp : " + _currentExp + "/" + getRequiredExp + " ===\n";
             if (Money > 0)
                 result += "=== Money : " + ConvertMoney(Money) + " ===\n";
             return (result);
@@ -139,14 +172,14 @@ namespace Business
             return (HPPotions);
         }
 
-        private List<dynamic> getAnonRightHands()
+        private List<dynamic> getAnonWeapons()
         {
             var RightHands = new List<dynamic>();
             foreach (var item in Inventory)
             {
-                if (item is RightHand)
+                if (item is Weapon)
                 {
-                    var rightHand = (item as RightHand);
+                    var rightHand = (item as Weapon);
                     RightHands.Add(new
                     {
                         rightHand.Name
@@ -194,21 +227,21 @@ namespace Business
             return (HPPotions);
         }
 
-        private List<RightHandsSave> getRightHands()
+        private List<WeaponsSave> getWeapons()
         {
-            var RightHands = new List<RightHandsSave>();
+            var Weapons = new List<WeaponsSave>();
             foreach (var item in Inventory)
             {
-                if (item is RightHand)
+                if (item is Weapon)
                 {
-                    var rightHand = (item as RightHand);
-                    RightHands.Add(new RightHandsSave
+                    var weapon = (item as Weapon);
+                    Weapons.Add(new WeaponsSave
                     {
-                        Id = rightHand.Id
+                        Id = weapon.Id
                     });
                 }
             }
-            return (RightHands);
+            return (Weapons);
         }
 
         private List<ChestArmorSave> getChestArmors()
@@ -360,6 +393,7 @@ namespace Business
                     Money = Money,
                     CurrentHP = CurrentHP,
                     RightHand = ((RightHand != null) ? (RightHand.Id) : (0)),
+                    LeftHand = ((LeftHand != null) ? (LeftHand.Id) : (0)),
                     ChestArmor = ((ChestArmor != null) ? (ChestArmor.Id) : (0)),
                     LegsArmor = ((LegsArmor != null) ? (LegsArmor.Id) : (0)),
                     SleevesArmor = ((SleevesArmor != null) ? (SleevesArmor.Id) : (0)),
@@ -371,7 +405,7 @@ namespace Business
                     Inventory = new InventorySave
                     {
                         HPPotions = getHPPotions(),
-                        RightHands = getRightHands(),
+                        Weapons = getWeapons(),
                         ChestArmors = getChestArmors(),
                         SleevesArmors = getSleevesArmors(),
                         LegsArmors = getLegsArmors(),

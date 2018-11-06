@@ -11,7 +11,7 @@ namespace DataAccess
 {
     public class Monster : DB
     {
-        public List<object> GetRightHandLootTable(int monster_id)
+        public List<object> GetWeaponLootTable(int monster_id)
         {
             List<object> result = new List<object>();
 
@@ -25,12 +25,12 @@ namespace DataAccess
                                                + "l.max_amount AS MaxAmount, "
                                                + "l.probability AS Probability "
                                         + "FROM " + MonsterTable + " m "
-                                        + "INNER JOIN " + loot_table_monster_righthand + " l "
+                                        + "INNER JOIN " + loot_table_monster_weapon + " l "
                                         + "ON l.monster_id=m.id "
-                                        + "INNER JOIN " + RightHandTable + " r "
-                                        + "ON l.righthand_id=r.id "
+                                        + "INNER JOIN " + WeaponTable + " w "
+                                        + "ON l.weapon_id=w.id "
                                         + "INNER JOIN " + ItemTable + " i "
-                                        + "ON r.item_id=i.id "
+                                        + "ON w.item_id=i.id "
                                         + "WHERE m.id = @monster_id";
                     command.CommandType = CommandType.Text;
                     command.Parameters.AddWithValue("@monster_id", monster_id);
@@ -366,7 +366,6 @@ namespace DataAccess
 
                     while (reader.Read())
                     {
-                        //Debug.WriteLine("Name: " + reader["name"] + "\tDescription: " + reader["description"] + "\tAmount: " + reader["amount"] + "\tMaxAmount: " + reader["max_amount"]);
                         result.Add(new
                         {
                             Name = reader["Name"],
@@ -389,13 +388,14 @@ namespace DataAccess
             List<object> Monsters = new List<object>();
             while (reader.Read())
             {
-                //Debug.WriteLine("Name: " + reader["name"] + "\tHP: " + reader["HP"] + "\tBaseMinAttack: " + reader["BaseMinAttack"] + "\tBaseMaxAttack: " + reader["BaseMaxAttack"] + "\tCoolDown: " + reader["BaseCoolDown"]);
                 Monsters.Add(new
                 {
                     Name = reader["name"],
                     HP = reader["HP"],
-                    BaseMinAttack = reader["BaseMinAttack"],
-                    BaseMaxAttack = reader["BaseMaxAttack"],
+                    BaseRightMinAttack = reader["BaseRightMinAttack"],
+                    BaseRightMaxAttack = reader["BaseRightMaxAttack"],
+                    BaseLeftMinAttack = reader["BaseLeftMinAttack"],
+                    BaseLeftMaxAttack = reader["BaseLeftMaxAttack"],
                     BaseCoolDown = reader["BaseCoolDown"],
                     GivenExp = reader["GivenExp"],
                     BaseExp = reader["BaseExp"],
@@ -410,7 +410,7 @@ namespace DataAccess
                     LootTable = new
                     {
                         HPPotion = GetHPPotionLootTable(int.Parse(reader["id"].ToString())),
-                        RightHand = GetRightHandLootTable(int.Parse(reader["id"].ToString())),
+                        Weapon = GetWeaponLootTable(int.Parse(reader["id"].ToString())),
                         ArmorChest = GetArmorChestLootTable(int.Parse(reader["id"].ToString())),
                         ArmorSleeves = GetArmorSleevesLootTable(int.Parse(reader["id"].ToString())),
                         ArmorLegs = GetArmorLegsLootTable(int.Parse(reader["id"].ToString())),

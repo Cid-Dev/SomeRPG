@@ -14,6 +14,7 @@ namespace DataAccess
         public int Money { get; set; }
         public int CurrentHP { get; set; }
         public int RightHand { get; set; }
+        public int LeftHand { get; set; }
         public int ChestArmor { get; set; }
         public int LegsArmor { get; set; }
         public int SleevesArmor { get; set; }
