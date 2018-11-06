@@ -116,6 +116,7 @@
     <Content Include="Resources\Datas\SomeRPG.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Resources\Datas\skills.json" />
     <None Include="SomeRPG_1_TemporaryKey.pfx" />
     <None Include="SomeRPG_2_TemporaryKey.pfx" />
     <None Include="SomeRPG_TemporaryKey.pfx" />
