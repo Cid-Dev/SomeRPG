@@ -1012,6 +1012,7 @@ namespace SomeRPG
 
         static void Main(string[] args)
         {
+            var skills = new Skills();
             ConsoleKeyInfo startOVer;
             bool isExiting = false;
             do

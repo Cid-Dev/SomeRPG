@@ -76,7 +76,7 @@ namespace Business
             {
                 int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
                 string bodyPart;
-                int TargetHP = Target.Defend(ref damage, out bodyPart);
+                int TargetHP = Target.Defend(ref damage, handGear, out bodyPart);
                 report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
                 report += Target.Name + " has " + TargetHP + " HP remaining.\n";
                 if (TargetHP <= 0)
