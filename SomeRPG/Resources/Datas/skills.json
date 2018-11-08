@@ -1,37 +1,47 @@
 ﻿{
   "Slash":
-  [
+  {
+    "Active":
     {
-      "Id": 1,
-      "Level": 1,
-      "Name": "Slashing strike",
-      "Description": "An attack dealing a bit more damage than the basic one.",
-      "Cost": 5,
-      "Damage": 1.08
-    },
-    {
-      "Id": 2,
-      "Level": 2,
-      "Name": "Cutting slash",
-      "Description": "Opens the flesh, causing bleeding",
-      "Cost": 7,
-      "Damage": 1.15,
-      "Opening":
+      "Required":
       {
-        "Skill": 1
+        "Weapon": "Slash"
       },
-      "Effects":
+      "Skills":
       [
         {
-          "Dot":
+          "Id": 1,
+          "Level": 1,
+          "Name": "Slashing strike",
+          "Description": "An attack dealing a bit more damage than the basic one.",
+          "Cost": 5,
+          "Damage": 1.08
+        },
+        {
+          "Id": 2,
+          "Level": 2,
+          "Name": "Cutting slash",
+          "Description": "Opens the flesh, causing bleeding",
+          "Cost": 7,
+          "Damage": 1.15,
+          "Opening":
           {
-            "Type": "bleeding",
-            "Damage": 5,
-            "Frequency": 5,
-            "Quantity": 10
+            "Skill": 1
+          },
+          "Effects":
+          {
+            "Dot":
+            [
+              {
+                "Type": "bleeding",
+                "Damage": 5,
+                "Frequency": 5,
+                "Quantity": 10
+              }
+            ]
           }
         }
       ]
     }
-  ]
+  }
 }

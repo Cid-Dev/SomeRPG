@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataAccess;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -37,6 +38,16 @@ namespace Business
         private double armsChance = 15;
         private double legsChance = 25;
         private double chestChance = 35;
+
+        public List<SkillFamily> Skills { get; set; }
+
+        /// <summary>
+        /// Stores informations about the last skill used
+        /// To show which skill can be used
+        /// </summary>
+        public Opening LastOpening { get; set; }
+
+        #region Stats
 
         /// <summary>
         /// The base strengh of the character
@@ -172,6 +183,8 @@ namespace Business
                 return (BasePrecision + AddedPrecision + BonusPrecision);
             }
         }
+
+        #endregion Stats
 
         public List<Buff> Buffs = new List<Buff>();
         public List<Buff> DeBuffs = new List<Buff>();
@@ -490,7 +503,6 @@ namespace Business
                 return (true);
             return (false);
         }
-        //BaseDexterity
 
         protected bool IsAttackParried()
         {
@@ -557,6 +569,66 @@ namespace Business
             result += " === Level : " + _level + " ===\n";
 
             return (result);
+        }
+
+        public void BuildSkillTree()
+        {
+            Skills = new List<SkillFamily>();
+            var skillLoader = new SkillLoader();
+            skillLoader.Load();
+            var skills = skillLoader.Skills;
+            var slash = new SkillFamily
+            {
+                Name = "Slash",
+                Actives = new List<ActiveSkill>()
+            };
+
+            foreach (var skill in skills.Slash.Active.Skills)
+            {
+                var newSkill = new ActiveSkill
+                {
+                    Cost = skill.Cost,
+                    Damage = skill.Damage,
+                    Description = skill.Description,
+                    Effects = new List<Status>(),
+                    Id = skill.Id,
+                    Level = skill.Level,
+                    Name = skill.Name,
+                };
+
+                if (skills.Slash.Active.Required != null)
+                {
+                    if (skills.Slash.Active.Required.Weapon != null
+                        && Enum.TryParse(skills.Slash.Active.Required.Weapon, out WeaponType weaponType))
+                    {
+                        if (newSkill.Required == null)
+                            newSkill.Required = new SkillRequirement();
+                        newSkill.Required.RequiredWeapon = weaponType;
+                    }
+                }
+
+                if (skill.Opening != null)
+                    newSkill.Opening = new Opening(skill.Opening, slash.Actives);
+
+                if (skill.Effects != null)
+                {
+                    if (skill.Effects.Dot != null)
+                    {
+                        foreach (var dot in skill.Effects.Dot)
+                        {
+                            newSkill.Effects.Add(new Dot
+                            {
+                                Damage = dot.Damage,
+                                Frequency = dot.Frequency,
+                                Quantity = dot.Quantity,
+                                Type = dot.Type
+                            });
+                        }
+                    }
+                }
+                slash.Actives.Add(newSkill);
+            }
+            Skills.Add(slash);
         }
     }
 }

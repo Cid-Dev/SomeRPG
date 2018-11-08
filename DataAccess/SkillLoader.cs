@@ -11,9 +11,9 @@ namespace DataAccess
 {
     public class SkillLoader
     {
-        public Skills Skills = new Skills();
-        private string FilePath;
-        private string SkillFile;
+        public Skills Skills;// = new Skills();
+        private readonly string FilePath;
+        private readonly string SkillFile;
 
         public SkillLoader()
         {

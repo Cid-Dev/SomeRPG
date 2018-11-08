@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccess
+namespace Business
 {
-    public class Skills
+    public class Status
     {
-        public SkillFamily Slash { get; set; }
+
     }
 }

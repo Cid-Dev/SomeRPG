@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Business
 {
-    public class Buff
+    public class Buff : Status
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -128,21 +128,24 @@ namespace Business
                 target.DeBuffs.Remove(this);
         }
 
-        public string Description()
+        public string Description(int numberOfTab = 1)
         {
-            string result = "\t" + Name + " (Duration : " + RemainingDuration + ") :\n";
+            string tabs = "";
+            for (int i = 0; i < numberOfTab; ++i)
+                tabs += "\t";
+            string result = tabs + Name + " (Duration : " + RemainingDuration + ") :\n";
             if (HPModifier != 0)
-                result += "\t\t" + "HP : " + HPModifier + "\n";
+                result += tabs + "\t" + "HP : " + HPModifier + "\n";
             if (StrenghModifier != 0)
-                result += "\t\t" + "Strengh : " + StrenghModifier + "\n";
+                result += tabs + "\t" + "Strengh : " + StrenghModifier + "\n";
             if (VitalityModifier != 0)
-                result += "\t\t" + "Vitality : " + VitalityModifier + "\n";
+                result += tabs + "\t" + "Vitality : " + VitalityModifier + "\n";
             if (AgilityModifier != 0)
-                result += "\t\t" + "Agility : " + AgilityModifier + "\n";
+                result += tabs + "\t" + "Agility : " + AgilityModifier + "\n";
             if (DexterityModifier != 0)
-                result += "\t\t" + "Dexterity : " + DexterityModifier + "\n";
+                result += tabs + "\t" + "Dexterity : " + DexterityModifier + "\n";
             if (PrecisionModifier != 0)
-                result += "\t\t" + "Precision : " + PrecisionModifier + "\n";
+                result += tabs + "\t" + "Precision : " + PrecisionModifier + "\n";
             return (result);
         }
     }

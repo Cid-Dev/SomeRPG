@@ -20,6 +20,64 @@ namespace SomeRPG
                 Console.ReadKey(true);
         }
 
+        public static string ShowEffects(List<Status> effects)
+        {
+            string result = "";
+
+            foreach (var effect in effects)
+            {
+                switch (effect)
+                {
+                    case Dot dot:
+                        result += "\t\t\tDoT type : " + dot.Type + " - " + dot.Quantity + " x Damage " + dot.Damage + " every " + dot.Frequency + "\n";
+                        break;
+
+                    case Buff buff:
+                        result += buff.Description(3);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            return (result);
+        }
+
+        public static string ShowOpening(Opening opening)
+        {
+            string result = "";
+
+            if (opening.Skill != null)
+                result += opening.Skill.Name;
+
+            return (result);
+        }
+
+        public static string SkillDetail(ActiveSkill skill)
+        {
+            string result = "\t- ";
+
+            result = skill.Name + "(Level " + skill.Level + ") : " + skill.Description + "\n";
+
+            if (skill.Required != null)
+            {
+                if (skill.Required.RequiredWeapon != null)
+                    result += "\t\t- Required weapon : " + skill.Required.RequiredWeapon.ToString() + "\n";
+            }
+
+            if (skill.Damage != null)
+                result += "\t\t- Damage : " + skill.Damage + "\n";
+
+            if (skill.Effects != null
+                && skill.Effects.Count > 0)
+                result += "\t\t- Effects :\n" + ShowEffects(skill.Effects);
+
+            if (skill.Opening != null)
+                result += "\t\t- Opening : " + ShowOpening(skill.Opening) + "\n";
+
+            return (result);
+        }
+
         public static void Stats()
         {
             Console.Write("=== Name : " + player.Name + " === HP : ");
@@ -118,10 +176,162 @@ namespace SomeRPG
             Console.WriteLine("=== " + player.Name + " : " + player.CurrentCooldown + " === " + monster.Name + " : " + monster.CurrentCooldown + " ===");
         }
 
+        static bool CheckUsableSkill(ActiveSkill skill)
+        {
+            if (skill.Required != null)
+            {
+                if (skill.Required.RequiredWeapon != null)
+                {
+                    if (!(player.RightHand != null
+                            && player.RightHand is Weapon
+                            && (player.RightHand as Weapon).TypeName == skill.Required.RequiredWeapon))
+                        return (false);
+                }
+            }
+
+            if (skill.Opening != null)
+            {
+                if (player.LastOpening != null)
+                {
+                    if (skill.Opening.Skill != null)
+                    {
+                        if (!(player.LastOpening.Skill != null
+                            && skill.Opening.Skill == player.LastOpening.Skill))
+                            return (false);
+                    }
+                }
+                else
+                    return (false);
+            }
+            return (true);
+        }
+
+        static bool SelectSkill(SkillFamily selected)
+        {
+            string error = "";
+            string input;
+            bool back = false;
+            bool IsSkillUsed = false;
+            do
+            {
+                do
+                {
+                    if (selected.Actives.Count > 0)
+                    {
+
+                        Console.Clear();
+                        Stats();
+
+                        Console.WriteLine("Skills availables for " + selected.Name + " skill family :\n");
+                        int i = 0;
+                        foreach (var skill in selected.Actives)
+                        {
+                            if (!CheckUsableSkill(skill))
+                                Console.ForegroundColor = ConsoleColor.DarkGray;
+                            Console.WriteLine("[" + ++i + "] - " + SkillDetail(skill));
+                            Console.ResetColor();
+                        }
+                        if (error != "")
+                            Console.WriteLine(error);
+                        Console.WriteLine("Please select a skill or go [[B]ack]");
+                    }
+                    else
+                        Console.WriteLine("No skill. Please go [B]ack]");
+                    input = Console.ReadLine();
+                    error = "";
+                } while (!Regex.IsMatch(input, "^(([0-9]+)|(b(ack)?))$", RegexOptions.IgnoreCase));
+
+                if (int.TryParse(input, out int result))
+                {
+                    if (result > 0 && result <= selected.Actives.Count)
+                    {
+                        var skill = selected.Actives[--result];
+                        if (CheckUsableSkill(skill))
+                        {
+                            //IsSkillUsed = skill.Use(player, monster);
+                            back = IsSkillUsed;
+                        }
+                        else
+                            error = "Skill " + skill.Name + " actually unavailable";
+                    }
+                    else
+                        error = "Invalid number.";
+                }
+                else
+                    back = true;
+
+            } while (!back);
+            return (IsSkillUsed);
+        }
+
+        static void ShowSkillFamily(SkillFamily selected)
+        {
+            Console.Clear();
+            Stats();
+            Console.WriteLine("Skills availables for " + selected.Name + " skill family :\n");
+            foreach (var skill in selected.Actives)
+                Console.WriteLine(SkillDetail(skill));
+            Console.WriteLine("Press any key to go back.");
+            ClearKeyBuffer();
+            Console.ReadKey(true);
+        }
+
+        static bool SkillsMenu(bool isInBattle = false)
+        {
+            string error = "";
+            string input;
+            bool back = false;
+            bool IsSkillUsed = false;
+            do
+            {
+                do
+                {
+                    string options = "";
+                    if (player.Skills.Count > 0)
+                    {
+                        int i = 0;
+                        foreach (var skill in player.Skills)
+                            options += "\t[" + ++i + "] " + skill.Name + "\n";
+
+                        Console.Clear();
+                        Stats();
+                        Console.WriteLine(options);
+                        if (error != "")
+                            Console.WriteLine(error);
+                        Console.WriteLine("Please select a skill family or go [[B]ack]");
+                    }
+                    else
+                        Console.WriteLine("No skill. Please go [B]ack]");
+                    input = Console.ReadLine();
+                    error = "";
+                } while (!Regex.IsMatch(input, "^(([0-9]+)|(b(ack)?))$", RegexOptions.IgnoreCase));
+
+                if (int.TryParse(input, out int result))
+                {
+                    if (result > 0 && result <= player.Skills.Count)
+                    {
+                        var selected = player.Skills[--result];
+                        if (isInBattle)
+                        {
+                            IsSkillUsed = SelectSkill(selected);
+                            back = IsSkillUsed;
+                        }
+                        else
+                            ShowSkillFamily(selected);
+                    }
+                    else
+                        error = "Invalid number.";
+                }
+                else
+                    back = true;
+
+            } while (!back);
+            return (IsSkillUsed);
+        }
+
         static void OpenUsableInventory(Character monster)
         {
             bool back = false;
-
             while (!back)
             {
                 string input = "";
@@ -219,10 +429,11 @@ namespace SomeRPG
             {
                 DisplayFightInfos(monster);
                 Console.WriteLine("Select your action");
-                Console.WriteLine("[A]ttack. [I]nventory. [F]lee like a coward");
+                Console.WriteLine("[A]ttack. [S]kills. [I]nventory. [F]lee like a coward");
                 ClearKeyBuffer();
                 menu = Console.ReadKey(true);
             } while (menu.Key != ConsoleKey.A
+                     && menu.Key != ConsoleKey.S
                      && menu.Key != ConsoleKey.I
                      && menu.Key != ConsoleKey.F);
 
@@ -230,6 +441,11 @@ namespace SomeRPG
             {
                 case (ConsoleKey.A):
                     Console.WriteLine(player.Attack());
+                    return (false);
+
+                case (ConsoleKey.S):
+                    SkillsMenu(true);
+                    player.CurrentCooldown = player.BaseCooldown;
                     return (false);
 
                 case (ConsoleKey.I):
@@ -790,16 +1006,21 @@ namespace SomeRPG
                     Stats();
                     DetailedStats();
                     Console.WriteLine("What do you want to do?");
-                    Console.WriteLine("[E]quipement. [I]nventory. [R]est. [B]ack");
+                    Console.WriteLine("[S]kills. [E]quipement. [I]nventory. [R]est. [B]ack");
                     ClearKeyBuffer();
                     menu = Console.ReadKey(true);
                 } while (menu.Key != ConsoleKey.E
+                         && menu.Key != ConsoleKey.S
                          && menu.Key != ConsoleKey.I
                          && menu.Key != ConsoleKey.R
                          && menu.Key != ConsoleKey.B);
 
                 switch (menu.Key)
                 {
+                    case ConsoleKey.S:
+                        SkillsMenu();
+                        break;
+
                     case ConsoleKey.E:
                         EquipementMenu();
                         break;
@@ -970,6 +1191,7 @@ namespace SomeRPG
                 {
                     case ConsoleKey.L:
                         Load();
+                        player.BuildSkillTree();
                         break;
 
                     case ConsoleKey.N:
@@ -988,6 +1210,8 @@ namespace SomeRPG
                             BasePrecision = 10,
                             BaseDexterity = 10
                         };
+
+                        player.BuildSkillTree();
 
                         try
                         {
@@ -1012,7 +1236,6 @@ namespace SomeRPG
 
         static void Main(string[] args)
         {
-            var skills = new Skills();
             ConsoleKeyInfo startOVer;
             bool isExiting = false;
             do

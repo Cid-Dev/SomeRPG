@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace DataAccess
 {
-    public class Skills
+    public class SkillRequirement
     {
-        public SkillFamily Slash { get; set; }
+        public string Weapon { get; set; }
     }
 }

@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess
 {
-    public class Skills
+    public class ActiveSkill
     {
-        public SkillFamily Slash { get; set; }
+        public List<Skill> Skills { get; set; }
+        public SkillRequirement Required { get; set; }
     }
 }

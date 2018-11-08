@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Business
+namespace DataAccess
 {
-    public class Slash : ActiveSkill
+    public class Effects
     {
-
+        public List<Dot> Dot { get; set; }
     }
 }

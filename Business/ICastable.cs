@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccess
+namespace Business
 {
-    public class Effect
+    interface ICastable
     {
-        public Dot Dot { get; set; }
+        bool Cast(Character From, Character To);
     }
 }
