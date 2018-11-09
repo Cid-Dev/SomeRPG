@@ -62,10 +62,11 @@ namespace Business
             }
         }
 
-        private int IsInList(List<Buff> buffs)
+        private int IsInList(List<Status> buffs)
         {
             for (int i = 0; i < buffs.Count; ++i)
-                if (Name == buffs[i].Name)
+                if ((buffs[i] is Buff)
+                    && Name == (buffs[i] as Buff).Name)
                     return (i);
             return (-1);
         }
@@ -86,7 +87,7 @@ namespace Business
             target.DeBuffs.Add(this);
         }
 
-        public void Apply(Character target)
+        public override void Apply(Character target)
         {
             RemainingDuration = Duration;
             target.HPBonus += HPModifier;
@@ -110,7 +111,7 @@ namespace Business
             }
         }
 
-        public void RemoveEffect(Character target)
+        public override void RemoveEffect(Character target)
         {
             target.HPBonus -= HPModifier;
             target.CurrentHP -= HPModifier;

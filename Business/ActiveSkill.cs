@@ -14,10 +14,25 @@ namespace Business
         public Opening Opening { get; set; }
         public SkillRequirement Required { get; set; }
 
-        public bool Cast(Character From, Character To)
-        {
+        private Random seed = new Random();
 
-            return (true);
+        public AttackResult Cast(Character From, Character To, out int damage, out string bodyPart)
+        {
+            damage = 0;
+            bodyPart = "";
+            if (To.IsAttackEvaded())
+                return (AttackResult.Evaded);
+            if (To.IsAttackParried())
+                return (AttackResult.Parried);
+            damage = (int)Math.Round((double)seed.Next(From.CurrentRightMinAttack, From.CurrentRightMaxAttack + 1) * (Damage ?? 1));
+            To.Defend(ref damage, From.RightHand, out bodyPart);
+            if (Effects != null)
+            {
+                foreach (var effect in Effects)
+                    (effect.Clone() as Status).Apply(To);
+            }
+            From.LastOpening.Skill = this;
+            return (AttackResult.Hit);
         }
     }
 }

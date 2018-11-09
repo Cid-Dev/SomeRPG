@@ -26,6 +26,36 @@ namespace Business
             return (result);
         }
 
+        private void applyStatus(Player player, List<StatusSave> Buff)
+        {
+            foreach (var status in Buff)
+            {
+                switch (status.StatusType)
+                {
+                    case "Buff":
+                        var buff = (status as BuffSave);
+                        Buff _buff = new Buff(buff.Id);
+                        _buff.Apply(player);
+                        _buff.RemainingDuration = buff.RemainingDuration;
+                        break;
+
+                    case "Dot":
+                        var dot = (status as DotSave);
+                        Dot _dot = new Dot()
+                        {
+                            Damage = dot.Damage,
+                            Frequency = dot.Frequency,
+                            Quantity = dot.Quantity,
+                            Type = dot.Type
+                        };
+                        _dot.Apply(player);
+                        _dot.RemainingQuantity = dot.RemainingQuantity;
+                        _dot.TimeBeforeNextTick = dot.TimeBeforeNextTick;
+                        break;
+                }
+            }
+        }
+
         public Player GetPlayer(int index)
         {
             --index;
@@ -55,8 +85,8 @@ namespace Business
                     FeetArmor = ((SavedGames[index].FeetArmor != 0) ? (new FeetArmor(SavedGames[index].FeetArmor)) : (null)),
                     HandsArmor = ((SavedGames[index].HandsArmor != 0) ? (new HandsArmor(SavedGames[index].HandsArmor)) : (null)),
                     HeadArmor = ((SavedGames[index].HeadArmor != 0) ? (new HeadArmor(SavedGames[index].HeadArmor)) : (null)),
-                    Buffs = new List<Buff>(),
-                    DeBuffs = new List<Buff>(),
+                    Buffs = new List<Status>(),
+                    DeBuffs = new List<Status>(),
                     Inventory = new List<Item>()
                 };
                 player.SetLevel(SavedGames[index].Level);
@@ -70,19 +100,8 @@ namespace Business
                     });
                 }
 
-                foreach (var buff in SavedGames[index].Buffs)
-                {
-                    Buff _buff = new Buff(buff.Id);
-                    _buff.Apply(player);
-                    _buff.RemainingDuration = buff.RemainingDuration;
-                }
-
-                foreach (var deBuff in SavedGames[index].DeBuffs)
-                {
-                    Buff _buff = new Buff(deBuff.Id);
-                    _buff.Apply(player);
-                    _buff.RemainingDuration = deBuff.RemainingDuration;
-                }
+                applyStatus(player, SavedGames[index].Buffs);
+                applyStatus(player, SavedGames[index].DeBuffs);
 
                 foreach (var item in SavedGames[index].Inventory.Weapons)
                     player.Inventory.Add(new Weapon(item.Id));

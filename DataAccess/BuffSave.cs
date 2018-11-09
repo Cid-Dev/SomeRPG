@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace DataAccess
 {
-    public class BuffSave
+    public class BuffSave : StatusSave
     {
         public int Id { get; set; }
         public int RemainingDuration { get; set; }
+
+        public BuffSave()
+        {
+            StatusType = "Buff";
+        }
     }
 }

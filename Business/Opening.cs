@@ -11,6 +11,8 @@ namespace Business
     {
         public ActiveSkill Skill { get; set; }
 
+        public Opening() { }
+
         public Opening(DataAccess.Opening opening, List<ActiveSkill> skills)
         {
             Skill = skills.SingleOrDefault(s => s.Id == opening.Skill);

@@ -44,6 +44,7 @@
     <Compile Include="ActiveSkill.cs" />
     <Compile Include="Armor.cs" />
     <Compile Include="ArmorType.cs" />
+    <Compile Include="AttackResult.cs" />
     <Compile Include="Buff.cs" />
     <Compile Include="Character.cs" />
     <Compile Include="Dot.cs" />
@@ -52,6 +53,7 @@
     <Compile Include="HeadArmor.cs" />
     <Compile Include="ChestArmor.cs" />
     <Compile Include="HPPotion.cs" />
+    <Compile Include="IApplicable.cs" />
     <Compile Include="IEquipable.cs" />
     <Compile Include="ICastable.cs" />
     <Compile Include="IStackable.cs" />

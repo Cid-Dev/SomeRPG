@@ -21,8 +21,8 @@ namespace DataAccess
         public int FeetArmor { get; set; }
         public int HandsArmor { get; set; }
         public int HeadArmor { get; set; }
-        public List<BuffSave> Buffs = new List<BuffSave>();
-        public List<BuffSave> DeBuffs = new List<BuffSave>();
+        public List<StatusSave> Buffs = new List<StatusSave>();
+        public List<StatusSave> DeBuffs = new List<StatusSave>();
         public InventorySave Inventory = new InventorySave();
     }
 }

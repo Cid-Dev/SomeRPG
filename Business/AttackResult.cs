@@ -6,8 +6,13 @@ using System.Threading.Tasks;
 
 namespace Business
 {
-    interface ICastable
+    public enum AttackResult
     {
-        AttackResult Cast(Character From, Character To, out int damage, out string bodyPart);
+        Missed,
+        Evaded,
+        Parried,
+        Blocked,
+        Hit,
+        CriticalHit
     }
 }

@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Business
 {
-    interface ICastable
+    public interface IApplicable
     {
-        AttackResult Cast(Character From, Character To, out int damage, out string bodyPart);
+        void Apply(Character target);
+        void RemoveEffect(Character target);
     }
 }

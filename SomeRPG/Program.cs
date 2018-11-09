@@ -162,8 +162,19 @@ namespace SomeRPG
             if (monster.DeBuffs.Count > 0)
             {
                 Console.WriteLine("=== Debuff" + ((monster.DeBuffs.Count > 1) ? ("s") : ("")) + ":\n");
-                foreach (Buff deBuff in monster.DeBuffs)
-                    Console.WriteLine(deBuff.Description());
+                foreach (var deBuff in monster.DeBuffs)
+                {
+                    if (deBuff is Buff)
+                        Console.WriteLine((deBuff as Buff).Description());
+                    if (deBuff is Dot)
+                    {
+                        var dot = (deBuff as Dot);
+                        string dotDetail = "\t" + dot.Type + " (Duration : " + ((dot.RemainingQuantity * dot.Frequency) - dot.TimeBeforeNextTick) + ") :\n";
+                        dotDetail += "\t\tDamage : " + dot.Damage + "\n";
+                        dotDetail += "\t\tFrequency : " + dot.Frequency + "\n";
+                        Console.WriteLine(dotDetail);
+                    }
+                }
             }
         }
 
@@ -219,8 +230,7 @@ namespace SomeRPG
                     if (selected.Actives.Count > 0)
                     {
 
-                        Console.Clear();
-                        Stats();
+                        DisplayFightInfos(player.Target);
 
                         Console.WriteLine("Skills availables for " + selected.Name + " skill family :\n");
                         int i = 0;
@@ -249,6 +259,30 @@ namespace SomeRPG
                         if (CheckUsableSkill(skill))
                         {
                             //IsSkillUsed = skill.Use(player, monster);
+                            string AttackReport = "";
+                            switch (skill.Cast(player, player.Target, out int damage, out string bodyPart))
+                            {
+                                case AttackResult.Evaded:
+                                    AttackReport = player.Name + " attacked " + player.Target.Name + " but " + player.Target.Name + " evaded the blow.";
+                                    break;
+
+                                case AttackResult.Parried:
+                                    AttackReport = player.Name + " attacked " + player.Target.Name + " but " + player.Target.Name + " parried the blow.";
+                                    break;
+
+                                case AttackResult.Hit:
+                                    AttackReport = player.Name + " attacked " + player.Target.Name + " with " + ((player.RightHand != null) ? (player.RightHand.Name) : ("bare hands")) + " on the " + bodyPart + " using " + skill.Name + " and dealt " + damage + " damage.\n";
+                                    AttackReport += player.Target.Name + " has " + player.Target.CurrentHP + " HP remaining.\n";
+                                    if (player.Target.CurrentHP <= 0)
+                                        AttackReport += player.Name + " killed " + player.Target.Name;
+                                    break;
+                            }
+                            DisplayFightInfos(player.Target);
+                            Console.WriteLine(AttackReport);
+                            Console.WriteLine("Press any key to continue");
+                            ClearKeyBuffer();
+                            Console.ReadKey(true);
+                            IsSkillUsed = true;
                             back = IsSkillUsed;
                         }
                         else
@@ -324,7 +358,6 @@ namespace SomeRPG
                 }
                 else
                     back = true;
-
             } while (!back);
             return (IsSkillUsed);
         }
@@ -487,20 +520,41 @@ namespace SomeRPG
             return (result);
         }
 
-        static void ManageEffectStatus(Character target)
+        static string ModifyEffectDuration(Character target, List<Status> statuss)
         {
-            for (int i = 0; i < target.Buffs.Count; ++i)
+            string result = "";
+            for (int i = 0; i < statuss.Count; ++i)
             {
-                --target.Buffs[i].RemainingDuration;
-                if (target.Buffs[i].RemainingDuration <= 0)
-                    target.Buffs[i].RemoveEffect(target);
+                switch (statuss[i])
+                {
+                    case Buff b:
+                        if (--b.RemainingDuration <= 0)
+                            b.RemoveEffect(target);
+                        break;
+
+                    case OverTime o:
+                        if (--o.TimeBeforeNextTick <= 0)
+                        {
+                            o.ApplyTick(target);
+                            switch (o)
+                            {
+                                case Dot d:
+                                    result += target.Name + " suffered " + d.Damage + " damage due to " + d.Type + "\n";
+                                    break;
+                            }
+                        }
+                        break;
+                }
             }
-            for (int i = 0; i < target.DeBuffs.Count; ++i)
-            {
-                --target.DeBuffs[i].RemainingDuration;
-                if (target.DeBuffs[i].RemainingDuration <= 0)
-                    target.DeBuffs[i].RemoveEffect(target);
-            }
+            return (result);
+        }
+
+        static string ManageEffectStatus(Character target)
+        {
+            string result = "";
+            result = ModifyEffectDuration(target, target.Buffs);
+            result += ModifyEffectDuration(target, target.DeBuffs);
+            return (result);
         }
 
         static void Fight(Monster monster)
@@ -512,27 +566,38 @@ namespace SomeRPG
             {
                 --player.CurrentCooldown;
                 --monster.CurrentCooldown;
-                ManageEffectStatus(player);
-                ManageEffectStatus(monster);
+                string overTimeEffects = ManageEffectStatus(player);
+                overTimeEffects += ManageEffectStatus(monster);
                 DisplayFightInfos(monster);
-                if (player.CurrentCooldown <= 0)
+                if (overTimeEffects != "")
                 {
-                    hasFlee = selectAction(monster);
-                    if (!hasFlee)
-                    {
-                        Console.WriteLine("Press any key");
-                        ClearKeyBuffer();
-                        Console.ReadKey(true);
-                    }
-                }
-                if (monster.CurrentCooldown <= 0)
-                {
-                    Console.WriteLine(monster.Attack());
+                    Console.WriteLine(overTimeEffects);
                     Console.WriteLine("Press any key");
                     ClearKeyBuffer();
                     Console.ReadKey(true);
                 }
-                Thread.Sleep(100);
+                if (player.CurrentHP > 0
+                    && monster.CurrentHP > 0)
+                {
+                    if (player.CurrentCooldown <= 0)
+                    {
+                        hasFlee = selectAction(monster);
+                        if (!hasFlee)
+                        {
+                            Console.WriteLine("Press any key");
+                            ClearKeyBuffer();
+                            Console.ReadKey(true);
+                        }
+                    }
+                    if (monster.CurrentCooldown <= 0)
+                    {
+                        Console.WriteLine(monster.Attack());
+                        Console.WriteLine("Press any key");
+                        ClearKeyBuffer();
+                        Console.ReadKey(true);
+                    }
+                    Thread.Sleep(100);
+                }
             }
             if (player.CurrentHP > 0 && monster.CurrentHP <= 0)
             {
@@ -550,7 +615,8 @@ namespace SomeRPG
                     player.Money += money;
                     loot += "Money looted :" + ConvertMoney(money) + "\n";
                 }
-                Console.WriteLine("Well done " + player.Name + ", you raped " + monster.Name + ".\nYou have " + player.CurrentHP + "HP remaining.");
+                Console.WriteLine("Well done " + player.Name + ", you raped " + monster.Name + " and earned " + monster.getGivenExp + " exp.\nYou have " + player.CurrentHP + "HP remaining.");
+                Console.WriteLine(player.SetExp(monster.getGivenExp));
                 if (loot != "")
                     Console.WriteLine("You've earned : \n" + loot);
             }

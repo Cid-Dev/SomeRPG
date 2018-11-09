@@ -6,8 +6,13 @@ using System.Threading.Tasks;
 
 namespace Business
 {
-    public class Status
+    public abstract class Status : IApplicable, ICloneable
     {
-
+        public abstract void Apply(Character target);
+        public abstract void RemoveEffect(Character target);
+        public object Clone()
+        {
+            return (MemberwiseClone());
+        }
     }
 }

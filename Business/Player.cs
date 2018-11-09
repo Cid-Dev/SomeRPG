@@ -79,11 +79,13 @@ namespace Business
                 int TargetHP = Target.Defend(ref damage, handGear, out bodyPart);
                 report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
                 report += Target.Name + " has " + TargetHP + " HP remaining.\n";
+                /*
                 if (TargetHP <= 0)
                 {
                     report += "You killed " + Target.Name + " and have earned " + Target.getGivenExp + " exp\n";
                     report += setExp(Target.getGivenExp);
                 }
+                */
             }
 
             return (report);
@@ -364,20 +366,36 @@ namespace Business
             return (StatusEffectPotions);
         }
 
-        private List<BuffSave> GetActiveBuffs(List<Buff> buffs)
+        private List<StatusSave> GetActiveBuffs(List<Status> statuss)
         {
-            List<BuffSave> buffSaves = new List<BuffSave>();
+            List<StatusSave> statusSaves = new List<StatusSave>();
 
-            foreach (var buff in buffs)
+            foreach (var status in statuss)
             {
-                buffSaves.Add(new BuffSave
+                switch (status)
                 {
-                    Id = buff.Id,
-                    RemainingDuration = buff.RemainingDuration
-                });
-            }
+                    case Buff b:
+                        statusSaves.Add(new BuffSave()
+                        {
+                            Id = b.Id,
+                            RemainingDuration = b.RemainingDuration
+                        });
+                        break;
 
-            return (buffSaves);
+                    case Dot d:
+                        statusSaves.Add(new DotSave()
+                        {
+                            Damage = d.Damage,
+                            Frequency = d.Frequency,
+                            Quantity = d.Quantity,
+                            RemainingQuantity = d.RemainingQuantity,
+                            TimeBeforeNextTick = d.TimeBeforeNextTick,
+                            Type = d.Type
+                        });
+                        break;
+                }
+            }
+            return (statusSaves);
         }
 
         public string Save()

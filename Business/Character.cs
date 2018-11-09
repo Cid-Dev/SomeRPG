@@ -45,7 +45,7 @@ namespace Business
         /// Stores informations about the last skill used
         /// To show which skill can be used
         /// </summary>
-        public Opening LastOpening { get; set; }
+        public Opening LastOpening = new Opening();
 
         #region Stats
 
@@ -186,8 +186,8 @@ namespace Business
 
         #endregion Stats
 
-        public List<Buff> Buffs = new List<Buff>();
-        public List<Buff> DeBuffs = new List<Buff>();
+        public List<Status> Buffs = new List<Status>();
+        public List<Status> DeBuffs = new List<Status>();
 
         #region gear
 
@@ -352,7 +352,7 @@ namespace Business
             CurrentHP = HP;
         }
 
-        protected string setExp(int exp)
+        public string SetExp(int exp)
         {
             string result = "";
             int levels = 0;
@@ -489,7 +489,7 @@ namespace Business
             return (CurrentHP);
         }
 
-        protected bool IsAttackEvaded()
+        public bool IsAttackEvaded()
         {
             int baseEvasion = 10;
             int factor = Target.Agility - Precision;
@@ -504,7 +504,7 @@ namespace Business
             return (false);
         }
 
-        protected bool IsAttackParried()
+        public bool IsAttackParried()
         {
             int baseParry = 10;
             int factor = Target.Agility - Precision;
@@ -534,8 +534,7 @@ namespace Business
             else
             {
                 int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
-                string bodyPart;
-                int TargetHP = Target.Defend(ref damage, handGear, out bodyPart);
+                int TargetHP = Target.Defend(ref damage, handGear, out string bodyPart);
                 report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
                 report += Target.Name + " has " + TargetHP + " HP remaining.\n";
                 if (TargetHP <= 0)
@@ -620,7 +619,9 @@ namespace Business
                             {
                                 Damage = dot.Damage,
                                 Frequency = dot.Frequency,
+                                TimeBeforeNextTick = dot.Frequency,
                                 Quantity = dot.Quantity,
+                                RemainingQuantity = dot.Quantity,
                                 Type = dot.Type
                             });
                         }
