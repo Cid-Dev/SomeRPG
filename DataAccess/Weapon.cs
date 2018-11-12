@@ -18,11 +18,13 @@ namespace DataAccess
                 m_dbConnection.Open();
                 using (SQLiteCommand command = m_dbConnection.CreateCommand())
                 {
-                    command.CommandText = "SELECT i.name AS name, i.description AS description, w.id AS id, w.mindamagebonus AS mindamagebonus, w.maxdamagebonus AS maxdamagebonus, w.isTwoHand as isTwoHand, t.name AS TypeName FROM " + WeaponTable + " w "
+                    command.CommandText = "SELECT i.name AS name, i.description AS description, w.id AS id, w.mindamagebonus AS mindamagebonus, w.maxdamagebonus AS maxdamagebonus, w.isTwoHand as isTwoHand, t.name AS TypeName, w.range AS Range, c.Name AS WeaponClass FROM " + WeaponTable + " w "
                                         + "INNER JOIN " + ItemTable + " i "
                                         + "ON w.item_id=i.id "
                                         + "INNER JOIN " + WeaponTypeTable + " t "
                                         + "ON w.type_id=t.id "
+                                        + "INNER JOIN " + WeaponClassTable + " c "
+                                        + "ON w.class_id=c.id "
                                         + "WHERE w.id = @id "
                                         + "LIMIT 1";
                     command.CommandType = CommandType.Text;
@@ -39,7 +41,9 @@ namespace DataAccess
                             MinDamageBonus = reader["mindamagebonus"],
                             MaxDamageBonus = reader["maxdamagebonus"],
                             isTwoHand = reader["isTwoHand"],
-                            TypeName = reader["TypeName"]
+                            TypeName = reader["TypeName"],
+                            WeaponClass = reader["WeaponClass"],
+                            Range = reader["Range"]
                         });
                     }
                 }
@@ -55,11 +59,13 @@ namespace DataAccess
                 m_dbConnection.Open();
                 using (SQLiteCommand command = m_dbConnection.CreateCommand())
                 {
-                    command.CommandText = "SELECT i.name AS name, i.description AS description, w.id AS id, w.mindamagebonus AS mindamagebonus, w.maxdamagebonus AS maxdamagebonus, w.isTwoHand as isTwoHand, t.name AS TypeName FROM " + WeaponTable + " w "
+                    command.CommandText = "SELECT i.name AS name, i.description AS description, w.id AS id, w.mindamagebonus AS mindamagebonus, w.maxdamagebonus AS maxdamagebonus, w.isTwoHand as isTwoHand, t.name AS TypeName, w.range AS Range, c.Name AS WeaponClass FROM " + WeaponTable + " w "
                                         + "INNER JOIN " + ItemTable + " i "
                                         + "ON w.item_id=i.id "
                                         + "INNER JOIN " + WeaponTypeTable + " t "
                                         + "ON w.type_id=t.id "
+                                        + "INNER JOIN " + WeaponClassTable + " c "
+                                        + "ON w.class_id=c.id "
                                         + "WHERE i.name = @name "
                                         + "LIMIT 1";
                     command.CommandType = CommandType.Text;
@@ -76,7 +82,9 @@ namespace DataAccess
                             MinDamageBonus = reader["mindamagebonus"],
                             MaxDamageBonus = reader["maxdamagebonus"],
                             isTwoHand = reader["isTwoHand"],
-                            TypeName = reader["TypeName"]
+                            TypeName = reader["TypeName"],
+                            WeaponClass = reader["WeaponClass"],
+                            Range = reader["Range"]
                         });
                     }
                 }

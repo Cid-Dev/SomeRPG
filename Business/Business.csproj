@@ -44,9 +44,12 @@
     <Compile Include="ActiveSkill.cs" />
     <Compile Include="Armor.cs" />
     <Compile Include="ArmorType.cs" />
+    <Compile Include="AttackReport.cs" />
     <Compile Include="AttackResult.cs" />
+    <Compile Include="Battle.cs" />
     <Compile Include="Buff.cs" />
     <Compile Include="Character.cs" />
+    <Compile Include="CharacterInBattle.cs" />
     <Compile Include="Dot.cs" />
     <Compile Include="HandGear.cs" />
     <Compile Include="HandsArmor.cs" />
@@ -77,6 +80,7 @@
     <Compile Include="FeetArmor.cs" />
     <Compile Include="SleevesArmor.cs" />
     <Compile Include="StatusEffectPotion.cs" />
+    <Compile Include="WeaponClass.cs" />
     <Compile Include="WeaponType.cs" />
   </ItemGroup>
   <ItemGroup>

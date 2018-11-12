@@ -20,6 +20,7 @@ namespace SomeRPG
                 Console.ReadKey(true);
         }
 
+        #region Display and strings builders
         public static string ShowEffects(List<Status> effects)
         {
             string result = "";
@@ -137,6 +138,37 @@ namespace SomeRPG
             Console.WriteLine();
         }
 
+        static string ConvertMoney(int money)
+        {
+            string result = "";
+
+            int cents;
+
+            cents = money % 100;
+            if (cents > 0)
+                result = " " + cents + " copper";
+            money /= 100;
+            if (money > 0)
+            {
+                cents = money % 100;
+                if (cents > 0)
+                    result = " " + cents + " silver" + result;
+                money /= 100;
+                if (money > 0)
+                {
+                    cents = money % 1000;
+                    if (cents > 0)
+                        result = " " + cents + " gold" + result;
+                    money /= 1000;
+                    if (money > 0)
+                        result = " " + money + " platinium" + result;
+                }
+            }
+            return (result);
+        }
+        #endregion Display and strings builders
+
+        #region Battle
         public static void MonsterStats(Character monster)
         {
             Console.Write("=== Name : " + monster.Name + " === HP : ");
@@ -178,13 +210,14 @@ namespace SomeRPG
             }
         }
 
-        static void DisplayFightInfos(Character monster)
+        static void DisplayFightInfos(Battle battle)
         {
             Console.Clear();
             Stats();
             Console.WriteLine("You are fighting a monster !");
-            MonsterStats(monster);
-            Console.WriteLine("=== " + player.Name + " : " + player.CurrentCooldown + " === " + monster.Name + " : " + monster.CurrentCooldown + " ===");
+            MonsterStats(battle.monster.Character);
+            Console.WriteLine("=== " + battle.player.Character.Name + " : " + battle.player.Character.CurrentCooldown + " === " + battle.monster.Character.Name + " : " + battle.monster.Character.CurrentCooldown + " ===");
+            Console.WriteLine("=== Distance between you and your target : " + battle.player.GetDistance(battle.monster) + "===");
         }
 
         static bool CheckUsableSkill(ActiveSkill skill)
@@ -455,17 +488,188 @@ namespace SomeRPG
             }
         }
 
-        static bool selectAction(Character monster)
+        static void Attack(Character Attacker)
+        {
+            var AttackReports = Attacker.Attack();
+            foreach (var attackReport in AttackReports)
+            {
+                var report = attackReport.AttackerName + " attacked " + attackReport.DefenderName + " with " + attackReport.WeaponName + " ";
+                switch (attackReport.AttackResult)
+                {
+                    case (AttackResult.Evaded):
+                        report += "but " + attackReport.DefenderName + " evaded the blow.";
+                        break;
+
+                    case (AttackResult.Parried):
+                        report += "but " + attackReport.DefenderName + " parried the blow.";
+                        break;
+
+                    case (AttackResult.Hit):
+                        report += " on the " + attackReport.BodyPart + " and dealt " + attackReport.Damage + " damage.\n";
+                        report += attackReport.BodyPart + " has " + attackReport.DefenderRemainingHP + " HP remaining.\n";
+                        if (attackReport.DefenderRemainingHP <= 0)
+                            report += attackReport.AttackerName + " killed " + attackReport.BodyPart;
+                        break;
+                }
+                Console.WriteLine(report);
+            }
+        }
+
+        static void MoveForwardOrBackWard(Battle battle, ref int movementPoints, bool IsMovingForward = true)
+        {
+            string error = "";
+            bool back = false;
+            while (!back)
+            {
+                string input = "";
+                do
+                {
+                    DisplayFightInfos(battle);
+                    if (error != "")
+                        Console.WriteLine(error);
+                    Console.WriteLine("You have " + movementPoints + " movement points remaining");
+                    Console.WriteLine("Enter the distance you want to move " + ((IsMovingForward) ? ("forward") : ("backward")) + " (1 to " + Math.Min(movementPoints, battle.player.GetDistance(battle.monster)) + ") or go [[B]ack]");
+                    input = Console.ReadLine();
+                    error = "Invalid input.";
+                } while (!Regex.IsMatch(input, "^([0-9]+)|(b(ack)?)$", RegexOptions.IgnoreCase));
+
+                if (int.TryParse(input, out int result))
+                {
+                    if (result > 1 && result <= Math.Min(movementPoints, battle.player.GetDistance(battle.monster)))
+                    {
+                        if (IsMovingForward)
+                            battle.player.MoveTo(battle.monster, result);
+                        else
+                            battle.player.MoveFrom(battle.monster, result);
+                        movementPoints -= result;
+                        back = true;
+                    }
+                    else
+                        error = "Please enter a value between 1 and " + Math.Min(movementPoints, battle.player.GetDistance(battle.monster));
+                }
+                else
+                    back = true;
+            }
+        }
+
+        /// <summary>
+        /// Menu for movments
+        /// </summary>
+        /// <param name="battle">The current battle</param>
+        /// <returns>Returns true if some action was done, else false</returns>
+        static bool Move(Battle battle)
+        {
+            ConsoleKeyInfo menu;
+            int movementPoints = battle.player.Character.BaseCooldown;
+            bool IsForwardPossible = battle.player.GetDistance(battle.monster) != 0;
+            bool IsInFrontPossible = battle.player.OnTheSideOf != null;
+            bool IsOnTheSidePossible = (battle.player.OnTheSideOf == null
+                                        && battle.player.IsStrafePossible(battle.monster));
+            bool IsBehindPossible = battle.player.OnTheSideOf != null
+                                    && battle.player.IsStrafePossible(battle.monster);
+            bool HasPlayerMoved = false;
+            string error = "";
+            bool back = false;
+
+            while (!back)
+            {
+                do
+                {
+                    DisplayFightInfos(battle);
+                    if (error != "")
+                        Console.WriteLine(error);
+                    Console.WriteLine("You have " + movementPoints + " movement points remaining");
+                    Console.Write("Move : ");
+                    if (!IsForwardPossible)
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.Write("[F]orward");
+                    Console.ResetColor();
+                    Console.Write(", [B]ackward, ");
+                    if (!IsInFrontPossible)
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.Write("[I]n front");
+                    Console.ResetColor();
+                    Console.Write(", ");
+                    if (!IsOnTheSidePossible)
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.Write("[O]n the side");
+                    Console.ResetColor();
+                    Console.Write(", ");
+                    if (!IsBehindPossible)
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.Write("B[e]hind");
+                    Console.ResetColor();
+                    Console.Write(". ");
+                    if (HasPlayerMoved)
+                        Console.WriteLine("[D]one");
+                    else
+                        Console.WriteLine("[C]ancel");
+                    ClearKeyBuffer();
+                    menu = Console.ReadKey(true);
+                    error = "Invalid input.";
+                } while (menu.Key != ConsoleKey.F
+                         && menu.Key != ConsoleKey.B
+                         && menu.Key != ConsoleKey.I
+                         && menu.Key != ConsoleKey.O
+                         && menu.Key != ConsoleKey.E
+                         && menu.Key != ConsoleKey.D
+                         && menu.Key != ConsoleKey.C);
+
+                switch (menu.Key)
+                {
+                    case (ConsoleKey.F):
+                        if (IsForwardPossible)
+                            MoveForwardOrBackWard(battle, ref movementPoints);
+                        else
+                            error = "You can't move forward.";
+                        break;
+
+                    case (ConsoleKey.B):
+                        MoveForwardOrBackWard(battle, ref movementPoints, false);
+                        break;
+
+                    case (ConsoleKey.I):
+                        if (IsInFrontPossible)
+                            battle.player.MoveInFront(battle.monster);
+                        else
+                            error = "You can't move in front of the target.";
+                        break;
+
+                    case (ConsoleKey.O):
+                        if (IsOnTheSidePossible)
+                            battle.player.MoveOnTheSide(battle.monster);
+                        else
+                            error = "You can't move on the side of the target.";
+                        break;
+
+                    case (ConsoleKey.E):
+                        if (IsInFrontPossible)
+                            battle.player.MoveOnTheBack(battle.monster);
+                        else
+                            error = "You can't move behind the target.";
+                        break;
+
+                    default:
+                        back = true;
+                        break;
+                }
+                HasPlayerMoved = movementPoints != battle.player.Character.BaseCooldown;
+            }
+            return (HasPlayerMoved);
+        }
+
+        static bool selectAction(Battle battle)
         {
             ConsoleKeyInfo menu;
             do
             {
-                DisplayFightInfos(monster);
+                DisplayFightInfos(battle);
                 Console.WriteLine("Select your action");
-                Console.WriteLine("[A]ttack. [S]kills. [I]nventory. [F]lee like a coward");
+                Console.WriteLine("[M]ove. [A]ttack. [S]kills. [I]nventory. [F]lee like a coward");
                 ClearKeyBuffer();
                 menu = Console.ReadKey(true);
             } while (menu.Key != ConsoleKey.A
+                     && menu.Key != ConsoleKey.M
                      && menu.Key != ConsoleKey.S
                      && menu.Key != ConsoleKey.I
                      && menu.Key != ConsoleKey.F);
@@ -473,11 +677,11 @@ namespace SomeRPG
             switch (menu.Key)
             {
                 case (ConsoleKey.A):
-                    Console.WriteLine(player.Attack());
+                    Attack(battle.player.Character);
                     return (false);
 
                 case (ConsoleKey.S):
-                    SkillsMenu(true);
+                    SkillsMenu(battle);
                     player.CurrentCooldown = player.BaseCooldown;
                     return (false);
 
@@ -489,35 +693,6 @@ namespace SomeRPG
                 default:
                     return (true);
             }
-        }
-
-        static string ConvertMoney(int money)
-        {
-            string result = "";
-
-            int cents;
-
-            cents = money % 100;
-            if (cents > 0)
-                result = " " + cents + " copper";
-            money /= 100;
-            if (money > 0)
-            {
-                cents = money % 100;
-                if (cents > 0)
-                    result = " " + cents + " silver" + result;
-                money /= 100;
-                if (money > 0)
-                {
-                    cents = money % 1000;
-                    if (cents > 0)
-                        result = " " + cents + " gold" + result;
-                    money /= 1000;
-                    if (money > 0)
-                        result = " " + money + " platinium" + result;
-                }
-            }
-            return (result);
         }
 
         static string ModifyEffectDuration(Character target, List<Status> statuss)
@@ -557,18 +732,19 @@ namespace SomeRPG
             return (result);
         }
 
-        static void Fight(Monster monster)
+        static void Fight(Battle battle)
         {
-            player.Target = monster;
-            monster.Target = player;
+            //Should be recoded when multiples friends fighting multiples ennemies will be coded
+            battle.player.Character.Target = battle.monster.Character;
+            battle.monster.Character.Target = battle.player.Character;
             bool hasFlee = false;
-            while (player.CurrentHP > 0 && monster.CurrentHP > 0 && !hasFlee)
+            while (battle.AreBothSidesAlive && !hasFlee)
             {
-                --player.CurrentCooldown;
-                --monster.CurrentCooldown;
-                string overTimeEffects = ManageEffectStatus(player);
-                overTimeEffects += ManageEffectStatus(monster);
-                DisplayFightInfos(monster);
+                --battle.player.Character.CurrentCooldown;
+                --battle.monster.Character.CurrentCooldown;
+                string overTimeEffects = ManageEffectStatus(battle.player.Character);
+                overTimeEffects += ManageEffectStatus(battle.monster.Character);
+                DisplayFightInfos(battle);
                 if (overTimeEffects != "")
                 {
                     Console.WriteLine(overTimeEffects);
@@ -576,12 +752,11 @@ namespace SomeRPG
                     ClearKeyBuffer();
                     Console.ReadKey(true);
                 }
-                if (player.CurrentHP > 0
-                    && monster.CurrentHP > 0)
+                if (battle.AreBothSidesAlive)
                 {
-                    if (player.CurrentCooldown <= 0)
+                    if (battle.player.Character.CurrentCooldown <= 0)
                     {
-                        hasFlee = selectAction(monster);
+                        hasFlee = selectAction(battle);
                         if (!hasFlee)
                         {
                             Console.WriteLine("Press any key");
@@ -632,7 +807,7 @@ namespace SomeRPG
             Console.ReadLine();
         }
 
-        static int Difficulty(Monster monster)
+        static int Difficulty(Battle battle)
         {
             int difficulty = player.Level;
             ConsoleKeyInfo menu;
@@ -652,22 +827,22 @@ namespace SomeRPG
             switch (menu.Key)
             {
                 case ConsoleKey.E:
-                    monster.SetLevel((difficulty - 5) > 0 ? (difficulty - 5) : (1));
-                    --monster.GivenExp;
-                    Fight(monster);
-                    ++monster.GivenExp;
+                    (battle.monster.Character as Monster).SetLevel((difficulty - 5) > 0 ? (difficulty - 5) : (1));
+                    --(battle.monster.Character as Monster).GivenExp;
+                    Fight(battle);
+                    ++(battle.monster.Character as Monster).GivenExp;
                     break;
 
                 case ConsoleKey.N:
-                    monster.SetLevel(difficulty);
-                    Fight(monster);
+                    (battle.monster.Character as Monster).SetLevel(difficulty);
+                    Fight(battle);
                     break;
 
                 case ConsoleKey.H:
-                    monster.SetLevel(difficulty + 5);
-                    ++monster.GivenExp;
-                    Fight(monster);
-                    --monster.GivenExp;
+                    (battle.monster.Character as Monster).SetLevel(difficulty + 5);
+                    ++(battle.monster.Character as Monster).GivenExp;
+                    Fight(battle);
+                    --(battle.monster.Character as Monster).GivenExp;
                     break;
 
                 default:
@@ -680,6 +855,9 @@ namespace SomeRPG
         static void selectMonster()
         {
             Monsters monsters;
+            Battle battle = new Battle();
+            battle.player.Character = player;
+            battle.player.Location = 0;
             try
             {
                 bool back = false;
@@ -712,7 +890,9 @@ namespace SomeRPG
                     {
                         if (result > 0 && result <= monsters.Count)
                         {
-                            Difficulty(monsters[--result]);
+                            battle.monster.Character = monsters[--result];
+                            battle.monster.Location = 50;
+                            Difficulty(battle);
                         }
                         else
                             error = "Invalid number.";
@@ -727,7 +907,9 @@ namespace SomeRPG
                 Console.WriteLine("Error while getting the monster list : " + ex.Message);
             }
         }
+        #endregion Battle
 
+        #region Rest
         static volatile bool WakeUp = false;
         static void Rest()
         {
@@ -753,7 +935,9 @@ namespace SomeRPG
             tokenSource2.Cancel();
             tokenSource2.Dispose();
         }
+        #endregion Rest
 
+        #region Character Menu
         static void GetInventoryGears<T>(bool IsLeftHand)
         {
             string input;
@@ -1111,6 +1295,7 @@ namespace SomeRPG
                 }
             } while (menu.Key != ConsoleKey.B);
         }
+        #endregion Character Menu
 
         static void Menu()
         {
@@ -1181,6 +1366,7 @@ namespace SomeRPG
             } while (menu.Key != ConsoleKey.E);
         }
 
+        #region Start Game
         static string getName()
         {
             string name = "";
@@ -1299,6 +1485,7 @@ namespace SomeRPG
             } while (player == null && menu.Key != ConsoleKey.E);
             return (isExiting);
         }
+        #endregion Start Game
 
         static void Main(string[] args)
         {

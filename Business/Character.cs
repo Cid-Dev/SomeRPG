@@ -376,48 +376,46 @@ namespace Business
             CurrentHP = ((CurrentHP + amount > HP) ? (HP) : (CurrentHP + amount));
         }
 
-        public int Defend(ref int damage, HandGear handGear, out string bodyPart)
+        public void Defend(HandGear handGear, AttackReport attackReport)
         {
-            bodyPart = "";
-
             int aim = seedBodyPart.Next(1, 101);
             Armor armorPart = null;
             switch (aim)
             {
                 case int n when (n <= headChance):
-                    bodyPart = "head";
+                    attackReport.BodyPart = "head";
                     armorPart = HeadArmor;
                     break;
 
                 case int n when (n <= headChance + handsChance):
-                    bodyPart = "hands";
+                    attackReport.BodyPart = "hands";
                     armorPart = HandsArmor;
                     break;
 
                 case int n when (n <= headChance + handsChance + feetChance):
-                    bodyPart = "feet";
+                    attackReport.BodyPart = "feet";
                     armorPart = FeetArmor;
                     break;
 
                 case int n when (n <= headChance + handsChance + feetChance + armsChance):
-                    bodyPart = "arms";
+                    attackReport.BodyPart = "arms";
                     armorPart = SleevesArmor;
                     break;
 
                 case int n when (n <= headChance + handsChance + feetChance + armsChance + legsChance):
-                    bodyPart = "legs";
+                    attackReport.BodyPart = "legs";
                     armorPart = LegsArmor;
                     break;
 
                 default:
-                    bodyPart = "chest";
+                    attackReport.BodyPart = "chest";
                     armorPart = ChestArmor;
                     break;
             }
             if (armorPart != null)
             {
-                damage = ((damage - armorPart.Defense >= 0) ? (damage - armorPart.Defense) : (0));
-                damage = (int)Math.Round((double)damage * ((100.0 - armorPart.ArmorType.Absorbency) / 100.0));
+                attackReport.Damage = ((attackReport.Damage - armorPart.Defense >= 0) ? (attackReport.Damage - armorPart.Defense) : (0));
+                attackReport.Damage = (int)Math.Round((double)attackReport.Damage * ((100.0 - armorPart.ArmorType.Absorbency) / 100.0));
                 if (handGear != null && handGear is Weapon)
                 {
                     var weaponType = (handGear as Weapon).TypeName;
@@ -428,15 +426,15 @@ namespace Business
                             switch (armorPart.ArmorType.Name)
                             {
                                 case "Plate":
-                                    damage -= (int)(damage * 25.0 / 100.0);
+                                    attackReport.Damage -= (int)(attackReport.Damage * 25.0 / 100.0);
                                     break;
 
                                 case "Studded leather":
-                                    damage += (int)(damage * 50.0 / 100.0);
+                                    attackReport.Damage += (int)(attackReport.Damage * 50.0 / 100.0);
                                     break;
 
                                 case "Leather":
-                                    damage += (int)(damage * 50.0 / 100.0);
+                                    attackReport.Damage += (int)(attackReport.Damage * 50.0 / 100.0);
                                     break;
 
                                 default:
@@ -448,11 +446,11 @@ namespace Business
                             switch (armorPart.ArmorType.Name)
                             {
                                 case "Plate":
-                                    damage += (int)(damage * 50.0 / 100.0);
+                                    attackReport.Damage += (int)(attackReport.Damage * 50.0 / 100.0);
                                     break;
 
                                 case "Mail":
-                                    damage -= (int)(damage * 25.0 / 100.0);
+                                    attackReport.Damage -= (int)(attackReport.Damage * 25.0 / 100.0);
                                     break;
 
                                 default:
@@ -465,15 +463,15 @@ namespace Business
                             switch (armorPart.ArmorType.Name)
                             {
                                 case "Mail":
-                                    damage += (int)(damage * 50.0 / 100.0);
+                                    attackReport.Damage += (int)(attackReport.Damage * 50.0 / 100.0);
                                     break;
 
                                 case "Studded leather":
-                                    damage -= (int)(damage * 25.0 / 100.0);
+                                    attackReport.Damage -= (int)(attackReport.Damage * 25.0 / 100.0);
                                     break;
 
                                 case "Leather":
-                                    damage -= (int)(damage * 25.0 / 100.0);
+                                    attackReport.Damage -= (int)(attackReport.Damage * 25.0 / 100.0);
                                     break;
 
                                 default:
@@ -483,10 +481,10 @@ namespace Business
                     }
                 }
             }
-            CurrentHP -= damage;
+            CurrentHP -= attackReport.Damage;
             if (CurrentHP <= 0)
                 CurrentHP = 0;
-            return (CurrentHP);
+            attackReport.DefenderRemainingHP = CurrentHP;
         }
 
         public bool IsAttackEvaded()
@@ -519,44 +517,43 @@ namespace Business
             return (false);
         }
 
-        protected virtual string AnyHandAttack(HandGear handGear, int CurrentMinAttack, int CurrentMaxAttack)
+        protected AttackReport AnyHandAttack(HandGear handGear, int CurrentMinAttack, int CurrentMaxAttack)
         {
-            string report = "";
+            //string report = "";
+            AttackReport attackReport = new AttackReport
+            {
+                AttackerName = Name,
+                WeaponName = ((handGear != null) ? (handGear.Name) : ("bare hands")),
+                DefenderName = Target.Name
+            };
 
             if (IsAttackEvaded())
-            {
-                report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " but " + Target.Name + " evaded the blow.";
-            }
+                attackReport.AttackResult = AttackResult.Evaded;
             else if (IsAttackParried())
-            {
-                report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " but " + Target.Name + " parried the blow.";
-            }
+                attackReport.AttackResult = AttackResult.Parried;
             else
             {
                 int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
-                int TargetHP = Target.Defend(ref damage, handGear, out string bodyPart);
-                report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
-                report += Target.Name + " has " + TargetHP + " HP remaining.\n";
-                if (TargetHP <= 0)
-                    report += Name + " killed " + Target.Name;
+                attackReport.Damage = damage;
+                Target.Defend(handGear, attackReport);
             }
 
-            return (report);
+            return (attackReport);
         }
 
-        public virtual string Attack()
+        public List<AttackReport> Attack()
         {
-            string report = "";
             CurrentCooldown = _baseCooldown;
+            var attackReports = new List<AttackReport>();
             if (CurrentRightMinAttack > 0
                 || CurrentRightMaxAttack > 0)
-                report += AnyHandAttack(RightHand, CurrentRightMinAttack, CurrentRightMaxAttack);
+                attackReports.Add(AnyHandAttack(RightHand, CurrentRightMinAttack, CurrentRightMaxAttack));
 
             if (Target.CurrentHP > 0
                 && (CurrentLeftMinAttack > 0
                 || CurrentLeftMaxAttack > 0))
-                report += AnyHandAttack(LeftHand, CurrentLeftMinAttack, CurrentLeftMaxAttack);
-            return (report);
+                attackReports.Add(AnyHandAttack(LeftHand, CurrentLeftMinAttack, CurrentLeftMaxAttack));
+            return (attackReports);
         }
 
         public virtual string Stats()

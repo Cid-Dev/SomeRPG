@@ -12,7 +12,12 @@ namespace Business
         public int MaxDamageBonus { get; set; }
         public bool isTwoHand { get; set; }
         public WeaponType TypeName { get; set; }
-
+        public WeaponClass WeaponClass { get; set; }
+        /// <summary>
+        /// 0 is melee
+        /// Some melee weapons can have longer range (Hasts...)
+        /// </summary>
+        public int Range { get; set; }
         public bool IsTargetingRightHand = true;
 
         public Weapon(int id)
@@ -30,11 +35,16 @@ namespace Business
                         Description = dalWeapon?.GetType().GetProperty("Description")?.GetValue(dalWeapon, null).ToString();
                         MinDamageBonus = int.Parse(dalWeapon?.GetType().GetProperty("MinDamageBonus")?.GetValue(dalWeapon, null).ToString());
                         MaxDamageBonus = int.Parse(dalWeapon?.GetType().GetProperty("MaxDamageBonus")?.GetValue(dalWeapon, null).ToString());
+                        Range = int.Parse(dalWeapon?.GetType().GetProperty("Range")?.GetValue(dalWeapon, null).ToString());
                         isTwoHand = bool.Parse(dalWeapon?.GetType().GetProperty("isTwoHand")?.GetValue(dalWeapon, null).ToString());
                         if (Enum.TryParse(dalWeapon?.GetType().GetProperty("TypeName")?.GetValue(dalWeapon, null).ToString(), out WeaponType weaponType))
                             TypeName = weaponType;
                         else
                             throw new Exception("Invalid weapon type");
+                        if (Enum.TryParse(dalWeapon?.GetType().GetProperty("WeaponClass")?.GetValue(dalWeapon, null).ToString(), out WeaponClass weaponClass))
+                            WeaponClass = weaponClass;
+                        else
+                            throw new Exception("Invalid weapon class");
                     }
                 }
             }
@@ -59,11 +69,16 @@ namespace Business
                         Description = dalWeapon?.GetType().GetProperty("Description")?.GetValue(dalWeapon, null).ToString();
                         MinDamageBonus = int.Parse(dalWeapon?.GetType().GetProperty("MinDamageBonus")?.GetValue(dalWeapon, null).ToString());
                         MaxDamageBonus = int.Parse(dalWeapon?.GetType().GetProperty("MaxDamageBonus")?.GetValue(dalWeapon, null).ToString());
+                        Range = int.Parse(dalWeapon?.GetType().GetProperty("Range")?.GetValue(dalWeapon, null).ToString());
                         isTwoHand = bool.Parse(dalWeapon?.GetType().GetProperty("isTwoHand")?.GetValue(dalWeapon, null).ToString());
                         if (Enum.TryParse(dalWeapon?.GetType().GetProperty("TypeName")?.GetValue(dalWeapon, null).ToString(), out WeaponType weaponType))
                             TypeName = weaponType;
                         else
                             throw new Exception("Invalid weapon type");
+                        if (Enum.TryParse(dalWeapon?.GetType().GetProperty("WeaponClass")?.GetValue(dalWeapon, null).ToString(), out WeaponClass weaponClass))
+                            WeaponClass = weaponClass;
+                        else
+                            throw new Exception("Invalid weapon class");
                     }
                 }
 

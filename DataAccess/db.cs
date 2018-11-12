@@ -24,6 +24,7 @@ namespace DataAccess
         protected string HeadArmorTable = "headarmor";
         protected string ArmorTypeTable = "armortype";
         protected string BuffTable = "buff";
+        protected string WeaponClassTable = "WeaponClass";
         protected string StatusEffectPotionTable = "statuseffectpotion";
         protected string loot_table_monster_hppotion = "loot_table_monster_hppotion";
         protected string loot_table_monster_weapon = "loot_table_monster_weapon";

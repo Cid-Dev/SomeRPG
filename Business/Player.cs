@@ -60,36 +60,36 @@ namespace Business
                 Inventory.Add(item.Clone() as Item);
         }
 
-        protected override string AnyHandAttack(HandGear handGear, int CurrentMinAttack, int CurrentMaxAttack)
-        {
-            string report = "";
+        //protected override string AnyHandAttack(HandGear handGear, int CurrentMinAttack, int CurrentMaxAttack)
+        //{
+        //    string report = "";
 
-            if (IsAttackEvaded())
-            {
-                report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " but " + Target.Name + " evaded the blow.";
-            }
-            else if (IsAttackParried())
-            {
-                report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " but " + Target.Name + " parried the blow.";
-            }
-            else
-            {
-                int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
-                string bodyPart;
-                int TargetHP = Target.Defend(ref damage, handGear, out bodyPart);
-                report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
-                report += Target.Name + " has " + TargetHP + " HP remaining.\n";
-                /*
-                if (TargetHP <= 0)
-                {
-                    report += "You killed " + Target.Name + " and have earned " + Target.getGivenExp + " exp\n";
-                    report += setExp(Target.getGivenExp);
-                }
-                */
-            }
+        //    if (IsAttackEvaded())
+        //    {
+        //        report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " but " + Target.Name + " evaded the blow.";
+        //    }
+        //    else if (IsAttackParried())
+        //    {
+        //        report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " but " + Target.Name + " parried the blow.";
+        //    }
+        //    else
+        //    {
+        //        int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
+        //        string bodyPart;
+        //        int TargetHP = Target.Defend(ref damage, handGear, out bodyPart);
+        //        report = Name + " attacked " + Target.Name + " with " + ((handGear != null) ? (handGear.Name) : ("bare hands")) + " on the " + bodyPart + " and dealt " + damage + " damage.\n";
+        //        report += Target.Name + " has " + TargetHP + " HP remaining.\n";
+        //        /*
+        //        if (TargetHP <= 0)
+        //        {
+        //            report += "You killed " + Target.Name + " and have earned " + Target.getGivenExp + " exp\n";
+        //            report += setExp(Target.getGivenExp);
+        //        }
+        //        */
+        //    }
 
-            return (report);
-        }
+        //    return (report);
+        //}
         /*
         public override string Attack()
         {
