@@ -47,6 +47,9 @@
     <Compile Include="AttackReport.cs" />
     <Compile Include="AttackResult.cs" />
     <Compile Include="Battle.cs" />
+    <Compile Include="Behaviour.cs" />
+    <Compile Include="Behaviours.cs" />
+    <Compile Include="BehaviourTrigger.cs" />
     <Compile Include="Buff.cs" />
     <Compile Include="Character.cs" />
     <Compile Include="CharacterInBattle.cs" />

@@ -9,6 +9,7 @@ namespace Business
     public class ActiveSkill : Skill, ICastable
     {
         public int Cost { get; set; }
+        public int? Range { get; set; }
         public double? Damage { get; set; }
         public List<Status> Effects { get; set; }
         public Opening Opening { get; set; }
@@ -16,23 +17,37 @@ namespace Business
 
         private Random seed = new Random();
 
-        public AttackResult Cast(Character From, Character To, out int damage, out string bodyPart)
+
+        public AttackReport Cast(Character From, Character To)
         {
-            damage = 0;
-            bodyPart = "";
+            AttackReport attackReport = new AttackReport
+            {
+                SkillName = Name,
+                AttackerName = From.Name,
+                DefenderName = To.Name
+            };
+
             if (To.IsAttackEvaded())
-                return (AttackResult.Evaded);
+                attackReport.AttackResult = AttackResult.Evaded;
             if (To.IsAttackParried())
-                return (AttackResult.Parried);
-            damage = (int)Math.Round((double)seed.Next(From.CurrentRightMinAttack, From.CurrentRightMaxAttack + 1) * (Damage ?? 1));
-            To.Defend(ref damage, From.RightHand, out bodyPart);
+                attackReport.AttackResult = AttackResult.Parried;
+            attackReport.AttackResult = AttackResult.Hit;
+
+            attackReport.Damage = (int)Math.Round((double)seed.Next(From.CurrentRightMinAttack, From.CurrentRightMaxAttack + 1) * (Damage ?? 1));
+
+            To.Defend(From.RightHand, attackReport);
+
+            if (From.RightHand != null)
+                attackReport.WeaponName = From.RightHand.Name;
+
             if (Effects != null)
             {
                 foreach (var effect in Effects)
                     (effect.Clone() as Status).Apply(To);
             }
             From.LastOpening.Skill = this;
-            return (AttackResult.Hit);
+
+            return (attackReport);
         }
     }
 }

@@ -536,6 +536,7 @@ namespace Business
                 int damage = seed.Next(CurrentMinAttack, CurrentMaxAttack + 1);
                 attackReport.Damage = damage;
                 Target.Defend(handGear, attackReport);
+                attackReport.AttackResult = AttackResult.Hit;
             }
 
             return (attackReport);

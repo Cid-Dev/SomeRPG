@@ -166,9 +166,36 @@ namespace SomeRPG
             }
             return (result);
         }
-        #endregion Display and strings builders
 
-        #region Battle
+        static void ShowAttackReport(List<AttackReport> AttackReports)
+        {
+            foreach (var attackReport in AttackReports)
+            {
+                var report = attackReport.AttackerName + " attacked " + attackReport.DefenderName + " with " + attackReport.WeaponName + " ";
+                if (attackReport.SkillName != null
+                    && attackReport.SkillName != "")
+                    report += "using " + attackReport.SkillName + " ";
+                switch (attackReport.AttackResult)
+                {
+                    case (AttackResult.Evaded):
+                        report += "but " + attackReport.DefenderName + " evaded the blow.";
+                        break;
+
+                    case (AttackResult.Parried):
+                        report += "but " + attackReport.DefenderName + " parried the blow.";
+                        break;
+
+                    case (AttackResult.Hit):
+                        report += "on the " + attackReport.BodyPart + " and dealt " + attackReport.Damage + " damage.\n";
+                        report += attackReport.DefenderName + " has " + attackReport.DefenderRemainingHP + " HP remaining.\n";
+                        if (attackReport.DefenderRemainingHP <= 0)
+                            report += attackReport.AttackerName + " killed " + attackReport.DefenderName;
+                        break;
+                }
+                Console.WriteLine(report);
+            }
+        }
+
         public static void MonsterStats(Character monster)
         {
             Console.Write("=== Name : " + monster.Name + " === HP : ");
@@ -217,10 +244,23 @@ namespace SomeRPG
             Console.WriteLine("You are fighting a monster !");
             MonsterStats(battle.monster.Character);
             Console.WriteLine("=== " + battle.player.Character.Name + " : " + battle.player.Character.CurrentCooldown + " === " + battle.monster.Character.Name + " : " + battle.monster.Character.CurrentCooldown + " ===");
-            Console.WriteLine("=== Distance between you and your target : " + battle.player.GetDistance(battle.monster) + "===");
+            Console.WriteLine("=== Distance between you and your target : " + battle.player.GetDistance(battle.monster) + " ===");
+        }
+        #endregion Display and strings builders
+
+        /// <summary>
+        /// This will need to be coded soon
+        /// </summary>
+        /// <returns></returns>
+        public Character SelectTarget()
+        {
+            return (null);
         }
 
-        static bool CheckUsableSkill(ActiveSkill skill)
+        #region Battle
+        
+
+        static bool CheckUsableSkill(Battle battle, ActiveSkill skill)
         {
             if (skill.Required != null)
             {
@@ -247,10 +287,19 @@ namespace SomeRPG
                 else
                     return (false);
             }
+
+            if (skill.Range != null)
+            {
+                if (skill.Range > battle.player.GetDistance(battle.monster))
+                    return (false);
+            }
+            else if (!battle.player.IsInRange(battle.monster))
+                return (false);
+
             return (true);
         }
 
-        static bool SelectSkill(SkillFamily selected)
+        static bool SelectSkill(Battle battle, SkillFamily selected)
         {
             string error = "";
             string input;
@@ -263,13 +312,13 @@ namespace SomeRPG
                     if (selected.Actives.Count > 0)
                     {
 
-                        DisplayFightInfos(player.Target);
+                        DisplayFightInfos(battle);
 
                         Console.WriteLine("Skills availables for " + selected.Name + " skill family :\n");
                         int i = 0;
                         foreach (var skill in selected.Actives)
                         {
-                            if (!CheckUsableSkill(skill))
+                            if (!CheckUsableSkill(battle, skill))
                                 Console.ForegroundColor = ConsoleColor.DarkGray;
                             Console.WriteLine("[" + ++i + "] - " + SkillDetail(skill));
                             Console.ResetColor();
@@ -281,7 +330,7 @@ namespace SomeRPG
                     else
                         Console.WriteLine("No skill. Please go [B]ack]");
                     input = Console.ReadLine();
-                    error = "";
+                    error = "Invalid input";
                 } while (!Regex.IsMatch(input, "^(([0-9]+)|(b(ack)?))$", RegexOptions.IgnoreCase));
 
                 if (int.TryParse(input, out int result))
@@ -289,29 +338,15 @@ namespace SomeRPG
                     if (result > 0 && result <= selected.Actives.Count)
                     {
                         var skill = selected.Actives[--result];
-                        if (CheckUsableSkill(skill))
+                        if (CheckUsableSkill(battle, skill))
                         {
-                            //IsSkillUsed = skill.Use(player, monster);
-                            string AttackReport = "";
-                            switch (skill.Cast(player, player.Target, out int damage, out string bodyPart))
+                            List<AttackReport> attackReport = new List<AttackReport>
                             {
-                                case AttackResult.Evaded:
-                                    AttackReport = player.Name + " attacked " + player.Target.Name + " but " + player.Target.Name + " evaded the blow.";
-                                    break;
+                                skill.Cast(battle.player.Character, battle.player.Character.Target)
+                            };
 
-                                case AttackResult.Parried:
-                                    AttackReport = player.Name + " attacked " + player.Target.Name + " but " + player.Target.Name + " parried the blow.";
-                                    break;
-
-                                case AttackResult.Hit:
-                                    AttackReport = player.Name + " attacked " + player.Target.Name + " with " + ((player.RightHand != null) ? (player.RightHand.Name) : ("bare hands")) + " on the " + bodyPart + " using " + skill.Name + " and dealt " + damage + " damage.\n";
-                                    AttackReport += player.Target.Name + " has " + player.Target.CurrentHP + " HP remaining.\n";
-                                    if (player.Target.CurrentHP <= 0)
-                                        AttackReport += player.Name + " killed " + player.Target.Name;
-                                    break;
-                            }
-                            DisplayFightInfos(player.Target);
-                            Console.WriteLine(AttackReport);
+                            DisplayFightInfos(battle);
+                            ShowAttackReport(attackReport);
                             Console.WriteLine("Press any key to continue");
                             ClearKeyBuffer();
                             Console.ReadKey(true);
@@ -343,7 +378,7 @@ namespace SomeRPG
             Console.ReadKey(true);
         }
 
-        static bool SkillsMenu(bool isInBattle = false)
+        static bool SkillsMenu(Battle battle = null)
         {
             string error = "";
             string input;
@@ -370,7 +405,7 @@ namespace SomeRPG
                     else
                         Console.WriteLine("No skill. Please go [B]ack]");
                     input = Console.ReadLine();
-                    error = "";
+                    error = "Invalid input";
                 } while (!Regex.IsMatch(input, "^(([0-9]+)|(b(ack)?))$", RegexOptions.IgnoreCase));
 
                 if (int.TryParse(input, out int result))
@@ -378,9 +413,9 @@ namespace SomeRPG
                     if (result > 0 && result <= player.Skills.Count)
                     {
                         var selected = player.Skills[--result];
-                        if (isInBattle)
+                        if (battle != null)
                         {
-                            IsSkillUsed = SelectSkill(selected);
+                            IsSkillUsed = SelectSkill(battle, selected);
                             back = IsSkillUsed;
                         }
                         else
@@ -395,12 +430,14 @@ namespace SomeRPG
             return (IsSkillUsed);
         }
 
-        static void OpenUsableInventory(Character monster)
+        static bool OpenUsableInventory(Battle battle)
         {
+            bool HasUsedItem = false;
             bool back = false;
             while (!back)
             {
                 string input = "";
+                string error = "";
                 int i = 1;
                 List<IUsable> usables;
                 do
@@ -424,7 +461,11 @@ namespace SomeRPG
                         }
                     }
 
-                    DisplayFightInfos(monster);
+                    DisplayFightInfos(battle);
+
+                    if (error != "")
+                        Console.WriteLine(error);
+
                     if (usables.Count > 0)
                     {
                         Console.WriteLine(options);
@@ -433,8 +474,8 @@ namespace SomeRPG
                     else
                         Console.WriteLine("No usables items in inventory. Please go [[B]ack]");
                     input = Console.ReadLine();
+                    error = "Invalid input.";
                 } while (!Regex.IsMatch(input, "^([0-9]+)|(b(ack)?)$", RegexOptions.IgnoreCase));
-
 
                 if (int.TryParse(input, out int result))
                 {
@@ -444,7 +485,7 @@ namespace SomeRPG
                         ConsoleKeyInfo menu;
                         do
                         {
-                            DisplayFightInfos(monster);
+                            DisplayFightInfos(battle);
                             Console.WriteLine("Please select a target for " + (usables[result] as Item).Name);
                             Console.WriteLine("[Y]ourself. [M]onster. [B]ack");
                             ClearKeyBuffer();
@@ -458,11 +499,11 @@ namespace SomeRPG
                         switch (menu.Key)
                         {
                             case (ConsoleKey.Y):
-                                target = player;
+                                target = battle.player.Character;
                                 break;
 
                             case (ConsoleKey.M):
-                                target = monster;
+                                target = battle.monster.Character;
                                 break;
 
                             default:
@@ -472,6 +513,8 @@ namespace SomeRPG
                         if (target != null)
                         {
                             usables[result].Use(target);
+                            HasUsedItem = true;
+                            back = true;
                             if (usables[result] is IStackable)
                             {
                                 var stackable = usables[result] as IStackable;
@@ -482,39 +525,22 @@ namespace SomeRPG
                                 player.Inventory.Remove(usables[result] as Item);
                         }
                     }
+                    else
+                        error = "Invalid input.";
                 }
                 else
                     back = true;
             }
+            return (HasUsedItem);
         }
 
         static void Attack(Character Attacker)
         {
             var AttackReports = Attacker.Attack();
-            foreach (var attackReport in AttackReports)
-            {
-                var report = attackReport.AttackerName + " attacked " + attackReport.DefenderName + " with " + attackReport.WeaponName + " ";
-                switch (attackReport.AttackResult)
-                {
-                    case (AttackResult.Evaded):
-                        report += "but " + attackReport.DefenderName + " evaded the blow.";
-                        break;
-
-                    case (AttackResult.Parried):
-                        report += "but " + attackReport.DefenderName + " parried the blow.";
-                        break;
-
-                    case (AttackResult.Hit):
-                        report += " on the " + attackReport.BodyPart + " and dealt " + attackReport.Damage + " damage.\n";
-                        report += attackReport.BodyPart + " has " + attackReport.DefenderRemainingHP + " HP remaining.\n";
-                        if (attackReport.DefenderRemainingHP <= 0)
-                            report += attackReport.AttackerName + " killed " + attackReport.BodyPart;
-                        break;
-                }
-                Console.WriteLine(report);
-            }
+            ShowAttackReport(AttackReports);
         }
 
+        #region Movements
         static void MoveForwardOrBackWard(Battle battle, ref int movementPoints, bool IsMovingForward = true)
         {
             string error = "";
@@ -535,13 +561,19 @@ namespace SomeRPG
 
                 if (int.TryParse(input, out int result))
                 {
-                    if (result > 1 && result <= Math.Min(movementPoints, battle.player.GetDistance(battle.monster)))
+                    if (result >= 1 && (!IsMovingForward || result <= Math.Min(movementPoints, battle.player.GetDistance(battle.monster))))
                     {
+                        int distance;
                         if (IsMovingForward)
-                            battle.player.MoveTo(battle.monster, result);
+                            distance = battle.player.MoveTo(battle.monster, result);
                         else
-                            battle.player.MoveFrom(battle.monster, result);
-                        movementPoints -= result;
+                            distance = battle.player.MoveFrom(battle.monster, result);
+                        Console.WriteLine("You moved " + distance + " " + ((IsMovingForward) ? ("to") : ("from")) + " " + battle.monster.Character.Name + "." +
+                            "\nDistance is now : " + battle.player.GetDistance(battle.monster));
+                        Console.WriteLine("Press any key");
+                        ClearKeyBuffer();
+                        Console.ReadKey(true);
+                        movementPoints -= distance;
                         back = true;
                     }
                     else
@@ -557,7 +589,7 @@ namespace SomeRPG
         /// </summary>
         /// <param name="battle">The current battle</param>
         /// <returns>Returns true if some action was done, else false</returns>
-        static bool Move(Battle battle)
+        static int Move(Battle battle)
         {
             ConsoleKeyInfo menu;
             int movementPoints = battle.player.Character.BaseCooldown;
@@ -567,7 +599,7 @@ namespace SomeRPG
                                         && battle.player.IsStrafePossible(battle.monster));
             bool IsBehindPossible = battle.player.OnTheSideOf != null
                                     && battle.player.IsStrafePossible(battle.monster);
-            bool HasPlayerMoved = false;
+            bool HasPlayerMoved;
             string error = "";
             bool back = false;
 
@@ -575,6 +607,7 @@ namespace SomeRPG
             {
                 do
                 {
+                    HasPlayerMoved = movementPoints != battle.player.Character.BaseCooldown;
                     DisplayFightInfos(battle);
                     if (error != "")
                         Console.WriteLine(error);
@@ -653,46 +686,77 @@ namespace SomeRPG
                         back = true;
                         break;
                 }
-                HasPlayerMoved = movementPoints != battle.player.Character.BaseCooldown;
+                
             }
-            return (HasPlayerMoved);
+            return (movementPoints);
         }
+        #endregion Movements
 
         static bool selectAction(Battle battle)
         {
             ConsoleKeyInfo menu;
+            bool HasDoneAnyAction = false;
+            string error = "";
             do
             {
-                DisplayFightInfos(battle);
-                Console.WriteLine("Select your action");
-                Console.WriteLine("[M]ove. [A]ttack. [S]kills. [I]nventory. [F]lee like a coward");
-                ClearKeyBuffer();
-                menu = Console.ReadKey(true);
-            } while (menu.Key != ConsoleKey.A
-                     && menu.Key != ConsoleKey.M
-                     && menu.Key != ConsoleKey.S
-                     && menu.Key != ConsoleKey.I
-                     && menu.Key != ConsoleKey.F);
+                do
+                {
+                    DisplayFightInfos(battle);
+                    if (error != "")
+                        Console.WriteLine(error);
+                    Console.WriteLine("Select your action");
+                    Console.WriteLine("[M]ove. [A]ttack. [S]kills. [I]nventory. [F]lee like a coward");
+                    ClearKeyBuffer();
+                    menu = Console.ReadKey(true);
+                    error = "Invalid Input";
+                } while (menu.Key != ConsoleKey.A
+                         && menu.Key != ConsoleKey.M
+                         && menu.Key != ConsoleKey.S
+                         && menu.Key != ConsoleKey.I
+                         && menu.Key != ConsoleKey.F);
 
-            switch (menu.Key)
-            {
-                case (ConsoleKey.A):
-                    Attack(battle.player.Character);
-                    return (false);
+                switch (menu.Key)
+                {
+                    case (ConsoleKey.M):
+                        var RemainingMovementsPoints = Move(battle);
+                        if (RemainingMovementsPoints != battle.player.Character.BaseCooldown)
+                        {
+                            HasDoneAnyAction = true;
+                            battle.player.Character.CurrentCooldown = battle.player.Character.BaseCooldown - RemainingMovementsPoints;
+                        }
+                        break;
 
-                case (ConsoleKey.S):
-                    SkillsMenu(battle);
-                    player.CurrentCooldown = player.BaseCooldown;
-                    return (false);
+                    case (ConsoleKey.A):
+                        if (battle.player.IsInRange(battle.monster))
+                        {
+                            Attack(battle.player.Character);
+                            HasDoneAnyAction = true;
+                        }
+                        else
+                            error = "You are not in range.";
+                        break;
 
-                case (ConsoleKey.I):
-                    OpenUsableInventory(monster);
-                    player.CurrentCooldown = player.BaseCooldown;
-                    return (false);
+                    case (ConsoleKey.S):
+                        if (SkillsMenu(battle))
+                        {
+                            HasDoneAnyAction = true;
+                            player.CurrentCooldown = player.BaseCooldown;
+                        }
+                        break;
 
-                default:
-                    return (true);
-            }
+                    case (ConsoleKey.I):
+                        if (OpenUsableInventory(battle))
+                        {
+                            HasDoneAnyAction = true;
+                            player.CurrentCooldown = player.BaseCooldown;
+                        }
+                        break;
+
+                    default:
+                        return (true);
+                }
+            } while (!HasDoneAnyAction);
+            return (false);
         }
 
         static string ModifyEffectDuration(Character target, List<Status> statuss)
@@ -764,9 +828,31 @@ namespace SomeRPG
                             Console.ReadKey(true);
                         }
                     }
-                    if (monster.CurrentCooldown <= 0)
+                    if (battle.monster.Character.CurrentCooldown <= 0)
                     {
-                        Console.WriteLine(monster.Attack());
+                        var choosenActions = battle.monster.Behaviours.SelectBehaviour();
+                        foreach (var choosenAction in choosenActions)
+                        {
+                            switch (choosenAction.Key)
+                            {
+                                case "InRange":
+                                    switch (choosenAction.Value)
+                                    {
+                                        case int distance:
+                                            battle.monster.Character.CurrentCooldown = distance;
+                                            Console.WriteLine(battle.monster.Character.Name + " moved " + distance + " " + "to" + " " + battle.player.Character.Name + "." +
+                                            "\nDistance is now : " + battle.monster.GetDistance(battle.player));
+                                            break;
+
+                                        case List<AttackReport> attackReport:
+                                            battle.monster.Character.CurrentCooldown = battle.monster.Character.BaseCooldown;
+                                            ShowAttackReport(attackReport);
+                                            break;
+                                    }
+
+                                    break;
+                            }
+                        }
                         Console.WriteLine("Press any key");
                         ClearKeyBuffer();
                         Console.ReadKey(true);
@@ -774,10 +860,10 @@ namespace SomeRPG
                     Thread.Sleep(100);
                 }
             }
-            if (player.CurrentHP > 0 && monster.CurrentHP <= 0)
+            if (battle.player.Character.CurrentHP > 0 && battle.monster.Character.CurrentHP <= 0)
             {
-                var loots = monster.GetLoots();
-                var money = monster.LootMoney();
+                var loots = (battle.monster.Character as Monster).GetLoots();
+                var money = (battle.monster.Character as Monster).LootMoney();
                 string loot = "";
                 foreach (var item in loots)
                 {
@@ -790,15 +876,15 @@ namespace SomeRPG
                     player.Money += money;
                     loot += "Money looted :" + ConvertMoney(money) + "\n";
                 }
-                Console.WriteLine("Well done " + player.Name + ", you raped " + monster.Name + " and earned " + monster.getGivenExp + " exp.\nYou have " + player.CurrentHP + "HP remaining.");
-                Console.WriteLine(player.SetExp(monster.getGivenExp));
+                Console.WriteLine("Well done " + player.Name + ", you raped " + battle.monster.Character.Name + " and earned " + battle.monster.Character.getGivenExp + " exp.\nYou have " + player.CurrentHP + "HP remaining.");
+                Console.WriteLine(player.SetExp(battle.monster.Character.getGivenExp));
                 if (loot != "")
                     Console.WriteLine("You've earned : \n" + loot);
             }
-            else if (monster.CurrentHP > 0 && player.CurrentHP <= 0)
-                Console.WriteLine("You really sux " + player.Name + ", you've been raped by " + monster.Name + ".\nIt has " + monster.CurrentHP + "HP remaining.");
-            else if (monster.CurrentHP <= 0 && player.CurrentHP <= 0)
-                Console.WriteLine("HAHA " + player.Name + " and " + monster.Name + " killed each other");
+            else if (battle.monster.Character.CurrentHP > 0 && player.CurrentHP <= 0)
+                Console.WriteLine("You really sux " + player.Name + ", you've been raped by " + battle.monster.Character.Name + ".\nIt has " + battle.monster.Character.CurrentHP + "HP remaining.");
+            else if (battle.monster.Character.CurrentHP <= 0 && player.CurrentHP <= 0)
+                Console.WriteLine("HAHA " + player.Name + " and " + battle.monster.Character.Name + " killed each other");
             else if (hasFlee)
                 Console.WriteLine("You flee like a coward. You are a chicken.");
             else
@@ -855,9 +941,15 @@ namespace SomeRPG
         static void selectMonster()
         {
             Monsters monsters;
-            Battle battle = new Battle();
-            battle.player.Character = player;
-            battle.player.Location = 0;
+            Battle battle = new Battle
+            {
+                player = new CharacterInBattle
+                {
+                    Character = player,
+                    Location = 0
+                },
+                monster = new CharacterInBattle()
+            };
             try
             {
                 bool back = false;
@@ -892,6 +984,8 @@ namespace SomeRPG
                         {
                             battle.monster.Character = monsters[--result];
                             battle.monster.Location = 50;
+                            var Behaviours = new Behaviours(battle, new List<string> { "InRange" });
+                            battle.monster.Behaviours = Behaviours;
                             Difficulty(battle);
                         }
                         else

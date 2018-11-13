@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Business
 {
-    interface ICastable
+    public class BehaviourTrigger
     {
-        AttackReport Cast(Character From, Character To);
+        
     }
 }

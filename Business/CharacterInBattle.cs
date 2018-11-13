@@ -27,6 +27,12 @@ namespace Business
         /// </summary>
         public Character OnTheBackOf = null;
 
+        /// <summary>
+        /// Defines the behaviours of the AI
+        /// This has to be set if current object is ennemy
+        /// </summary>
+        public Behaviours Behaviours { get; set; }
+
         public int GetDistance(CharacterInBattle other)
         {
             if (other != null)
@@ -34,16 +40,17 @@ namespace Business
             return (-1);
         }
 
-        public void MoveFrom(CharacterInBattle other, int distance)
+        public int MoveFrom(CharacterInBattle other, int distance)
         {
             OnTheSideOf = null;
             OnTheBackOf = null;
             if (Location < other.Location)
                 distance *= -1;
             Location += distance;
+            return (Math.Abs(distance));
         }
 
-        public void MoveTo(CharacterInBattle other, int distance)
+        public int MoveTo(CharacterInBattle other, int distance)
         {
             OnTheSideOf = null;
             OnTheBackOf = null;
@@ -53,6 +60,7 @@ namespace Business
             if (Location > other.Location)
                 distance *= -1;
             Location += distance;
+            return (Math.Abs(distance));
         }
 
         public bool IsInRange(CharacterInBattle target)
