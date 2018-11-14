@@ -986,6 +986,7 @@ namespace SomeRPG
                             battle.monster.Location = 50;
                             var Behaviours = new Behaviours(battle, new List<string> { "InRange" });
                             battle.monster.Behaviours = Behaviours;
+                            battle.player.Character.CurrentCooldown = battle.player.Character.BaseCooldown;
                             Difficulty(battle);
                         }
                         else

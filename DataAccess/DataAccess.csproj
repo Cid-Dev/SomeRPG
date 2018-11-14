@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActiveSkill.cs" />
+    <Compile Include="StatusSpecifiedConcreteClassConverter.cs" />
     <Compile Include="OverTimeSave.cs" />
     <Compile Include="DotSave.cs" />
     <Compile Include="BuffSave.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="SkillLoader.cs" />
     <Compile Include="SkillRequirement.cs" />
     <Compile Include="Skills.cs" />
+    <Compile Include="StatusConverter.cs" />
     <Compile Include="StatusEffectPotionSave.cs" />
     <Compile Include="StatusEffectPotion.cs" />
     <Compile Include="SleevesArmorSave.cs" />
