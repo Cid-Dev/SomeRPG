@@ -1,6 +1,6 @@
 ﻿namespace DataAccess
 {
-    public class WeaponsSave
+    public class ItemSave
     {
         public int Id { get; set; }
     }

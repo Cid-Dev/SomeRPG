@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +18,27 @@ namespace SomeRPG
         }
 
         #region Display and strings builders
+        public static string BuffDescription(Buff buff, int numberOfTab = 1)
+        {
+            string tabs = "";
+            for (int i = 0; i < numberOfTab; ++i)
+                tabs += "\t";
+            string result = tabs + buff.Name + " (Duration : " + buff.RemainingDuration + ") :\n";
+            if (buff.HPModifier != 0)
+                result += tabs + "\t" + "HP : " + buff.HPModifier + "\n";
+            if (buff.StrenghModifier != 0)
+                result += tabs + "\t" + "Strengh : " + buff.StrenghModifier + "\n";
+            if (buff.VitalityModifier != 0)
+                result += tabs + "\t" + "Vitality : " + buff.VitalityModifier + "\n";
+            if (buff.AgilityModifier != 0)
+                result += tabs + "\t" + "Agility : " + buff.AgilityModifier + "\n";
+            if (buff.DexterityModifier != 0)
+                result += tabs + "\t" + "Dexterity : " + buff.DexterityModifier + "\n";
+            if (buff.PrecisionModifier != 0)
+                result += tabs + "\t" + "Precision : " + buff.PrecisionModifier + "\n";
+            return (result);
+        }
+
         public static string ShowEffects(List<Status> effects)
         {
             string result = "";
@@ -34,7 +52,7 @@ namespace SomeRPG
                         break;
 
                     case Buff buff:
-                        result += buff.Description(3);
+                        result += BuffDescription(buff, 3);
                         break;
 
                     default:
@@ -79,6 +97,35 @@ namespace SomeRPG
             return (result);
         }
 
+        static string ConvertMoney(int money)
+        {
+            string result = "";
+
+            int cents;
+
+            cents = money % 100;
+            if (cents > 0)
+                result = " " + cents + " copper";
+            money /= 100;
+            if (money > 0)
+            {
+                cents = money % 100;
+                if (cents > 0)
+                    result = " " + cents + " silver" + result;
+                money /= 100;
+                if (money > 0)
+                {
+                    cents = money % 1000;
+                    if (cents > 0)
+                        result = " " + cents + " gold" + result;
+                    money /= 1000;
+                    if (money > 0)
+                        result = " " + money + " platinium" + result;
+                }
+            }
+            return (result);
+        }
+
         public static void Stats()
         {
             Console.Write("=== Name : " + player.Name + " === HP : ");
@@ -96,18 +143,18 @@ namespace SomeRPG
                 Console.Write(" Left hand [" + player.CurrentLeftMinAttack + " - " + player.CurrentLeftMaxAttack + "]");
             Console.WriteLine(" === Level : " + player.Level + " === Exp : " + player._currentExp + "/" + player.getRequiredExp + " ===\n");
             if (player.Money > 0)
-                Console.WriteLine("=== Money : " + player.ConvertMoney(player.Money) + " ===\n");
+                Console.WriteLine("=== Money : " + ConvertMoney(player.Money) + " ===\n");
             if (player.Buffs.Count > 0)
             {
                 Console.WriteLine("=== Buff" + ((player.Buffs.Count > 1) ? ("s") : ("")) + ":\n");
                 foreach (Buff buff in player.Buffs)
-                    Console.WriteLine(buff.Description());
+                    Console.WriteLine(BuffDescription(buff));
             }
             if (player.DeBuffs.Count > 0)
             {
                 Console.WriteLine("=== Debuff" + ((player.DeBuffs.Count > 1) ? ("s") : ("")) + ":\n");
                 foreach (Buff deBuff in player.DeBuffs)
-                    Console.WriteLine(deBuff.Description());
+                    Console.WriteLine(BuffDescription(deBuff));
             }
         }
 
@@ -136,35 +183,6 @@ namespace SomeRPG
             Console.WriteLine("\tPrecision : " + player.Precision);
             Console.WriteLine("\tDexterity : " + player.Dexterity);
             Console.WriteLine();
-        }
-
-        static string ConvertMoney(int money)
-        {
-            string result = "";
-
-            int cents;
-
-            cents = money % 100;
-            if (cents > 0)
-                result = " " + cents + " copper";
-            money /= 100;
-            if (money > 0)
-            {
-                cents = money % 100;
-                if (cents > 0)
-                    result = " " + cents + " silver" + result;
-                money /= 100;
-                if (money > 0)
-                {
-                    cents = money % 1000;
-                    if (cents > 0)
-                        result = " " + cents + " gold" + result;
-                    money /= 1000;
-                    if (money > 0)
-                        result = " " + money + " platinium" + result;
-                }
-            }
-            return (result);
         }
 
         static void ShowAttackReport(List<AttackReport> AttackReports)
@@ -216,7 +234,7 @@ namespace SomeRPG
             {
                 Console.WriteLine("=== Buff" + ((monster.Buffs.Count > 1) ? ("s") : ("")) + ":\n");
                 foreach (Buff buff in monster.Buffs)
-                    Console.WriteLine(buff.Description());
+                    Console.WriteLine(BuffDescription(buff));
             }
             if (monster.DeBuffs.Count > 0)
             {
@@ -224,7 +242,7 @@ namespace SomeRPG
                 foreach (var deBuff in monster.DeBuffs)
                 {
                     if (deBuff is Buff)
-                        Console.WriteLine((deBuff as Buff).Description());
+                        Console.WriteLine(BuffDescription(deBuff as Buff));
                     if (deBuff is Dot)
                     {
                         var dot = (deBuff as Dot);
@@ -237,6 +255,15 @@ namespace SomeRPG
             }
         }
 
+        public static string ShowSavedGames(Dictionary<string, int> FriendlySavedGames)
+        {
+            string result = "";
+            int i = 0;
+            foreach (var FriendlySavedGame in FriendlySavedGames)
+                result += "[" + ++i + "] : " + FriendlySavedGame.Key + " - Level " + FriendlySavedGame.Value + "\n";
+            return (result);
+        }
+
         static void DisplayFightInfos(Battle battle)
         {
             Console.Clear();
@@ -247,6 +274,12 @@ namespace SomeRPG
             Console.WriteLine("=== Distance between you and your target : " + battle.player.GetDistance(battle.monster) + " ===");
         }
         #endregion Display and strings builders
+
+        public static ConsoleKeyInfo GetKey()
+        {
+            ClearKeyBuffer();
+            return (Console.ReadKey(true));
+        }
 
         /// <summary>
         /// This will need to be coded soon
@@ -348,8 +381,7 @@ namespace SomeRPG
                             DisplayFightInfos(battle);
                             ShowAttackReport(attackReport);
                             Console.WriteLine("Press any key to continue");
-                            ClearKeyBuffer();
-                            Console.ReadKey(true);
+                            GetKey();
                             IsSkillUsed = true;
                             back = IsSkillUsed;
                         }
@@ -374,8 +406,7 @@ namespace SomeRPG
             foreach (var skill in selected.Actives)
                 Console.WriteLine(SkillDetail(skill));
             Console.WriteLine("Press any key to go back.");
-            ClearKeyBuffer();
-            Console.ReadKey(true);
+            GetKey();
         }
 
         static bool SkillsMenu(Battle battle = null)
@@ -488,8 +519,7 @@ namespace SomeRPG
                             DisplayFightInfos(battle);
                             Console.WriteLine("Please select a target for " + (usables[result] as Item).Name);
                             Console.WriteLine("[Y]ourself. [M]onster. [B]ack");
-                            ClearKeyBuffer();
-                            menu = Console.ReadKey(true);
+                            menu = GetKey();
                         } while (menu.Key != ConsoleKey.Y
                                  && menu.Key != ConsoleKey.M
                                  && menu.Key != ConsoleKey.B);
@@ -571,8 +601,7 @@ namespace SomeRPG
                         Console.WriteLine("You moved " + distance + " " + ((IsMovingForward) ? ("to") : ("from")) + " " + battle.monster.Character.Name + "." +
                             "\nDistance is now : " + battle.player.GetDistance(battle.monster));
                         Console.WriteLine("Press any key");
-                        ClearKeyBuffer();
-                        Console.ReadKey(true);
+                        GetKey();
                         movementPoints -= distance;
                         back = true;
                     }
@@ -637,8 +666,7 @@ namespace SomeRPG
                         Console.WriteLine("[D]one");
                     else
                         Console.WriteLine("[C]ancel");
-                    ClearKeyBuffer();
-                    menu = Console.ReadKey(true);
+                    menu = GetKey();
                     error = "Invalid input.";
                 } while (menu.Key != ConsoleKey.F
                          && menu.Key != ConsoleKey.B
@@ -706,8 +734,7 @@ namespace SomeRPG
                         Console.WriteLine(error);
                     Console.WriteLine("Select your action");
                     Console.WriteLine("[M]ove. [A]ttack. [S]kills. [I]nventory. [F]lee like a coward");
-                    ClearKeyBuffer();
-                    menu = Console.ReadKey(true);
+                    menu = GetKey();
                     error = "Invalid Input";
                 } while (menu.Key != ConsoleKey.A
                          && menu.Key != ConsoleKey.M
@@ -813,8 +840,7 @@ namespace SomeRPG
                 {
                     Console.WriteLine(overTimeEffects);
                     Console.WriteLine("Press any key");
-                    ClearKeyBuffer();
-                    Console.ReadKey(true);
+                    GetKey();
                 }
                 if (battle.AreBothSidesAlive)
                 {
@@ -824,8 +850,7 @@ namespace SomeRPG
                         if (!hasFlee)
                         {
                             Console.WriteLine("Press any key");
-                            ClearKeyBuffer();
-                            Console.ReadKey(true);
+                            GetKey();
                         }
                     }
                     if (battle.monster.Character.CurrentCooldown <= 0)
@@ -854,8 +879,7 @@ namespace SomeRPG
                             }
                         }
                         Console.WriteLine("Press any key");
-                        ClearKeyBuffer();
-                        Console.ReadKey(true);
+                        GetKey();
                     }
                     Thread.Sleep(100);
                 }
@@ -877,7 +901,9 @@ namespace SomeRPG
                     loot += "Money looted :" + ConvertMoney(money) + "\n";
                 }
                 Console.WriteLine("Well done " + player.Name + ", you raped " + battle.monster.Character.Name + " and earned " + battle.monster.Character.getGivenExp + " exp.\nYou have " + player.CurrentHP + "HP remaining.");
-                Console.WriteLine(player.SetExp(battle.monster.Character.getGivenExp));
+                var QuantityOfLevelEarned = player.SetExp(battle.monster.Character.getGivenExp);
+                if (QuantityOfLevelEarned > 0)
+                    Console.WriteLine("You've earned " + QuantityOfLevelEarned + " level" + ((QuantityOfLevelEarned < 2) ? ("") : ("s")) + " ! You are now level " + player.Level + "\n");
                 if (loot != "")
                     Console.WriteLine("You've earned : \n" + loot);
             }
@@ -903,8 +929,7 @@ namespace SomeRPG
                 Stats();
                 Console.WriteLine("Select your difficulty");
                 Console.WriteLine("[E]asy. [N]normal [H]hard [B]ack");
-                ClearKeyBuffer();
-                menu = Console.ReadKey(true);
+                menu = GetKey();
             } while (menu.Key != ConsoleKey.E
                      && menu.Key != ConsoleKey.N
                      && menu.Key != ConsoleKey.H
@@ -1098,8 +1123,7 @@ namespace SomeRPG
                 Stats();
                 Console.WriteLine(slotName + " : " + ((item != null) ? ((item as Item).Name + " : " + (item as Item).Description + ((item is Armor) ? (" - " + ArmorDetail(item as Armor)) : ((item is Weapon) ? (WeaponDetail(item as Weapon)) : ("")))) : ("Nothing equiped")) + "\n");
                 Console.WriteLine(((item != null) ? ("[R]emove. R[e]place") : ("[E]quip")) + ". [B]ack");
-                ClearKeyBuffer();
-                menu = Console.ReadKey(true);
+                menu = GetKey();
             } while (menu.Key != ConsoleKey.R
                         && menu.Key != ConsoleKey.E
                         && menu.Key != ConsoleKey.B);
@@ -1139,8 +1163,7 @@ namespace SomeRPG
                     Console.WriteLine("[H]and : " + ((player.HandsArmor != null) ? (player.HandsArmor.Name + " : " + player.HandsArmor.Description + " - " + ArmorDetail(player.HandsArmor)) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("Hea[d] : " + ((player.HeadArmor != null) ? (player.HeadArmor.Name + " : " + player.HeadArmor.Description + " - " + ArmorDetail(player.HeadArmor)) : ("Nothing equiped")) + "\n");
                     Console.WriteLine("Select an equipement slot or go [B]ack");
-                    ClearKeyBuffer();
-                    menu = Console.ReadKey(true);
+                    menu = GetKey();
                 } while (menu.Key != ConsoleKey.R
                          && menu.Key != ConsoleKey.C
                          && menu.Key != ConsoleKey.L
@@ -1315,8 +1338,7 @@ namespace SomeRPG
                     }
                     else
                         Console.WriteLine("No item in inventory. Please go [B]ack]");
-                    ClearKeyBuffer();
-                    menu = Console.ReadKey(true);
+                    menu = GetKey();
                 } while (menu.Key != ConsoleKey.U
                          && menu.Key != ConsoleKey.E
                          && menu.Key != ConsoleKey.B);
@@ -1352,8 +1374,7 @@ namespace SomeRPG
                     DetailedStats();
                     Console.WriteLine("What do you want to do?");
                     Console.WriteLine("[S]kills. [E]quipement. [I]nventory. [R]est. [B]ack");
-                    ClearKeyBuffer();
-                    menu = Console.ReadKey(true);
+                    menu = GetKey();
                 } while (menu.Key != ConsoleKey.E
                          && menu.Key != ConsoleKey.S
                          && menu.Key != ConsoleKey.I
@@ -1403,8 +1424,7 @@ namespace SomeRPG
                     Stats();
                     Console.WriteLine("What do you want to do?");
                     Console.WriteLine("[A]ttack a monster. [C]haracter menu. [R]est. [S]ave game. [E]xit");
-                    ClearKeyBuffer();
-                    menu = Console.ReadKey(true);
+                    menu = GetKey();
                 } while (menu.Key != ConsoleKey.A
                          && menu.Key != ConsoleKey.R
                          && menu.Key != ConsoleKey.C
@@ -1495,7 +1515,7 @@ namespace SomeRPG
                 do
                 {
                     loadManager = new LoadManager();
-                    string gameList = loadManager.ShowSavedGames();
+                    string gameList = ShowSavedGames(loadManager.FriendlySavedGames);
                     Console.Clear();
                     if (gameList != "")
                     {
@@ -1528,8 +1548,7 @@ namespace SomeRPG
                     Console.Clear();
                     Console.WriteLine("Welcome to SomeRPG :)");
                     Console.WriteLine("[L]oad game. [N]ew game. [E]xit");
-                    ClearKeyBuffer();
-                    menu = Console.ReadKey(true);
+                    menu = GetKey();
                 } while (menu.Key != ConsoleKey.L
                          && menu.Key != ConsoleKey.N
                          && menu.Key != ConsoleKey.E);
@@ -1545,6 +1564,7 @@ namespace SomeRPG
                         player = new Player
                         {
                             Name = getName(),
+                            Level = 1,
                             BaseHP = 42,
                             BaseCooldown = 10,
                             BaseRightMinAttack = 5,
@@ -1594,8 +1614,7 @@ namespace SomeRPG
                     do
                     {
                         Console.WriteLine("Game over. Exit? y/n");
-                        ClearKeyBuffer();
-                        startOVer = Console.ReadKey(true);
+                        startOVer = GetKey();
                     } while (startOVer.Key != ConsoleKey.Y
                              && startOVer.Key != ConsoleKey.N);
                     if (startOVer.Key == ConsoleKey.Y)

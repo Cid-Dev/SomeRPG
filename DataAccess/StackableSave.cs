@@ -1,6 +1,6 @@
 ﻿namespace DataAccess
 {
-    public class HPPotionsSave : ItemSave
+    public class StackableSave : ItemSave
     {
         public int Quantity { get; set; }
     }

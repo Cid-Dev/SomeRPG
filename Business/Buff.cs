@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business
 {
     public class Buff : Status
     {
         public int Id { get; set; }
-        public string Name { get; set; }
         public int RemainingDuration { get; set; }
         public int Duration { get; set; }
         public bool IsGood { get; set; }
@@ -36,7 +31,7 @@ namespace Business
             try
             {
                 DataAccess.Buff DalBuff = new DataAccess.Buff();
-                var temp = DalBuff.GetBuffById(id);
+                var temp = DalBuff.GetBuff(id);
                 if (temp != null)
                 {
                     foreach (var dalBuff in temp)
@@ -53,38 +48,11 @@ namespace Business
                         PrecisionModifier = int.Parse(dalBuff?.GetType().GetProperty("PrecisionModifier")?.GetValue(dalBuff, null).ToString());
                     }
                 }
-
             }
             catch (Exception ex)
             {
-                //Debug.WriteLine(ex.Message);
                 throw ex;
             }
-        }
-
-        private int IsInList(List<Status> buffs)
-        {
-            for (int i = 0; i < buffs.Count; ++i)
-                if ((buffs[i] is Buff)
-                    && Name == (buffs[i] as Buff).Name)
-                    return (i);
-            return (-1);
-        }
-
-        private void ApplyToBuff(Character target)
-        {
-            int buffIndex = IsInList(target.Buffs);
-            if (buffIndex >= 0)
-                target.Buffs.RemoveAt(buffIndex);
-            target.Buffs.Add(this);
-        }
-
-        private void ApplyToDeBuff(Character target)
-        {
-            int buffIndex = IsInList(target.DeBuffs);
-            if (buffIndex >= 0)
-                target.DeBuffs.RemoveAt(buffIndex);
-            target.DeBuffs.Add(this);
         }
 
         public override void Apply(Character target)
@@ -102,13 +70,9 @@ namespace Business
             target.BonusPrecision += PrecisionModifier;
 
             if (IsGood)
-            {
-                ApplyToBuff(target);
-            }
+                ApplyTo<Buff>(target.Buffs);
             else
-            {
-                ApplyToDeBuff(target);
-            }
+                ApplyTo<Buff>(target.DeBuffs);
         }
 
         public override void RemoveEffect(Character target)
@@ -127,27 +91,6 @@ namespace Business
                 target.Buffs.Remove(this);
             else
                 target.DeBuffs.Remove(this);
-        }
-
-        public string Description(int numberOfTab = 1)
-        {
-            string tabs = "";
-            for (int i = 0; i < numberOfTab; ++i)
-                tabs += "\t";
-            string result = tabs + Name + " (Duration : " + RemainingDuration + ") :\n";
-            if (HPModifier != 0)
-                result += tabs + "\t" + "HP : " + HPModifier + "\n";
-            if (StrenghModifier != 0)
-                result += tabs + "\t" + "Strengh : " + StrenghModifier + "\n";
-            if (VitalityModifier != 0)
-                result += tabs + "\t" + "Vitality : " + VitalityModifier + "\n";
-            if (AgilityModifier != 0)
-                result += tabs + "\t" + "Agility : " + AgilityModifier + "\n";
-            if (DexterityModifier != 0)
-                result += tabs + "\t" + "Dexterity : " + DexterityModifier + "\n";
-            if (PrecisionModifier != 0)
-                result += tabs + "\t" + "Precision : " + PrecisionModifier + "\n";
-            return (result);
         }
     }
 }

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business
 {
@@ -16,7 +13,6 @@ namespace Business
         public SkillRequirement Required { get; set; }
 
         private Random seed = new Random();
-
 
         public AttackReport Cast(Character From, Character To)
         {
@@ -41,10 +37,9 @@ namespace Business
                 attackReport.WeaponName = From.RightHand.Name;
 
             if (Effects != null)
-            {
                 foreach (var effect in Effects)
                     (effect.Clone() as Status).Apply(To);
-            }
+
             From.LastOpening.Skill = this;
 
             return (attackReport);

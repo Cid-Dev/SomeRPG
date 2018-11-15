@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DataAccess;
 
 namespace Business
 {
@@ -41,17 +37,14 @@ namespace Business
                             BaseDexterity = int.Parse(dalMonster?.GetType().GetProperty("BaseDexterity")?.GetValue(dalMonster, null).ToString()),
                             MoneyMultiplier = float.Parse(dalMonster?.GetType().GetProperty("MoneyMultiplier")?.GetValue(dalMonster, null).ToString())
                         };
-
                         monster.BuildLootTable(dalMonster?.GetType().GetProperty("LootTable")?.GetValue(dalMonster, null));
 
                         Add(monster);
-
                     }
                 }
             }
             catch (Exception ex)
             {
-                //Debug.WriteLine(ex.Message);
                 throw ex;
             }
         }

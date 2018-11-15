@@ -1,95 +1,75 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Data;
 
 namespace DataAccess
 {
     public class Weapon : DB
     {
-        public List<object> GetWeaponById(int id)
-        {
-            List<object> Weapon = new List<object>();
-            using (m_dbConnection = new SQLiteConnection(ConnectionString))
-            {
-                m_dbConnection.Open();
-                using (SQLiteCommand command = m_dbConnection.CreateCommand())
-                {
-                    command.CommandText = "SELECT i.name AS name, i.description AS description, w.id AS id, w.mindamagebonus AS mindamagebonus, w.maxdamagebonus AS maxdamagebonus, w.isTwoHand as isTwoHand, t.name AS TypeName, w.range AS Range, c.Name AS WeaponClass FROM " + WeaponTable + " w "
-                                        + "INNER JOIN " + ItemTable + " i "
-                                        + "ON w.item_id=i.id "
-                                        + "INNER JOIN " + WeaponTypeTable + " t "
-                                        + "ON w.type_id=t.id "
-                                        + "INNER JOIN " + WeaponClassTable + " c "
-                                        + "ON w.class_id=c.id "
-                                        + "WHERE w.id = @id "
-                                        + "LIMIT 1";
-                    command.CommandType = CommandType.Text;
-                    command.Parameters.AddWithValue("@id", id);
-                    SQLiteDataReader reader = command.ExecuteReader();
+        private List<object> Weapons;
 
-                    while (reader.Read())
-                    {
-                        Weapon.Add(new
-                        {
-                            Id = reader["id"],
-                            Name = reader["name"],
-                            Description = reader["description"],
-                            MinDamageBonus = reader["mindamagebonus"],
-                            MaxDamageBonus = reader["maxdamagebonus"],
-                            isTwoHand = reader["isTwoHand"],
-                            TypeName = reader["TypeName"],
-                            WeaponClass = reader["WeaponClass"],
-                            Range = reader["Range"]
-                        });
-                    }
-                }
-            }
-            return (Weapon);
+        private string BuildQuery(string fieldName, string parameterName)
+        {
+            string query = "SELECT i.name AS name, "
+                               + "i.description AS description,"
+                               + " w.id AS id, w.mindamagebonus AS mindamagebonus, "
+                               + "w.maxdamagebonus AS maxdamagebonus, "
+                               + "w.isTwoHand as isTwoHand, "
+                               + "t.name AS TypeName, "
+                               + "w.range AS Range, "
+                               + "c.Name AS WeaponClass "
+                          + "FROM " + WeaponTable + " w "
+                          + "INNER JOIN " + ItemTable + " i "
+                          + "ON w.item_id=i.id "
+                          + "INNER JOIN " + WeaponTypeTable + " t "
+                          + "ON w.type_id=t.id "
+                          + "INNER JOIN " + WeaponClassTable + " c "
+                          + "ON w.class_id=c.id "
+                          + "WHERE " + fieldName + " = " + parameterName + " "
+                          + "LIMIT 1";
+            return (query);
         }
 
-        public List<object> GetWeaponByName(string name)
+        private void BuildWeapon(SQLiteDataReader weapon)
         {
-            List<object> Weapon = new List<object>();
-            using (m_dbConnection = new SQLiteConnection(ConnectionString))
+            Weapons.Add(new
             {
-                m_dbConnection.Open();
-                using (SQLiteCommand command = m_dbConnection.CreateCommand())
-                {
-                    command.CommandText = "SELECT i.name AS name, i.description AS description, w.id AS id, w.mindamagebonus AS mindamagebonus, w.maxdamagebonus AS maxdamagebonus, w.isTwoHand as isTwoHand, t.name AS TypeName, w.range AS Range, c.Name AS WeaponClass FROM " + WeaponTable + " w "
-                                        + "INNER JOIN " + ItemTable + " i "
-                                        + "ON w.item_id=i.id "
-                                        + "INNER JOIN " + WeaponTypeTable + " t "
-                                        + "ON w.type_id=t.id "
-                                        + "INNER JOIN " + WeaponClassTable + " c "
-                                        + "ON w.class_id=c.id "
-                                        + "WHERE i.name = @name "
-                                        + "LIMIT 1";
-                    command.CommandType = CommandType.Text;
-                    command.Parameters.AddWithValue("@name", name);
-                    SQLiteDataReader reader = command.ExecuteReader();
+                Id = weapon["id"],
+                Name = weapon["name"],
+                Description = weapon["description"],
+                MinDamageBonus = weapon["mindamagebonus"],
+                MaxDamageBonus = weapon["maxdamagebonus"],
+                isTwoHand = weapon["isTwoHand"],
+                TypeName = weapon["TypeName"],
+                WeaponClass = weapon["WeaponClass"],
+                Range = weapon["Range"]
+            });
+        }
+        public List<object> GetWeapon(int id)
+        {
+            Weapons = new List<object>();
+            string query = BuildQuery("w.id", "@id");
+            Dictionary<string, object> parameters = new Dictionary<string, object>
+            {
+                { "@id", id }
+            };
 
-                    while (reader.Read())
-                    {
-                        Weapon.Add(new
-                        {
-                            Id = reader["id"],
-                            Name = reader["name"],
-                            Description = reader["description"],
-                            MinDamageBonus = reader["mindamagebonus"],
-                            MaxDamageBonus = reader["maxdamagebonus"],
-                            isTwoHand = reader["isTwoHand"],
-                            TypeName = reader["TypeName"],
-                            WeaponClass = reader["WeaponClass"],
-                            Range = reader["Range"]
-                        });
-                    }
-                }
-            }
-            return (Weapon);
+            GetDatas(query, parameters, BuildWeapon);
+
+            return (Weapons);
+        }
+
+        public List<object> GetWeapon(string name)
+        {
+            Weapons = new List<object>();
+            string query = BuildQuery("i.name", "@name");
+            Dictionary<string, object> parameters = new Dictionary<string, object>
+            {
+                { "@name", name }
+            };
+
+            GetDatas(query, parameters, BuildWeapon);
+
+            return (Weapons);
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using DataAccess;
 
 namespace Business
@@ -10,20 +6,16 @@ namespace Business
     public class LoadManager
     {
         public List<PlayerSave> SavedGames;
+        public Dictionary<string, int> FriendlySavedGames;
 
         public LoadManager()
         {
+            FriendlySavedGames = new Dictionary<string, int>();
             var gameSave = new GameSave();
             gameSave.Load();
             SavedGames = gameSave.playerSaves;
-        }
-
-        public string ShowSavedGames()
-        {
-            string result = "";
-            for (int i = 0; i < SavedGames.Count; ++i)
-                result += "[" + (i + 1) + "] : " + SavedGames[i].Name + " - Level " + SavedGames[i].Level + "\n";
-            return (result);
+            foreach (var SavedGame in SavedGames)
+                FriendlySavedGames.Add(SavedGame.Name, SavedGame.Level);
         }
 
         private void applyStatus(Player player, List<StatusSave> Buff)
@@ -90,15 +82,12 @@ namespace Business
                     Inventory = new List<Item>()
                 };
                 player.SetLevel(SavedGames[index].Level);
-                //player.BaseHP = (int)(42 * Math.Pow(1.1, SavedGames[index].Level - 1));
                 player.CurrentHP = SavedGames[index].CurrentHP;
                 foreach (var hPPotion in SavedGames[index].Inventory.HPPotions)
-                {
                     player.Inventory.Add(new HPPotion(hPPotion.Id)
                     {
                         Quantity = hPPotion.Quantity
                     });
-                }
 
                 applyStatus(player, SavedGames[index].Buffs);
                 applyStatus(player, SavedGames[index].DeBuffs);
@@ -127,10 +116,8 @@ namespace Business
         public bool CheckName(string Name)
         {
             foreach (var save in SavedGames)
-            {
                 if (save.Name == Name)
                     return (false);
-            }
             return (true);
         }
 

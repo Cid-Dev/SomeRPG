@@ -1,43 +1,32 @@
 ﻿using DataAccess;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business
 {
     public class Character
     {
-        protected Random seed = new Random();
-        protected Random seedEvasion = new Random();
-        protected Random seedParry = new Random();
-        protected Random seedBodyPart = new Random();
-        private int _baseHP;
-        protected int _baseCooldown;
-        private int _level = 1;
         public int _currentExp = 0;
-        private int _baseExp = 16;
-        private int _givenExp = 16;
-        private float expMultiplier = 1.9F;
         public float hpMultiplier = 1.1F;
-        private float minAttackMultiplier = 1F;
-        private float maxAttackMultiplier = 1F;
-        private HandGear _rightHand;
-        private HandGear _leftHand;
+        public int HPBonus = 0;
 
+        protected Random seed = new Random(Guid.NewGuid().GetHashCode());
+        protected int _baseCooldown;
+
+        private int _baseHP;
+        private int _baseExp = 16;
         private int RightMinDamageBonus = 0;
         private int RightMaxDamageBonus = 0;
         private int LeftMinDamageBonus = 0;
         private int LeftMaxDamageBonus = 0;
-        public int HPBonus = 0;
-
-        private double headChance = 5;
-        private double handsChance = 10;
-        private double feetChance = 10;
-        private double armsChance = 15;
-        private double legsChance = 25;
-        private double chestChance = 35;
+        private readonly float expMultiplier = 1.9F;
+        private readonly double headChance = 5;
+        private readonly double handsChance = 10;
+        private readonly double feetChance = 10;
+        private readonly double armsChance = 15;
+        private readonly double legsChance = 25;
+        private HandGear _rightHand;
+        private HandGear _leftHand;
 
         public List<SkillFamily> Skills { get; set; }
 
@@ -48,7 +37,6 @@ namespace Business
         public Opening LastOpening = new Opening();
 
         #region Stats
-
         /// <summary>
         /// The base strengh of the character
         /// </summary>
@@ -183,14 +171,12 @@ namespace Business
                 return (BasePrecision + AddedPrecision + BonusPrecision);
             }
         }
-
         #endregion Stats
 
         public List<Status> Buffs = new List<Status>();
         public List<Status> DeBuffs = new List<Status>();
 
         #region gear
-
         public HandGear RightHand
         {
             get => _rightHand;
@@ -245,13 +231,21 @@ namespace Business
         public FeetArmor FeetArmor { get; set; }
         public HandsArmor HandsArmor { get; set; }
         public HeadArmor HeadArmor { get; set; }
-
         #endregion gear
 
         public string Name { get; set; }
-        public int Level{ get => _level; set => _level = value; }
-        public int GivenExp { get => _givenExp; set => _givenExp = value; }
+        public int Level { get; set; }
+        /// <summary>
+        /// The base exp given by a the character at level 1
+        /// </summary>
+        public int GivenExp { get; set; }
+        /// <summary>
+        /// The current HP of the character
+        /// </summary>
         public int CurrentHP { get; set; }
+        /// <summary>
+        /// The max HP of the character, considering Level, Vitality and eventuals HP bonus
+        /// </summary>
         public int HP
         {
             get
@@ -260,6 +254,9 @@ namespace Business
                 return ((int)Math.Round(curHP));
             }
         }
+        /// <summary>
+        /// The base HP of the character, used for HP calculation
+        /// </summary>
         public int BaseHP
         {
             get => _baseHP;
@@ -305,8 +302,13 @@ namespace Business
                 return ((int)Math.Round(curMaxAtk));
             }
         }
-
+        /// <summary>
+        /// When this value is 0, the character can use an action
+        /// </summary>
         public int CurrentCooldown { get; set; }
+        /// <summary>
+        /// Starting value for the cooldown
+        /// </summary>
         public int BaseCooldown
         {
             get => _baseCooldown;
@@ -316,45 +318,71 @@ namespace Business
                 CurrentCooldown = value;
             }
         }
+
         public Character Target { get; set; }
-
+        /// <summary>
+        /// The amount of exp required to reach level 2
+        /// </summary>
         public int BaseExp { set => _baseExp = value; }
-
+        /// <summary>
+        /// The amount of exp required to reach next level.
+        /// Depends of BaseExp
+        /// </summary>
         public int getRequiredExp
         {
             get
             {
-                return ((int)Math.Round((double)_baseExp * Math.Pow((double)_level, (double)expMultiplier)));
+                return ((int)Math.Round((double)_baseExp * Math.Pow((double)Level, (double)expMultiplier)));
             }
         }
-
+        /// <summary>
+        /// The amount of exp given when this character is dead
+        /// </summary>
         public int getGivenExp
         {
             get
             {
-                return ((int)(_givenExp * _level));
+                return (GivenExp * Level);
             }
         }
 
+        public void SetLevel(int lvl)
+        {
+            Level = lvl;
+            BaseStrengh += (lvl - 1);
+            BaseVitality += (int)Math.Floor((double)lvl / 2);
+            BaseAgility += (int)Math.Floor((double)lvl / 5);
+            BasePrecision += (int)Math.Floor((double)lvl / 5);
+            BaseDexterity += (int)Math.Floor((double)lvl / 3);
+            CurrentHP = HP;
+        }
+
+        /// <summary>
+        /// GG
+        /// </summary>
         protected void LevelUp()
         {
-            ++_level;
+            ++Level;
             ++BaseStrengh;
-            if (_level % 2 == 0)
+            if (Level % 2 == 0)
                 ++BaseVitality;
-            if (_level % 5 == 0)
+            if (Level % 5 == 0)
                 ++BaseAgility;
-            if (_level % 5 == 0)
+            if (Level % 5 == 0)
                 ++BasePrecision;
-            if (_level % 3 == 0)
+            if (Level % 3 == 0)
                 ++BaseDexterity;
             _currentExp = 0;
             CurrentHP = HP;
         }
 
-        public string SetExp(int exp)
+        /// <summary>
+        /// Set to the character an amount of exp
+        /// </summary>
+        /// <param name="exp">The amount of exp</param>
+        /// <returns>Returns the number of levels earned</returns>
+        public int SetExp(int exp)
         {
-            string result = "";
             int levels = 0;
             while (exp > 0)
             {
@@ -366,19 +394,28 @@ namespace Business
                     ++levels;
                 }
             }
-            if (levels > 0)
-                result = "You've earned " + levels + " level" + ((levels < 2) ? ("") : ("s")) + " ! You are now level " + _level + "\n";
-            return (result);
+            return (levels);
         }
 
+        /// <summary>
+        /// Heals the character.
+        /// HP restored is caped at max HP
+        /// </summary>
+        /// <param name="amount"></param>
         public void Heal(int amount)
         {
             CurrentHP = ((CurrentHP + amount > HP) ? (HP) : (CurrentHP + amount));
         }
 
+        /// <summary>
+        /// Calculate the amount of HP lose when being hit
+        /// </summary>
+        /// <param name="handGear">The weapon used for the attack (can be null if none equiped)</param>
+        /// <param name="attackReport">The result of the defense will be stored there</param>
         public void Defend(HandGear handGear, AttackReport attackReport)
         {
-            int aim = seedBodyPart.Next(1, 101);
+            //Used to define where the character has been hit
+            int aim = seed.Next(1, 101);
             Armor armorPart = null;
             switch (aim)
             {
@@ -412,6 +449,7 @@ namespace Business
                     armorPart = ChestArmor;
                     break;
             }
+            //Defines the bonus or malus in function of the weapon type against the armor type
             if (armorPart != null)
             {
                 attackReport.Damage = ((attackReport.Damage - armorPart.Defense >= 0) ? (attackReport.Damage - armorPart.Defense) : (0));
@@ -455,7 +493,6 @@ namespace Business
 
                                 default:
                                     break;
-
                             }
                             break;
 
@@ -482,7 +519,7 @@ namespace Business
                 }
             }
             CurrentHP -= attackReport.Damage;
-            if (CurrentHP <= 0)
+            if (CurrentHP < 0)
                 CurrentHP = 0;
             attackReport.DefenderRemainingHP = CurrentHP;
         }
@@ -496,7 +533,7 @@ namespace Business
             int finalEvasion = baseEvasion + factor;
             if (finalEvasion > 90)
                 finalEvasion = 90;
-            int evadResult = seedEvasion.Next(101);
+            int evadResult = seed.Next(101);
             if (evadResult <= finalEvasion)
                 return (true);
             return (false);
@@ -511,15 +548,21 @@ namespace Business
             int finalParry = baseParry + factor;
             if (finalParry > 90)
                 finalParry = 90;
-            int parryResult = seedParry.Next(101);
+            int parryResult = seed.Next(101);
             if (parryResult <= finalParry)
                 return (true);
             return (false);
         }
 
+        /// <summary>
+        /// Attack the target with a weapon
+        /// </summary>
+        /// <param name="handGear">The weapon</param>
+        /// <param name="CurrentMinAttack"></param>
+        /// <param name="CurrentMaxAttack"></param>
+        /// <returns>Returns the report of the attack</returns>
         protected AttackReport AnyHandAttack(HandGear handGear, int CurrentMinAttack, int CurrentMaxAttack)
         {
-            //string report = "";
             AttackReport attackReport = new AttackReport
             {
                 AttackerName = Name,
@@ -549,23 +592,12 @@ namespace Business
             if (CurrentRightMinAttack > 0
                 || CurrentRightMaxAttack > 0)
                 attackReports.Add(AnyHandAttack(RightHand, CurrentRightMinAttack, CurrentRightMaxAttack));
-
+            //If the target is still alive and the character can use the left hand, another attack is done
             if (Target.CurrentHP > 0
                 && (CurrentLeftMinAttack > 0
                 || CurrentLeftMaxAttack > 0))
                 attackReports.Add(AnyHandAttack(LeftHand, CurrentLeftMinAttack, CurrentLeftMaxAttack));
             return (attackReports);
-        }
-
-        public virtual string Stats()
-        {
-            string result = "=== Name : " + Name + " === HP : " + CurrentHP + "/" + HP + " === Damages : Right hand [" + CurrentRightMinAttack + " - " + CurrentRightMaxAttack + "]";
-            if (CurrentLeftMinAttack > 0
-                || CurrentLeftMaxAttack > 0)
-                result += " Left hand [" + CurrentLeftMinAttack + " - " + CurrentLeftMaxAttack + "]";
-            result += " === Level : " + _level + " ===\n";
-
-            return (result);
         }
 
         public void BuildSkillTree()
@@ -620,7 +652,8 @@ namespace Business
                                 TimeBeforeNextTick = dot.Frequency,
                                 Quantity = dot.Quantity,
                                 RemainingQuantity = dot.Quantity,
-                                Type = dot.Type
+                                Type = dot.Type,
+                                Name = dot.Type.ToString()
                             });
                         }
                     }

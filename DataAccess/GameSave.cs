@@ -1,35 +1,25 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess
 {
-    public class GameSave
+    public class GameSave : JsonLoader
     {
-        string SaveFolder;
-        string SaveFile;
         public List<PlayerSave> playerSaves = new List<PlayerSave>();
 
-        public GameSave()
+        public GameSave() : base(new List<string>
         {
-            SaveFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Saved Games");
-            SaveFolder = Path.Combine(SaveFolder, "SomeRPG");
-            SaveFile = Path.Combine(SaveFolder, "save.json");
-        }
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            "Saved Games",
+            "SomeRPG"
+        }, "save.json")
+        { }
 
         public void Load()
         {
-            
-            if (Directory.Exists(SaveFolder)
-                && File.Exists(SaveFile))
-            {
-                playerSaves = JsonConvert.DeserializeObject<List<PlayerSave>>(File.ReadAllText(SaveFile));
-            }
+            playerSaves = Load<List<PlayerSave>>();
         }
 
         public void Save(PlayerSave playerSave)
@@ -40,22 +30,20 @@ namespace DataAccess
                 && playerSaves.Count > 0)
             {
                 for (int i = 0; i < playerSaves.Count; ++i)
-                {
                     if (playerSaves[i].Name == playerSave.Name)
                     {
                         playerSaves[i] = playerSave;
                         playerFound = true;
                     }
-                }
             }
             else
             {
-                var di = Directory.CreateDirectory(SaveFolder);
+                var di = Directory.CreateDirectory(JsonFolder);
                 playerSaves = new List<PlayerSave>();
             }
             if (!playerFound)
                 playerSaves.Add(playerSave);
-            using (StreamWriter file = File.CreateText(SaveFile))
+            using (StreamWriter file = File.CreateText(JsonFile))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 serializer.Serialize(file, playerSaves);

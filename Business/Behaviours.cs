@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business
 {
@@ -42,16 +38,15 @@ namespace Business
         public Dictionary<string, object> SelectBehaviour()
         {
             var result = new Dictionary<string, object>();
-            foreach (var Event in events)
+            foreach (var EventsName in EventsNames)
             {
-                var name = Event.Key;
-                switch (name)
+                switch (EventsName)
                 {
                     case "InRange":
-                        if (events[name].Trigger<bool>(battle.player))
-                            result.Add(name, (events[name].ResultOk<List<AttackReport>>()));
-                        else if (events[name].resultko != null)
-                            result.Add(name, (events[name].ResultKo<int>(battle.player, battle.monster.Character.BaseCooldown)));
+                        if (events[EventsName].Trigger<bool>(battle.player))
+                            result.Add(EventsName, (events[EventsName].ResultOk<List<AttackReport>>()));
+                        else if (events[EventsName].resultko != null)
+                            result.Add(EventsName, (events[EventsName].ResultKo<int>(battle.player, battle.monster.Character.BaseCooldown)));
                         break;
                 }
             }

@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Configuration;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data.SQLite;
+using System.Data;
 
 namespace DataAccess
 {
-    public class DB
+    public abstract class DB
     {
         protected string ItemTable = "item";
         protected string MonsterTable = "monster";
@@ -52,17 +49,24 @@ namespace DataAccess
             catch { }
         }
 
-        protected void Open()
+        protected void GetDatas(string query, Dictionary<string, object> parameters, Action<SQLiteDataReader> callback)
         {
-            m_dbConnection = new SQLiteConnection(ConnectionString);
-            m_dbConnection.Open();
-        }
+            using (m_dbConnection = new SQLiteConnection(ConnectionString))
+            {
+                m_dbConnection.Open();
+                using (SQLiteCommand command = m_dbConnection.CreateCommand())
+                {
+                    command.CommandText = query;
+                    command.CommandType = CommandType.Text;
+                    if (parameters != null)
+                        foreach (var parameter in parameters)
+                            command.Parameters.AddWithValue(parameter.Key, parameter.Value);
+                    SQLiteDataReader reader = command.ExecuteReader();
 
-        protected void Close()
-        {
-            m_dbConnection.Close();
-
-            m_dbConnection = null;
+                    while (reader.Read())
+                        callback(reader);
+                }
+            }
         }
     }
 }

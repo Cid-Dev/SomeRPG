@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace DataAccess
 {
     public class InventorySave
     {
-        public List<HPPotionsSave> HPPotions = new List<HPPotionsSave>();
-        public List<WeaponsSave> Weapons = new List<WeaponsSave>();
-        public List<ChestArmorSave> ChestArmors = new List<ChestArmorSave>();
-        public List<LegsArmorSave> LegsArmors = new List<LegsArmorSave>();
-        public List<SleevesArmorSave> SleevesArmors = new List<SleevesArmorSave>();
-        public List<FeetArmorSave> FeetArmors = new List<FeetArmorSave>();
-        public List<HandsArmorSave> HandsArmors = new List<HandsArmorSave>();
-        public List<HeadArmorSave> HeadArmors = new List<HeadArmorSave>();
-        public List<StatusEffectPotionSave> StatusEffectPotions = new List<StatusEffectPotionSave>();
+        public List<StackableSave> HPPotions = new List<StackableSave>();
+        public List<ItemSave> Weapons = new List<ItemSave>();
+        public List<ItemSave> ChestArmors = new List<ItemSave>();
+        public List<ItemSave> LegsArmors = new List<ItemSave>();
+        public List<ItemSave> SleevesArmors = new List<ItemSave>();
+        public List<ItemSave> FeetArmors = new List<ItemSave>();
+        public List<ItemSave> HandsArmors = new List<ItemSave>();
+        public List<ItemSave> HeadArmors = new List<ItemSave>();
+        public List<StackableSave> StatusEffectPotions = new List<StackableSave>();
     }
 }

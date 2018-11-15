@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Business
 {
@@ -18,35 +15,42 @@ namespace Business
         /// Some melee weapons can have longer range (Hasts...)
         /// </summary>
         public int Range { get; set; }
+        /// <summary>
+        /// Used to define if that weapon is going to be worn on the right hand
+        /// </summary>
         public bool IsTargetingRightHand = true;
+
+        private void BuildWeapon(List<object> temp)
+        {
+            if (temp != null)
+            {
+                foreach (var dalWeapon in temp)
+                {
+                    Id = int.Parse(dalWeapon?.GetType().GetProperty("Id")?.GetValue(dalWeapon, null).ToString());
+                    Name = dalWeapon?.GetType().GetProperty("Name")?.GetValue(dalWeapon, null).ToString();
+                    Description = dalWeapon?.GetType().GetProperty("Description")?.GetValue(dalWeapon, null).ToString();
+                    MinDamageBonus = int.Parse(dalWeapon?.GetType().GetProperty("MinDamageBonus")?.GetValue(dalWeapon, null).ToString());
+                    MaxDamageBonus = int.Parse(dalWeapon?.GetType().GetProperty("MaxDamageBonus")?.GetValue(dalWeapon, null).ToString());
+                    Range = int.Parse(dalWeapon?.GetType().GetProperty("Range")?.GetValue(dalWeapon, null).ToString());
+                    isTwoHand = bool.Parse(dalWeapon?.GetType().GetProperty("isTwoHand")?.GetValue(dalWeapon, null).ToString());
+                    if (Enum.TryParse(dalWeapon?.GetType().GetProperty("TypeName")?.GetValue(dalWeapon, null).ToString(), out WeaponType weaponType))
+                        TypeName = weaponType;
+                    else
+                        throw new Exception("Invalid weapon type");
+                    if (Enum.TryParse(dalWeapon?.GetType().GetProperty("WeaponClass")?.GetValue(dalWeapon, null).ToString(), out WeaponClass weaponClass))
+                        WeaponClass = weaponClass;
+                    else
+                        throw new Exception("Invalid weapon class");
+                }
+            }
+        }
 
         public Weapon(int id)
         {
             try
             {
                 DataAccess.Weapon DalWeapon = new DataAccess.Weapon();
-                var temp = DalWeapon.GetWeaponById(id);
-                if (temp != null)
-                {
-                    foreach (var dalWeapon in temp)
-                    {
-                        Id = int.Parse(dalWeapon?.GetType().GetProperty("Id")?.GetValue(dalWeapon, null).ToString());
-                        Name = dalWeapon?.GetType().GetProperty("Name")?.GetValue(dalWeapon, null).ToString();
-                        Description = dalWeapon?.GetType().GetProperty("Description")?.GetValue(dalWeapon, null).ToString();
-                        MinDamageBonus = int.Parse(dalWeapon?.GetType().GetProperty("MinDamageBonus")?.GetValue(dalWeapon, null).ToString());
-                        MaxDamageBonus = int.Parse(dalWeapon?.GetType().GetProperty("MaxDamageBonus")?.GetValue(dalWeapon, null).ToString());
-                        Range = int.Parse(dalWeapon?.GetType().GetProperty("Range")?.GetValue(dalWeapon, null).ToString());
-                        isTwoHand = bool.Parse(dalWeapon?.GetType().GetProperty("isTwoHand")?.GetValue(dalWeapon, null).ToString());
-                        if (Enum.TryParse(dalWeapon?.GetType().GetProperty("TypeName")?.GetValue(dalWeapon, null).ToString(), out WeaponType weaponType))
-                            TypeName = weaponType;
-                        else
-                            throw new Exception("Invalid weapon type");
-                        if (Enum.TryParse(dalWeapon?.GetType().GetProperty("WeaponClass")?.GetValue(dalWeapon, null).ToString(), out WeaponClass weaponClass))
-                            WeaponClass = weaponClass;
-                        else
-                            throw new Exception("Invalid weapon class");
-                    }
-                }
+                BuildWeapon(DalWeapon.GetWeapon(id));
             }
             catch (Exception ex)
             {
@@ -59,33 +63,10 @@ namespace Business
             try
             {
                 DataAccess.Weapon DalWeapon = new DataAccess.Weapon();
-                var temp = DalWeapon.GetWeaponByName(name);
-                if (temp != null)
-                {
-                    foreach (var dalWeapon in temp)
-                    {
-                        Id = int.Parse(dalWeapon?.GetType().GetProperty("Id")?.GetValue(dalWeapon, null).ToString());
-                        Name = dalWeapon?.GetType().GetProperty("Name")?.GetValue(dalWeapon, null).ToString();
-                        Description = dalWeapon?.GetType().GetProperty("Description")?.GetValue(dalWeapon, null).ToString();
-                        MinDamageBonus = int.Parse(dalWeapon?.GetType().GetProperty("MinDamageBonus")?.GetValue(dalWeapon, null).ToString());
-                        MaxDamageBonus = int.Parse(dalWeapon?.GetType().GetProperty("MaxDamageBonus")?.GetValue(dalWeapon, null).ToString());
-                        Range = int.Parse(dalWeapon?.GetType().GetProperty("Range")?.GetValue(dalWeapon, null).ToString());
-                        isTwoHand = bool.Parse(dalWeapon?.GetType().GetProperty("isTwoHand")?.GetValue(dalWeapon, null).ToString());
-                        if (Enum.TryParse(dalWeapon?.GetType().GetProperty("TypeName")?.GetValue(dalWeapon, null).ToString(), out WeaponType weaponType))
-                            TypeName = weaponType;
-                        else
-                            throw new Exception("Invalid weapon type");
-                        if (Enum.TryParse(dalWeapon?.GetType().GetProperty("WeaponClass")?.GetValue(dalWeapon, null).ToString(), out WeaponClass weaponClass))
-                            WeaponClass = weaponClass;
-                        else
-                            throw new Exception("Invalid weapon class");
-                    }
-                }
-
+                BuildWeapon(DalWeapon.GetWeapon(name));
             }
             catch (Exception ex)
             {
-                //Debug.WriteLine(ex.Message);
                 throw ex;
             }
         }

@@ -8,80 +8,28 @@ using System.Threading.Tasks;
 
 namespace DataAccess
 {
-    public class LegsArmor : DB
+    public class LegsArmor : Armor
     {
-        public List<object> GetLegsArmorById(int id)
+        public List<object> GetLegsArmor(int id)
         {
-            List<object> LegsArmor = new List<object>();
-            using (m_dbConnection = new SQLiteConnection(ConnectionString))
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
-                m_dbConnection.Open();
-                using (SQLiteCommand command = m_dbConnection.CreateCommand())
-                {
-                    command.CommandText = "SELECT a.id AS id, a.defense AS defense, i.name AS name, i.description AS description, t.name AS type_name, t.absorbency as absorbency FROM " + LegsArmorTable + " a "
-                                        + "INNER JOIN " + ItemTable + " i "
-                                        + "ON a.item_id=i.id "
-                                        + "INNER JOIN " + ArmorTypeTable + " t "
-                                        + "ON a.armortype_id=t.id "
-                                        + "WHERE a.id = @id "
-                                        + "LIMIT 1";
-                    command.CommandType = CommandType.Text;
-                    command.Parameters.AddWithValue("@id", id);
-                    SQLiteDataReader reader = command.ExecuteReader();
+                { "@id", id }
+            };
+            GetArmors("a.id", "@id", LegsArmorTable, parameters);
 
-                    while (reader.Read())
-                    {
-                        //Debug.WriteLine("Name: " + reader["name"] + "\tDescription: " + reader["description"] + "\tAmount: " + reader["amount"] + "\tMaxAmount: " + reader["max_amount"]);
-                        LegsArmor.Add(new
-                        {
-                            Id = reader["id"],
-                            Name = reader["name"],
-                            Description = reader["description"],
-                            ArmorTypeName = reader["type_name"],
-                            Absorbency = reader["absorbency"],
-                            Defense = reader["defense"]
-                        });
-                    }
-                }
-            }
-            return (LegsArmor);
+            return (Armors);
         }
 
-        public List<object> GetLegsArmorByName(string name)
+        public List<object> GetLegsArmor(string name)
         {
-            List<object> LegsArmor = new List<object>();
-            using (m_dbConnection = new SQLiteConnection(ConnectionString))
+            Dictionary<string, object> parameters = new Dictionary<string, object>
             {
-                m_dbConnection.Open();
-                using (SQLiteCommand command = m_dbConnection.CreateCommand())
-                {
-                    command.CommandText = "SELECT a.id AS id, a.defense AS defense, i.name AS name, i.description AS description, t.name AS type_name, t.absorbency as absorbency FROM " + LegsArmorTable + " a "
-                                        + "INNER JOIN " + ItemTable + " i "
-                                        + "ON a.item_id=i.id "
-                                        + "INNER JOIN " + ArmorTypeTable + " t "
-                                        + "ON a.armortype_id=t.id "
-                                        + "WHERE i.name = @name "
-                                        + "LIMIT 1";
-                    command.CommandType = CommandType.Text;
-                    command.Parameters.AddWithValue("@name", name);
-                    SQLiteDataReader reader = command.ExecuteReader();
+                { "@name", name }
+            };
+            GetArmors("i.name", "@name", LegsArmorTable, parameters);
 
-                    while (reader.Read())
-                    {
-                        //Debug.WriteLine("Name: " + reader["name"] + "\tDescription: " + reader["description"] + "\tAmount: " + reader["amount"] + "\tMaxAmount: " + reader["max_amount"]);
-                        LegsArmor.Add(new
-                        {
-                            Id = reader["id"],
-                            Name = reader["name"],
-                            Description = reader["description"],
-                            ArmorTypeName = reader["type_name"],
-                            Absorbency = reader["absorbency"],
-                            Defense = reader["defense"]
-                        });
-                    }
-                }
-            }
-            return (LegsArmor);
+            return (Armors);
         }
     }
 }
